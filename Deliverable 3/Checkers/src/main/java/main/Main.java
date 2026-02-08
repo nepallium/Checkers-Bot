@@ -54,7 +54,7 @@ public class Main {
          */
     }
 
-    public static void printConvolution(ConvolutionalLayer layer, int[][][] board) {
+    public static void printConvolution(ConvolutionalLayer layer, double[][][] board) {
         double[][][] ans = layer.forward(board);
 
         for (int i = 0; i < ans.length; i++) {

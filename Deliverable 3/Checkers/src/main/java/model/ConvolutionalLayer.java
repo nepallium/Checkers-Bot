@@ -35,7 +35,7 @@ public class ConvolutionalLayer {
         this.kernels = new double[numInAndOut][channels][width][height];
     }
 
-    public double[][][] forward(int[][][] board) {
+    public double[][][] forward(double[][][] board) {
         double[][][] ans = new double[kernels.length][8][8];
 
         for (int m = 0; m < kernels.length; m++) { // num of kernels/filters per layer
