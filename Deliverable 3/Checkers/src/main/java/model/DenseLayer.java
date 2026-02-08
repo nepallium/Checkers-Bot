@@ -56,26 +56,6 @@ public class DenseLayer {
         }
     }
 
-    public double[] softmax(double[] input) {
-        double max = input[0];
-
-        for (int i = 1; i < input.length; i++) {
-            if (input[i] > max) max = input[i];
-        }
-
-        double eSum = 0;
-        for (int i = 0; i < outputSize; i++) {
-            input[i] = Math.exp(input[i] - max);
-            eSum += input[i];
-        }
-
-        for (int i = 0; i < outputSize; i++) {
-            input[i] = Math.exp(input[i]) / eSum;
-        }
-
-        return input;
-    }
-
     public double[] applyFilter(double[] inputVector, Function<Double, Double> finalValueFunc) {
         double[] outputVect = new double[outputSize];
         for (int i = 0; i < outputSize; i++) {
@@ -108,7 +88,7 @@ public class DenseLayer {
             outputVect[i] = outputVect[i] + bias[i];
         }
 
-        return softmax(outputVect);
+        return Activation.softmax(outputVect);
     }
 
     public double valueOutput(double[] inputVector) {
