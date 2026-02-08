@@ -14,7 +14,7 @@ public class ConvolutionalLayer {
     public ConvolutionalLayer(int numInAndOut, int channels, int width, int height) {
         this.kernels = new double[numInAndOut][channels][width][height];
 
-        Random random = new Random();
+        Random random = new Random();   
 
         double fan_in = kernels[0].length * kernels[0][0].length * kernels[0][0][0].length;
 

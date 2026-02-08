@@ -6,9 +6,10 @@ import java.io.FileReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.function.Function;
 
 public class DenseLayer {
-    private double[][] weights;
+    private double[][] weights ;
     private double[] bias;
     private int inputSize;
     private int outputSize;
@@ -77,6 +78,17 @@ public class DenseLayer {
         }
 
         return input;
+    }
+
+    public double[] applyFilter(double[] inputVector, Function<Double, Double> finalValueFunc) {
+        double[] outputVect = new double[outputSize];
+        for (int i = 0; i < outputSize; i++) {
+            for(int j = 0; j < inputSize; j++) {
+                outputVect[i] += inputVector[j] * weights[i][j];
+            }
+            outputVect[i] = finalValueFunc == null ? outputVect[i] + bias[i] : finalValueFunc.apply(outputVect[i] + bias[i]);
+        }
+        return outputVect;
     }
 
     public double[] forward(double[] inputVector) {
