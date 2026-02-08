@@ -1,5 +1,5 @@
 package game;
-
+/* DEPRECATED - moved to Coordinate class
 public class Rules {
 
 
@@ -13,3 +13,4 @@ public class Rules {
         return (r + c) % 2 == 1;
     }
 }
+*/
