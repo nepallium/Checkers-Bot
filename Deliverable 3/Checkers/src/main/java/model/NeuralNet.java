@@ -52,9 +52,7 @@ public class NeuralNet {
      * @return the policy and value heads
      */
     public PolicyValue forward(Board boardObj) {
-//        TODO use actual board obj
-        double[][][] board = new double[4][8][8];
-
+        double[][][] board = boardObj.splitBoardChannels();
 
         // CONVOLUTIONAL LAYERS
         // numFeatureMaps (m) * 8 * 8, featureMaps[m][r][c] == how strongly pattern m is present around square (r, c)

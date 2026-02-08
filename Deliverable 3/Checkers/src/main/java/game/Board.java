@@ -1,8 +1,6 @@
 package game;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Board {
@@ -62,8 +60,9 @@ public class Board {
 
     /**
      * Gets the action space of the piece
-     * @param coordinate coordinate of the piece
-     * @param piece the value of the piece (1 for man, 2 for king, positive for white, negative for black)
+     *
+     * @param coordinate       coordinate of the piece
+     * @param piece            the value of the piece (1 for man, 2 for king, positive for white, negative for black)
      * @param previousCaptures [used for recursion], stores the previous captures made by the piece (if the move follows a capture)
      * @return a list of possible moves for the piece
      */
@@ -97,6 +96,7 @@ public class Board {
 
     /**
      * Gets the action space for every peace for a player
+     *
      * @param whiteToMove the player to find actions for
      * @return a list of every possible move
      */
@@ -132,33 +132,47 @@ public class Board {
     public int getPieceAt(Coordinate coords) {
         return cells[coords.getYIndex()][coords.getXIndex()];
     }
-    /* DEPRECATED - board is now 8x8 array
-    public static int idx(int r, int c) {
-        return r * 8 + c;
-    }
 
-    public static int row(int idx) {
-        return idx / 8;
-    }
-
-    public static int col(int idx) {
-        return idx % 8;
-    }
-    */
-
-    /*
-     * DEPRECATED - board is now 8x8 array
-     * Applies a move to a board and returns a new board
-     * Assumes the move is already legal
-     * @param move a legal move
-     * @return the new board state
-
-    public Board applyMove(Move move) {
-    cells[move.to] = move.from;
-
-    currentPlayer = -currentPlayer;
-
-    return new Board(cells, currentPlayer);
-    }
+    /**
+     * Splits the board cells into 4 channels:
+     * 0: ALLY men
+     * 1: ALLY king
+     * 2: OPPONENT men
+     * 3: OPPONENT king
+     *
+     * Ally / Opponent assumes that it is from the currentPlayer's POV
+     *
+     * @return the board with pieces split into 4 channels
      */
+    public double[][][] splitBoardChannels() {
+        double[][][] board = new double[4][8][8];
+
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                int val = cells[r][c];
+
+                // ALLY men
+                if (val == 1) {
+                    board[0][r][c] = 1;
+                }
+
+                // ALLY king
+                else if (val == 2) {
+                    board[1][r][c] = 1;
+                }
+
+                // OPPONENT men
+                else if (val == -1) {
+                    board[2][r][c] = 1;
+                }
+
+                // OPPONENT king
+                else if (val == -2) {
+                    board[3][r][c] = 1;
+                }
+            }
+        }
+
+        return board;
+    }
 }
