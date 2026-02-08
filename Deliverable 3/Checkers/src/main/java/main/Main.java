@@ -1,14 +1,22 @@
 package main;
 
+import game.Board;
+import game.Coordinate;
+import game.Move;
 import model.ConvolutionalLayer;
 import model.DenseLayer;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
-
+        Board b = new Board();
+        System.out.println(b);
+        List<Move> globalActionSpace =b.getGlobalActionSpace(true);
+        globalActionSpace.forEach(System.out::println);
+        /*
         long startTime = System.nanoTime();
 
         System.out.println("START TIME: " + startTime / 1000000);
@@ -42,6 +50,8 @@ public class Main {
         long endTime = System.nanoTime();
 
         System.out.println("Time taken: " + ((endTime - startTime) / 1000000));
+
+         */
     }
 
     public static void printConvolution(ConvolutionalLayer layer, int[][][] board) {
