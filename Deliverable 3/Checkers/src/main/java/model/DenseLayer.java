@@ -35,9 +35,18 @@ public class DenseLayer {
             int fileInputSize = dis.readInt();
             int fileOutputSize = dis.readInt();
 
+<<<<<<< HEAD
             this.weights = new double[fileOutputSize][fileInputSize];
             this. = new double[fileOutputSize];
 
+=======
+            this.inputSize = fileInputSize;
+            this.outputSize = fileOutputSize;
+
+            this.weights = new double[fileOutputSize][fileInputSize];
+            this.bias = new double[fileOutputSize];
+
+>>>>>>> 56fa8b1f0cf4e442999f25925d1021aed2657ee8
             for (int i = 0; i < fileOutputSize; i++) {
                 for (int j = 0; j < fileInputSize; j++) {
                     weights[i][j] = dis.readDouble();
@@ -55,10 +64,23 @@ public class DenseLayer {
     }
 
     public double[] softmax(double[] input) {
+<<<<<<< HEAD
 
         double eSum = 0;
         for (int i = 0; i < outputSize; i++) {
             eSum += Math.exp(input[i]);
+=======
+        double max = input[0];
+
+        for (int i = 1; i < input.length; i++) {
+            if (input[i] > max) max = input[i];
+        }
+
+        double eSum = 0;
+        for (int i = 0; i < outputSize; i++) {
+            input[i] = Math.exp(input[i] - max);
+            eSum += input[i];
+>>>>>>> 56fa8b1f0cf4e442999f25925d1021aed2657ee8
         }
 
         for (int i = 0; i < outputSize; i++) {
@@ -68,7 +90,10 @@ public class DenseLayer {
         return input;
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 56fa8b1f0cf4e442999f25925d1021aed2657ee8
     public double[] forward(double[] inputVector) {
         double[] outputVect = new double[outputSize];
         for (int i = 0; i < outputSize; i++) {
@@ -94,6 +119,18 @@ public class DenseLayer {
     }
 
     public double valueOutput(double[] inputVector) {
+<<<<<<< HEAD
         
+=======
+        double[] outputVect = new double[outputSize];
+        for (int i = 0; i < outputSize; i++) {
+            for(int j = 0; j < inputSize; j++) {
+                outputVect[i] += inputVector[j] * weights[i][j];
+            }
+            outputVect[i] = outputVect[i] + bias[i];
+        }
+        
+        return Math.tanh(outputVect[0]);
+>>>>>>> 56fa8b1f0cf4e442999f25925d1021aed2657ee8
     }
 }
