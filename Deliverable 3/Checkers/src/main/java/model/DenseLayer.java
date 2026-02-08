@@ -56,10 +56,6 @@ public class DenseLayer {
         }
     }
 
-    public double ReLu(double x) {
-        return Math.max(0, x);
-    }
-
     public double[] softmax(double[] input) {
         double max = input[0];
 
@@ -97,7 +93,7 @@ public class DenseLayer {
             for(int j = 0; j < inputSize; j++) {
                 outputVect[i] += inputVector[j] * weights[i][j];
             }
-            outputVect[i] = ReLu(outputVect[i] + bias[i]);
+            outputVect[i] = Activation.relu(outputVect[i] + bias[i]);
         }
 
         return outputVect;
