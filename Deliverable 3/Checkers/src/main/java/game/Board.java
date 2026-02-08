@@ -139,7 +139,7 @@ public class Board {
      * 1: ALLY king
      * 2: OPPONENT men
      * 3: OPPONENT king
-     *
+     * <p>
      * Ally / Opponent assumes that it is from the currentPlayer's POV
      *
      * @return the board with pieces split into 4 channels

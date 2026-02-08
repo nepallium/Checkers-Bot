@@ -42,7 +42,8 @@ public class ConvolutionalLayer {
             for (int r = 0; r < board[0].length; r++) { // current row
                 for (int c = 0; c < board[0][0].length; c++) { // current column
 
-                    double sum = bias[m]; // bias applied to every index in the board (per filter)
+//                    double sum = bias[m]; // bias applied to every index in the board (per filter)
+                    double sum = 0;
 
                     for (int channel = 0; channel < board.length; channel++) { // num of channels per board/kernel (must be the same)
                         for (int i = 0; i < kernels[m][channel].length; i++) { // current row (of filter)
