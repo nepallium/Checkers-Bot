@@ -41,9 +41,9 @@ public class ConvolutionalLayer {
                     for (int m = 0; m < kernels.length; m++) {
                         for (int i = 0; i < kernels[m][channel].length; i++) {
                             for (int j = 0; j < kernels[m][channel][i].length; j++) {
-                                ans[m][w][h] += ((w - 1 + i) >= 0 && (w - 1 + i) < board[m].length
-                                && (h - 1 + j ) >= 0 && (h - 1 + j) < board[m][w].length)
-                                        ? board[m][w - 1 + i][h - 1 + j] * kernels[m][channel][i][j]
+                                ans[m][w][h] += ((w - 1 + i) >= 0 && (w - 1 + i) < board[channel].length
+                                && (h - 1 + j ) >= 0 && (h - 1 + j) < board[channel][w].length)
+                                        ? board[channel][w - 1 + i][h - 1 + j] * kernels[m][channel][i][j]
                                         : 0;
                             }
                         }
