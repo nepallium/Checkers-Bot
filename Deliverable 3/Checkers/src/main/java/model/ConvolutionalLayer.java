@@ -16,11 +16,15 @@ public class ConvolutionalLayer {
 
         Random random = new Random();
 
+        double fan_in = kernels[0].length * kernels[0][0].length * kernels[0][0][0].length;
+
+        double std = Math.sqrt(2 / fan_in);
+
         for (int i = 0; i < kernels.length; i++) {
             for (int j = 0; j < kernels[i].length; j++) {
                 for (int k = 0; k < kernels[i][j].length; k++) {
                     for (int l = 0; l < kernels[i][j][k].length; l++) {
-                        kernels[i][j][k][l] = random.nextGaussian();
+                        kernels[i][j][k][l] = random.nextGaussian() * std;
                     }
                 }
             }
@@ -34,25 +38,32 @@ public class ConvolutionalLayer {
     public double[][][] forward(int[][][] board) {
         double[][][] ans = new double[kernels.length][8][8];
 
-        for (int channel = 0; channel < board.length; channel++) {
-            for (int w = 0; w < board[channel].length; w++) {
-                for (int h = 0; h < board[channel][w].length; h++) {
+        for (int m = 0; m < kernels.length; m++) { // num of kernels/filters per layer
+            for (int r = 0; r < board[0].length; r++) { // current row
+                for (int c = 0; c < board[0][0].length; c++) { // current column
 
-                    for (int m = 0; m < kernels.length; m++) {
-                        for (int i = 0; i < kernels[m][channel].length; i++) {
-                            for (int j = 0; j < kernels[m][channel][i].length; j++) {
-                                ans[m][w][h] += ((w - 1 + i) >= 0 && (w - 1 + i) < board[channel].length
-                                && (h - 1 + j ) >= 0 && (h - 1 + j) < board[channel][w].length)
-                                        ? board[channel][w - 1 + i][h - 1 + j] * kernels[m][channel][i][j]
-                                        : 0;
+                    double sum = bias[m]; // bias applied to every index in the board (per filter)
+
+                    for (int channel = 0; channel < board.length; channel++) { // num of channels per board/kernel (must be the same)
+                        for (int i = 0; i < kernels[m][channel].length; i++) { // current row (of filter)
+                            for (int j = 0; j < kernels[m][channel][i].length; j++) { // current column (of filter)
+
+                                int x = r - 1 + i; // centers filter around the current index of the board
+                                int y = c - 1 + j; // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+                                if (x >= 0 && x < board[channel].length && // check horizontal bound
+                                        y >= 0 && y < board[channel][0].length) { // check vertical bound
+                                    sum += board[channel][x][y] * kernels[m][channel][i][j]; // add product
+                                }
                             }
                         }
-//                        ans[m][w][h] += bias[m];
                     }
 
+                    ans[m][r][c] = Activation.relu(sum);
                 }
             }
         }
+
 
         return ans;
     }
