@@ -1,15 +1,12 @@
-package model;
-
 import java.util.Random;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.function.Function;
 
 public class DenseLayer {
-    private double[][] weights ;
+    private double[][] weights;
     private double[] bias;
     private int inputSize;
     private int outputSize;
@@ -23,7 +20,7 @@ public class DenseLayer {
         Random random = new Random();   
 
         for (int i = 0; i < outputSize; i++) {
-            bias[i] = random.nextGaussian() * Math.sqrt(2.0 / inputSize);
+            bias[i] = 0;
 
             for (int j = 0; j < inputSize; j++) {
                 weights[i][j] = random.nextGaussian() * Math.sqrt(2.0 / inputSize);
@@ -42,29 +39,38 @@ public class DenseLayer {
             this.outputSize = fileOutputSize;
 
             this.weights = new double[fileOutputSize][fileInputSize];
-            this.bias = new double[fileOutputSize];
 
             for (int i = 0; i < fileOutputSize; i++) {
+                this.bias[i] = 0;
                 for (int j = 0; j < fileInputSize; j++) {
                     weights[i][j] = dis.readDouble();
                 }
             }
-            
-            for (int i = 0; i < fileOutputSize; i++) {
-                bias[i] = dis.readDouble();
-            }
         }
     }
 
-    public double[] applyFilter(double[] inputVector, Function<Double, Double> finalValueFunc) {
-        double[] outputVect = new double[outputSize];
-        for (int i = 0; i < outputSize; i++) {
-            for(int j = 0; j < inputSize; j++) {
-                outputVect[i] += inputVector[j] * weights[i][j];
-            }
-            outputVect[i] = finalValueFunc == null ? outputVect[i] + bias[i] : finalValueFunc.apply(outputVect[i] + bias[i]);
+    public double ReLu(double x) {
+        return Math.max(0, x);
+    }
+
+    public double[] softmax(double[] input) {
+        double max = input[0];
+
+        for (int i = 1; i < input.length; i++) {
+            if (input[i] > max) max = input[i];
         }
-        return outputVect;
+
+        double eSum = 0;
+        for (int i = 0; i < outputSize; i++) {
+            input[i] = Math.exp(input[i] - max);
+            eSum += input[i];
+        }
+
+        for (int i = 0; i < outputSize; i++) {
+            input[i] = Math.exp(input[i]) / eSum;
+        }
+
+        return input;
     }
 
     public double[] forward(double[] inputVector) {
@@ -73,7 +79,7 @@ public class DenseLayer {
             for(int j = 0; j < inputSize; j++) {
                 outputVect[i] += inputVector[j] * weights[i][j];
             }
-            outputVect[i] = Activation.relu(outputVect[i] + bias[i]);
+            outputVect[i] = ReLu(outputVect[i] + bias[i]);
         }
 
         return outputVect;
@@ -88,7 +94,7 @@ public class DenseLayer {
             outputVect[i] = outputVect[i] + bias[i];
         }
 
-        return Activation.softmax(outputVect);
+        return softmax(outputVect);
     }
 
     public double valueOutput(double[] inputVector) {
