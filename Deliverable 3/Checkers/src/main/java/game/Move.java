@@ -16,7 +16,7 @@ public class Move{
         this.actions = new ArrayList<>();
         Coordinate lastCoordinate = start;
         for (Coordinate capture : captureCoordinates) {
-            Coordinate endCoordinate = lastCoordinate.addedWith(capture.getSubstracted(lastCoordinate));
+            Coordinate endCoordinate = lastCoordinate.addedWith(capture.getSubtracted(lastCoordinate));
             actions.add(new Action(lastCoordinate, endCoordinate));
             lastCoordinate = endCoordinate;
 
