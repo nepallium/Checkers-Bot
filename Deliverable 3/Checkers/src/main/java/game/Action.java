@@ -6,13 +6,14 @@ public class Action {
     private Coordinate start;
     private Coordinate destination;
 
+
     public Action(Coordinate start, Coordinate destination) {
         this.start = start;
         this.destination = destination;
     }
 
-    public Coordinate getDeltaCoordinates() {
-        return new Coordinate(destination.getXIndex() - start.getXIndex(), destination.getYIndex() - start.getYIndex());
+    public Coordinate getDeltaCoordinate() {
+        return new Coordinate(destination.getX() - start.getX(), destination.getY() - start.getY());
     }
 
     @Override
@@ -25,6 +26,14 @@ public class Action {
         if (o == null || getClass() != o.getClass()) return false;
         Action action = (Action) o;
         return Objects.equals(start, action.start) && Objects.equals(destination, action.destination);
+    }
+
+    public Coordinate getCaptureCoordinate() {
+        Coordinate deltaCoordinates = getDeltaCoordinate();
+        if (deltaCoordinates.getX() == 1) {
+            return null;
+        }
+        return getStart().addedWith(deltaCoordinates.halved());
     }
 
     @Override
@@ -148,7 +157,7 @@ public class Action {
             new Action(new Coordinate(5, 7), new Coordinate(6, 6)),
             new Action(new Coordinate(7, 7), new Coordinate(6, 6))
     ));
-    /*
+     /*
         //Get and print the global action space
         HashMap<Coordinate, Set<Action>> globalActionSpace = new HashMap<>();
         for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
