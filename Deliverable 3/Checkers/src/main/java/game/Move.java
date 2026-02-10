@@ -4,23 +4,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Move extends Action{
+public class Move{
 
-    private List<Coordinate> captures;
+    private List<Action> actions;
 
-    public Move(Action action, List<Coordinate> captures) {
-        super(action.getStart(), action.getDestination());
-        this.captures = captures;
+    public Move(List<Action> actions) {
+        this.actions = actions;
     }
 
-    public Move(Coordinate start, Coordinate destination, List<Coordinate> captures) {
-        super(start, destination);
-        this.captures = captures;
+    public Move(Coordinate start, List<Coordinate> captureCoordinates) {
+        this.actions = new ArrayList<>();
+        Coordinate lastCoordinate = start;
+        for (Coordinate capture : captureCoordinates) {
+            Coordinate endCoordinate = lastCoordinate.addedWith(capture.getSubstracted(lastCoordinate));
+            actions.add(new Action(lastCoordinate, endCoordinate));
+            lastCoordinate = endCoordinate;
+
+        }
+    }
+
+    public Move(Action action) {
+        this.actions = List.of(action);
     }
 
     public Move(Coordinate start, Coordinate destination) {
-        this(start, destination, new ArrayList<>());
+        this.actions = List.of(new Action(start, destination));
     }
+
 
     @Override
     public String toString() {
@@ -32,23 +42,19 @@ public class Move extends Action{
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Move move = (Move) o;
-        return Objects.equals(captures, move.captures);
+        return Objects.equals(actions, move.actions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), captures);
+        return Objects.hash(super.hashCode(), actions);
     }
 
     public List<Coordinate> getCaptures() {
         return captures;
     }
 
-    public void setCaptures(List<Coordinate> captures) {
-        this.captures = captures;
-    }
-
     public boolean isCapture() {
-        return !this.captures.isEmpty();
+        return !(actions.size() >= 2);
     }
 }
