@@ -48,7 +48,7 @@ public class Action {
         this.start = start;
     }
 
-    public static Set<Action> globalActionSpace = Set.of(
+    public final static Set<Action> globalActionSpace = Set.of(
             new Action(new Coordinate(0, 0), new Coordinate(1, 1)),
             new Action(new Coordinate(2, 0), new Coordinate(3, 1)),
             new Action(new Coordinate(2, 0), new Coordinate(1, 1)),
