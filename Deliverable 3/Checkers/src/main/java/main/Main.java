@@ -1,11 +1,7 @@
 package main;
 
-import game.Action;
 import game.Board;
-import game.Coordinate;
-import game.Move;
 import model.ConvolutionalLayer;
-import model.DenseLayer;
 import model.NeuralNet;
 import model.PolicyValue;
 
