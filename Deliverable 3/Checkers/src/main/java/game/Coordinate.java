@@ -20,12 +20,12 @@ public class Coordinate {
     }
 
     public Coordinate addedWith(Coordinate addCoords) {
-        return new Coordinate(this.getXIndex() + addCoords.getXIndex(), this.getYIndex() + addCoords.getYIndex());
+        return new Coordinate(this.getX() + addCoords.getX(), this.getY() + addCoords.getY());
     }
 
     public List<Action> getPossibleManActions(boolean whiteToMove) {
         List<Action> actions = new ArrayList<>();
-        int toYIdx = getYIndex() + (whiteToMove ? 1 : -1);
+        int toYIdx = getY() + (whiteToMove ? 1 : -1);
         //No possible moves if is on an invalid square or at the end of the board
         if (isInvalid() || Coordinate.isIndexInvalid(toYIdx)) {
             return actions;
@@ -38,6 +38,19 @@ public class Coordinate {
             actions.add(new Action(this, new Coordinate(toXIdx, toYIdx)));
         }
         return actions;
+    }
+
+    /**
+     * Gets the change in coordinates
+     * @param other other coordinate C
+     * @return self - C
+     */
+    public Coordinate getSubtracted(Coordinate other) {
+        return new Coordinate(x - other.getX(), y - other.getY());
+    }
+
+    public Coordinate halved() {
+        return new Coordinate(x/2, y/2);
     }
 
     public List<Action> getPossibleKingActions() {
@@ -59,19 +72,19 @@ public class Coordinate {
         return x + 1;
     }
 
-    public int getYIndex() {
+    public int getY() {
         return y;
     }
 
-    public void setYIndex(int y) {
+    public void setY(int y) {
         this.y = y;
     }
 
-    public int getXIndex() {
+    public int getX() {
         return x;
     }
 
-    public void setXIndex(int x) {
+    public void setX(int x) {
         this.x = x;
     }
 
