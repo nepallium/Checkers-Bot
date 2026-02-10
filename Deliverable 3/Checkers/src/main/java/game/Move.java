@@ -34,7 +34,7 @@ public class Move{
 
     @Override
     public String toString() {
-        return String.format("Move<Start: %s, Destination: %s, Captures:%s>", super.getStart(), super.getDestination(), captures);
+        return String.format("Move:%s", actions.toString());
     }
 
     @Override
@@ -48,10 +48,6 @@ public class Move{
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), actions);
-    }
-
-    public List<Coordinate> getCaptures() {
-        return captures;
     }
 
     public boolean isCapture() {
