@@ -57,35 +57,78 @@ public class Board {
         return str;
     }
 
+    public void applyAction(Action action) {
+        Coordinate start = action.getStart();
+
+        int piece = getPieceAt(start);
+        if (piece == 0) {
+            return;
+        }
+        Coordinate destination = action.getDestination();
+        Coordinate capturedCoordinate = action.getCaptureCoordinate();
+        cells[start.getY()][start.getX()] = 0;
+        cells[destination.getY()][destination.getX()] = piece;
+        if (capturedCoordinate != null) {
+            cells[capturedCoordinate.getY()][capturedCoordinate.getX()] = 0;
+        }
+    }
+
 
     /**
      * Gets the action space of the piece
+     * @param coordinate coordinate of the piece
+     * @param piece the value of the piece (1 for man, 2 for king, positive for white, negative for black)
+     * @return a list of possible actions for the piece (or null if invalid arguments)
+     */
+    public List<Action> getPieceActionSpace(Coordinate coordinate, int piece) {
+        if (coordinate.isInvalid() || !isPieceValid(piece)) {
+            return null;
+        }
+        List<Action> actionSpace = new ArrayList<>();
+        List<Action> pieceActions = (Math.abs(piece) > 1 ? coordinate.getPossibleKingActions() : coordinate.getPossibleManActions(piece > 0));
+        for (Action action : pieceActions) {
+            Coordinate moveDestination = action.getDestination();
+            int destinationPiece = getPieceAt(moveDestination);
+            if (destinationPiece == 0) {
+                actionSpace.add(action);
+                continue;
+            }
+            Coordinate captureDestination = moveDestination.addedWith(action.getDeltaCoordinate());
+            if (arePiecesSameTeam(destinationPiece, piece) && getPieceAt(captureDestination) == 0) {
+                actionSpace.add(new Action(action.getStart(), captureDestination));
+            }
+        }
+        return actionSpace;
+    }
+
+    /**
+     * Gets the move space of the piece
      *
      * @param coordinate       coordinate of the piece
      * @param piece            the value of the piece (1 for man, 2 for king, positive for white, negative for black)
      * @param previousCaptures [used for recursion], stores the previous captures made by the piece (if the move follows a capture)
-     * @return a list of possible moves for the piece
+     * @return a list of possible moves for the piece (or null if invalid arguments)
      */
     public List<Move> getPieceMoveSpace(Coordinate coordinate, int piece, List<Coordinate> previousCaptures) {
+        if (coordinate.isInvalid() || !isPieceValid(piece)) {
+            return null;
+        }
         List<Move> moveSpace = new ArrayList<>();
-        List<Action> pieceMoves = (Math.abs(piece) > 1 ? coordinate.getPossibleKingActions() : coordinate.getPossibleManActions(piece > 0));
-        for (Action action : pieceMoves) {
+        List<Action> pieceActions = (Math.abs(piece) > 1 ? coordinate.getPossibleKingActions() : coordinate.getPossibleManActions(piece > 0));
+        for (Action action : pieceActions) {
             Coordinate moveDestination = action.getDestination();
-            if (moveDestination.isInvalid()) {
-                continue;
-            }
             int destinationPiece = getPieceAt(moveDestination);
             //if there is no piece on the square, the move is valid
             if (destinationPiece == 0 && (previousCaptures == null || previousCaptures.isEmpty())) {
-                moveSpace.add(new Move(action, null));
+                moveSpace.add(new Move(action));
                 continue;
             }
-            Coordinate captureDestination = action.getDestination().addedWith(action.getDeltaCoordinates());
-            //if there is a piece on the square, check if can be captured
+            Coordinate captureDestination = action.getDestination().addedWith(action.getDeltaCoordinate());
+            //if there is a piece on the square, check if it can be captured
             if (!captureDestination.isInvalid() && !arePiecesSameTeam(destinationPiece, piece)) {
                 List<Coordinate> captures = previousCaptures == null ? new ArrayList<>() : previousCaptures;
                 captures.add(action.getDestination());
-                moveSpace.add(new Move(action, captures));
+                moveSpace.add(new Move(action.getStart(), captures));
                 //after captures, can move again
                 List<Move> nextActionSpace = getPieceMoveSpace(captureDestination, piece, captures);
                 moveSpace.addAll(nextActionSpace);
@@ -95,10 +138,10 @@ public class Board {
     }
 
     /**
-     * Gets the action space for every peace for a player
+     * Gets the move space for every peace for a player
      *
      * @param whiteToMove the player to find actions for
-     * @return a list of every possible move
+     * @return a list of every possible move for the player
      */
     public List<Move> getGlobalMoveSpace(boolean whiteToMove) {
         List<Move> globalMoveSpace = new ArrayList<>();
@@ -117,20 +160,19 @@ public class Board {
         return globalMoveSpace;
     }
 
-    public List<Move> getActionSpaceForCoordinate(Coordinate coords) {
-        if (coords.isInvalid()) {
-            System.out.println("Invalid coords" + coords);
-            return new ArrayList<>();
-        }
-        return getPieceMoveSpace(coords, getPieceAt(coords), null);
+
+
+
+    public int getPieceAt(Coordinate coordinate) {
+        return cells[coordinate.getY()][coordinate.getX()];
     }
 
-    public boolean arePiecesSameTeam(int piece1, int piece2) {
+    public static boolean arePiecesSameTeam(int piece1, int piece2) {
         return piece1 > 0 == piece2 > 0 && !(piece1 == 0 || piece2 == 0);
     }
 
-    public int getPieceAt(Coordinate coords) {
-        return cells[coords.getYIndex()][coords.getXIndex()];
+    public static boolean isPieceValid(int piece) {
+        return piece > -3 && piece < 3 && piece != 0;
     }
 
     /**
@@ -140,7 +182,7 @@ public class Board {
      * 2: OPPONENT men
      * 3: OPPONENT king
      * <p>
-     * Ally / Opponent assumes that it is from the currentPlayer's POV
+     * Ally / Opponent assumes that it is from the white player's POV
      *
      * @return the board with pieces split into 4 channels
      */
@@ -172,7 +214,7 @@ public class Board {
                 }
             }
         }
-
         return board;
     }
+
 }
