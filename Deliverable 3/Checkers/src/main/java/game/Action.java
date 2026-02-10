@@ -48,7 +48,7 @@ public class Action {
         this.start = start;
     }
 
-    public final static Set<Action> globalActionSpace = Set.of(
+    public final static Set<Action> globalActionSpace = Collections.unmodifiableSet(Set.of(
             new Action(new Coordinate(0, 0), new Coordinate(1, 1)),
             new Action(new Coordinate(2, 0), new Coordinate(3, 1)),
             new Action(new Coordinate(2, 0), new Coordinate(1, 1)),
@@ -147,7 +147,7 @@ public class Action {
             new Action(new Coordinate(5, 7), new Coordinate(4, 6)),
             new Action(new Coordinate(5, 7), new Coordinate(6, 6)),
             new Action(new Coordinate(7, 7), new Coordinate(6, 6))
-    );
+    ));
     /*
         //Get and print the global action space
         HashMap<Coordinate, Set<Action>> globalActionSpace = new HashMap<>();
