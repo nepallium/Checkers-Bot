@@ -2,16 +2,19 @@ package game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class Move {
-    private Coordinate start;
-    private Coordinate destination;
+public class Move extends Action{
+
     private List<Coordinate> captures;
 
+    public Move(Action action, List<Coordinate> captures) {
+        super(action.getStart(), action.getDestination());
+        this.captures = captures;
+    }
 
     public Move(Coordinate start, Coordinate destination, List<Coordinate> captures) {
-        this.start = start;
-        this.destination = destination;
+        super(start, destination);
         this.captures = captures;
     }
 
@@ -19,29 +22,22 @@ public class Move {
         this(start, destination, new ArrayList<>());
     }
 
-    public Coordinate getDeltaCoordinates() {
-        return new Coordinate(destination.getXIndex() - start.getXIndex(), destination.getYIndex() - start.getYIndex());
-    }
-
-    public Coordinate getDestination() {
-        return destination;
+    @Override
+    public String toString() {
+        return String.format("Move<Start: %s, Destination: %s, Captures:%s>", super.getStart(), super.getDestination(), captures);
     }
 
     @Override
-    public String toString() {
-        return String.format("<Start: %s, Destination: %s, Captures:%s>", start, destination, captures);
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Move move = (Move) o;
+        return Objects.equals(captures, move.captures);
     }
 
-    public void setDestination(Coordinate destination) {
-        this.destination = destination;
-    }
-
-    public Coordinate getStart() {
-        return start;
-    }
-
-    public void setStart(Coordinate start) {
-        this.start = start;
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), captures);
     }
 
     public List<Coordinate> getCaptures() {
