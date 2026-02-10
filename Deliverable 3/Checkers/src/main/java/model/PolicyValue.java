@@ -1,8 +1,8 @@
 package model;
 
 public class PolicyValue {
-    double[] policy;
-    double value;
+    public double[] policy;
+    public double value;
 
     public PolicyValue(double[] p, double v) {
         this.policy = p;

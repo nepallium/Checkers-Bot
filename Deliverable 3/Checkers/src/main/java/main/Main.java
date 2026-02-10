@@ -5,6 +5,8 @@ import game.Coordinate;
 import game.Move;
 import model.ConvolutionalLayer;
 import model.DenseLayer;
+import model.NeuralNet;
+import model.PolicyValue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,10 +14,17 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        Board b = new Board();
-        System.out.println(b);
-        List<Move> globalActionSpace =b.getGlobalActionSpace(true);
-        globalActionSpace.forEach(System.out::println);
+        // ALEX
+        neuralNetTest();
+
+
+        // DANIEL
+//        Board b = new Board();
+//        System.out.println(b);
+//        List<Move> globalActionSpace =b.getGlobalActionSpace(true);
+//        globalActionSpace.forEach(System.out::println);
+
+
         /*
         long startTime = System.nanoTime();
 
@@ -52,6 +61,23 @@ public class Main {
         System.out.println("Time taken: " + ((endTime - startTime) / 1000000));
 
          */
+    }
+
+    private static void neuralNetTest() {
+        Board b = new Board();
+        b.cells[2][3] = 1; // ally man
+        b.cells[5][4] = -1; // op man
+        b.cells[0][7] = 2; // ally king
+
+        NeuralNet net = new NeuralNet(8, 16);
+
+        PolicyValue pv = net.forward(b);
+
+        System.out.println("Policy:");
+        System.out.println(Arrays.toString(pv.policy));
+
+        System.out.println("\nValue:");
+        System.out.println(pv.value);
     }
 
     public static void printConvolution(ConvolutionalLayer layer, double[][][] board) {
