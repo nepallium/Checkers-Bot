@@ -67,7 +67,7 @@ public class Board {
      * @return a list of possible moves for the piece
      */
     public List<Move> getPieceMoveSpace(Coordinate coordinate, int piece, List<Coordinate> previousCaptures) {
-        List<Move> actionSpace = new ArrayList<>();
+        List<Move> moveSpace = new ArrayList<>();
         List<Action> pieceMoves = (Math.abs(piece) > 1 ? coordinate.getPossibleKingActions() : coordinate.getPossibleManActions(piece > 0));
         for (Action action : pieceMoves) {
             Coordinate moveDestination = action.getDestination();
@@ -77,7 +77,7 @@ public class Board {
             int destinationPiece = getPieceAt(moveDestination);
             //if there is no piece on the square, the move is valid
             if (destinationPiece == 0 && (previousCaptures == null || previousCaptures.isEmpty())) {
-                actionSpace.add(new Move(action, null));
+                moveSpace.add(new Move(action, null));
                 continue;
             }
             Coordinate captureDestination = action.getDestination().addedWith(action.getDeltaCoordinates());
@@ -85,13 +85,13 @@ public class Board {
             if (!captureDestination.isInvalid() && !arePiecesSameTeam(destinationPiece, piece)) {
                 List<Coordinate> captures = previousCaptures == null ? new ArrayList<>() : previousCaptures;
                 captures.add(action.getDestination());
-                actionSpace.add(new Move(action, captures));
+                moveSpace.add(new Move(action, captures));
                 //after captures, can move again
                 List<Move> nextActionSpace = getPieceMoveSpace(captureDestination, piece, captures);
-                actionSpace.addAll(nextActionSpace);
+                moveSpace.addAll(nextActionSpace);
             }
         }
-        return actionSpace;
+        return moveSpace;
     }
 
     /**
@@ -101,7 +101,7 @@ public class Board {
      * @return a list of every possible move
      */
     public List<Move> getGlobalMoveSpace(boolean whiteToMove) {
-        List<Move> globalActionSpace = new ArrayList<>();
+        List<Move> globalMoveSpace = new ArrayList<>();
         //Assuming piece values: Man = 1, King = 2 (+ for white, - for black)
         for (int row = 0; row < cells.length; row++) {
             for (int col = 0; col < cells[0].length; col++) {
@@ -111,10 +111,10 @@ public class Board {
                     continue;
                 }
                 Coordinate coordinate = new Coordinate(col, row);
-                globalActionSpace.addAll(getPieceMoveSpace(coordinate, piece, null));
+                globalMoveSpace.addAll(getPieceMoveSpace(coordinate, piece, null));
             }
         }
-        return globalActionSpace;
+        return globalMoveSpace;
     }
 
     public List<Move> getActionSpaceForCoordinate(Coordinate coords) {
