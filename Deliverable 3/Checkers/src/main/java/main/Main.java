@@ -1,6 +1,8 @@
 package main;
 
+import game.Action;
 import game.Board;
+import game.Coordinate;
 import model.ConvolutionalLayer;
 import model.NeuralNet;
 import model.PolicyValue;
@@ -17,7 +19,8 @@ public class Main {
         // DANIEL
         Board b = new Board();
         System.out.println(b);
-
+        b.applyAction(new Action(new Coordinate(2,2) , new Coordinate(3,3)));
+        System.out.println(b);
 
         //List<Move> globalActionSpace = b.getGlobalMoveSpace(true);
         //globalActionSpace.forEach(System.out::println);
