@@ -66,28 +66,28 @@ public class Board {
      * @param previousCaptures [used for recursion], stores the previous captures made by the piece (if the move follows a capture)
      * @return a list of possible moves for the piece
      */
-    public List<Move> getPieceActionSpace(Coordinate coordinate, int piece, List<Coordinate> previousCaptures) {
+    public List<Move> getPieceMoveSpace(Coordinate coordinate, int piece, List<Coordinate> previousCaptures) {
         List<Move> actionSpace = new ArrayList<>();
-        List<Move> pieceMoves = (Math.abs(piece) > 1 ? coordinate.getPossibleKingMoves() : coordinate.getPossibleManMoves(piece > 0));
-        for (Move move : pieceMoves) {
-            Coordinate moveDestination = move.getDestination();
+        List<Action> pieceMoves = (Math.abs(piece) > 1 ? coordinate.getPossibleKingActions() : coordinate.getPossibleManActions(piece > 0));
+        for (Action action : pieceMoves) {
+            Coordinate moveDestination = action.getDestination();
             if (moveDestination.isInvalid()) {
                 continue;
             }
             int destinationPiece = getPieceAt(moveDestination);
             //if there is no piece on the square, the move is valid
-            if (destinationPiece == 0) {
-                actionSpace.add(move);
+            if (destinationPiece == 0 && (previousCaptures == null || previousCaptures.isEmpty())) {
+                actionSpace.add(new Move(action, null));
                 continue;
             }
-            Coordinate captureDestination = move.getDestination().addedWith(move.getDeltaCoordinates());
+            Coordinate captureDestination = action.getDestination().addedWith(action.getDeltaCoordinates());
             //if there is a piece on the square, check if can be captured
             if (!captureDestination.isInvalid() && !arePiecesSameTeam(destinationPiece, piece)) {
                 List<Coordinate> captures = previousCaptures == null ? new ArrayList<>() : previousCaptures;
-                captures.add(move.getDestination());
-                actionSpace.add(new Move(move.getStart(), captureDestination, captures));
+                captures.add(action.getDestination());
+                actionSpace.add(new Move(action, captures));
                 //after captures, can move again
-                List<Move> nextActionSpace = getPieceActionSpace(captureDestination, piece, captures);
+                List<Move> nextActionSpace = getPieceMoveSpace(captureDestination, piece, captures);
                 actionSpace.addAll(nextActionSpace);
             }
         }
@@ -100,7 +100,7 @@ public class Board {
      * @param whiteToMove the player to find actions for
      * @return a list of every possible move
      */
-    public List<Move> getGlobalActionSpace(boolean whiteToMove) {
+    public List<Move> getGlobalMoveSpace(boolean whiteToMove) {
         List<Move> globalActionSpace = new ArrayList<>();
         //Assuming piece values: Man = 1, King = 2 (+ for white, - for black)
         for (int row = 0; row < cells.length; row++) {
@@ -111,7 +111,7 @@ public class Board {
                     continue;
                 }
                 Coordinate coordinate = new Coordinate(col, row);
-                globalActionSpace.addAll(getPieceActionSpace(coordinate, piece, null));
+                globalActionSpace.addAll(getPieceMoveSpace(coordinate, piece, null));
             }
         }
         return globalActionSpace;
@@ -122,7 +122,7 @@ public class Board {
             System.out.println("Invalid coords" + coords);
             return new ArrayList<>();
         }
-        return getPieceActionSpace(coords, getPieceAt(coords), null);
+        return getPieceMoveSpace(coords, getPieceAt(coords), null);
     }
 
     public boolean arePiecesSameTeam(int piece1, int piece2) {
