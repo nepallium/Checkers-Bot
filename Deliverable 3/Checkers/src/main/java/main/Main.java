@@ -1,5 +1,6 @@
 package main;
 
+import game.Action;
 import game.Board;
 import game.Coordinate;
 import game.Move;
@@ -8,8 +9,7 @@ import model.DenseLayer;
 import model.NeuralNet;
 import model.PolicyValue;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Main {
 
@@ -19,10 +19,12 @@ public class Main {
 
 
         // DANIEL
-//        Board b = new Board();
-//        System.out.println(b);
-//        List<Move> globalActionSpace =b.getGlobalActionSpace(true);
-//        globalActionSpace.forEach(System.out::println);
+        Board b = new Board();
+        System.out.println(b);
+
+
+        //List<Move> globalActionSpace = b.getGlobalMoveSpace(true);
+        //globalActionSpace.forEach(System.out::println);
 
 
         /*
