@@ -2,6 +2,7 @@ package game;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Coordinate {
     /**
@@ -22,27 +23,32 @@ public class Coordinate {
         return new Coordinate(this.getXIndex() + addCoords.getXIndex(), this.getYIndex() + addCoords.getYIndex());
     }
 
-    public List<Move> getPossibleManMoves(boolean whiteToMove) {
-        List<Move> moves = new ArrayList<>();
+    public List<Action> getPossibleManActions(boolean whiteToMove) {
+        List<Action> actions = new ArrayList<>();
         int toYIdx = getYIndex() + (whiteToMove ? 1 : -1);
         //No possible moves if is on an invalid square or at the end of the board
         if (isInvalid() || Coordinate.isIndexInvalid(toYIdx)) {
-            return moves;
+            return actions;
         }
         for (int xDisplacement = -1; xDisplacement <= 1; xDisplacement += 2) {
             int toXIdx = x + xDisplacement;
             if (isIndexInvalid(toXIdx)) {
                 continue;
             }
-            moves.add(new Move(this, new Coordinate(toXIdx, toYIdx)));
+            actions.add(new Action(this, new Coordinate(toXIdx, toYIdx)));
         }
-        return moves;
+        return actions;
     }
 
-    public List<Move> getPossibleKingMoves() {
-        List<Move> moves = getPossibleManMoves(true);
-        moves.addAll(getPossibleManMoves(false));
-        return  moves;
+    public List<Action> getPossibleKingActions() {
+        List<Action> actions = getPossibleManActions(true);
+        actions.addAll(getPossibleManActions(false));
+        return actions;
+    }
+
+    public void set(int XIdx, int YIdx) {
+        this.x = XIdx;
+        this.y = YIdx;
     }
 
     public int getYNotation() {
@@ -84,5 +90,17 @@ public class Coordinate {
     @Override
     public String toString() {
         return String.format("[%s, %s]", x, y);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Coordinate that = (Coordinate) o;
+        return x == that.x && y == that.y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 }
