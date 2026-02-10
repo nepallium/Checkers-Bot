@@ -6,7 +6,11 @@ import java.util.Objects;
 
 public class Move{
 
-    private List<Action> actions;
+    private final List<Action> actions;
+
+    public Move() {
+        this(new ArrayList<>());
+    }
 
     public Move(List<Action> actions) {
         this.actions = actions;
@@ -31,6 +35,9 @@ public class Move{
         this.actions = List.of(new Action(start, destination));
     }
 
+    public void addAction(Action action) {
+        this.actions.add(action);
+    }
 
     @Override
     public String toString() {
@@ -52,5 +59,9 @@ public class Move{
 
     public boolean isCapture() {
         return !(actions.size() >= 2);
+    }
+
+    public List<Action> getActions() {
+        return actions;
     }
 }
