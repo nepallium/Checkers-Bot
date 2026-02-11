@@ -21,17 +21,16 @@ public class Main {
         Board b = new Board();
         //Test playing
         for (int i = 0; i < 100; i++) {
-            System.out.println(b);
             List<Move> ms = b.getBoardMoveSpace();
             if (ms == null) {
                 break;
             }
             System.out.printf("Move space: %s\n",ms);
+            System.out.println(b);
             if (!b.applyMove(ms.get((int)(Math.random() * ms.size())))) {
                 break;
             };
         }
-        System.out.println(b);
 
         //List<Move> globalActionSpace = b.getGlobalMoveSpace(true);
         //globalActionSpace.forEach(System.out::println);
