@@ -19,6 +19,10 @@ public class MoveLog {
         this.whiteTurn = whiteTurn;
     }
 
+    public MoveLog getDuplicate(boolean invertColors) {
+        return new MoveLog(invertColors ? blackMoves : whiteMoves, invertColors ? whiteMoves : blackMoves, invertColors != whiteTurn);
+    }
+
     /**
      * /**
      * Adds an action to the log

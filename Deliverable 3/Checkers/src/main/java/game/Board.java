@@ -21,27 +21,18 @@ public class Board {
     private Coordinate forcedPieceCaptureCoordinate = null;
     private boolean whiteToMove;
 
-    public Board(int[][] cells, boolean whiteToMove) {
-        this.cells = cells;
-        this.whiteToMove = whiteToMove;
-        this.gameResult = GameResult.ONGOING;
-    }
-
     public Board(int[][] cells, boolean whiteToMove, Coordinate forcedPieceCaptureCoordinate, MoveLog moveLog, PositionLog positionLog, GameResult gameResult) {
         this.cells = cells;
-        this.moveLog = new MoveLog(moveLog.getWhiteMoves(), moveLog.getBlackMoves(), moveLog.isWhiteTurn());
+        this.moveLog = null;
         this.positionLog = new PositionLog(positionLog.getMaxPositionLogs(), positionLog.getRecentPositions());
         this.gameResult = gameResult;
         this.forcedPieceCaptureCoordinate = forcedPieceCaptureCoordinate;
         this.whiteToMove = whiteToMove;
     }
 
+
     public Board() {
-        this.cells = getStartingBoard();
-        this.whiteToMove = true;
-        this.moveLog = new MoveLog();
-        this.positionLog = new PositionLog(Math.max(NeuralNet.CHANNELS / 4 - 4, DRAW_BY_REPETITION_REPEAT_AMOUNT)); //save up to 3 positions for the CNN
-        this.gameResult = GameResult.ONGOING;
+        this(getStartingBoard(), true, null, new MoveLog(), new PositionLog(Math.max(NeuralNet.CHANNELS / 4 - 4, DRAW_BY_REPETITION_REPEAT_AMOUNT)), GameResult.ONGOING);
     }
 
     /**
@@ -133,7 +124,7 @@ public class Board {
                 System.out.printf("INVALID ACTION: %s", action);
                 return false;
             }
-            if (!applyAction(action, i < (moveActions.size() -1))) {
+            if (!applyAction(action, i < (moveActions.size() - 1))) {
                 System.out.printf("COULD NOT APPLY ACTION: %s", action);
                 return false;
             }
@@ -483,7 +474,7 @@ public class Board {
             }
             str += rowIdx == 0 ? (forcedPieceCaptureCoordinate == null ? "" : String.format("Forced to capture with piece at: %s", forcedPieceCaptureCoordinate)) : "\n";
         }
-        str += String.format("\nLOGS\n%s", moveLog.toString());
+        str += moveLog == null ? "\n[no move logs]" : String.format("\nLOGS\n%s", moveLog.toString());
         return str;
     }
 
@@ -496,17 +487,46 @@ public class Board {
         System.out.printf("GAME OVER:\n%s", this);
     }
 
-
-    public int[][] getCellsDuplicate() {
+    /**
+     * Gets the duplicate of the board position
+     *
+     * @param invertColors to invert white and black's values or not
+     * @return the duplicate (inverted?) board
+     */
+    public int[][] getCellsDuplicate(boolean invertColors) {
         int[][] duplicate = new int[8][8];
-        for (int i = 0; i < 8; i++) {
-            duplicate[i] = cells[i].clone();
+        if (!invertColors) {
+            for (int i = 0; i < 8; i++) {
+                duplicate[i] = cells[i].clone();
+            }
+            return duplicate;
+        }
+        for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
+            for (int xIdx = (rowIdx % 2 == 0 ? 0 : 1); xIdx < 8; xIdx += 2) {
+                duplicate[rowIdx][xIdx] = -cells[rowIdx][xIdx];
+            }
         }
         return duplicate;
     }
 
+    /**
+     * Gets a copy of this board object | no move logs
+     *
+     * @return copy of board object
+     */
     public Board getBoardDuplicate() {
-        return new Board(getCellsDuplicate(), whiteToMove, forcedPieceCaptureCoordinate, moveLog, positionLog, gameResult);
+        return new Board(getCellsDuplicate(false), whiteToMove, forcedPieceCaptureCoordinate, moveLog.getDuplicate(false), positionLog.getDuplicate(false), gameResult);
+    }
+
+    /**
+     * Gets a copy of this board object where the player to move is of the color of the argument
+     *
+     * @param asWhiteToMove color of the player that has the move
+     * @return copy of board object with (inverted?) colors
+     */
+    public Board getBoardWithColorOverride(boolean asWhiteToMove) {
+        boolean invertColors = asWhiteToMove != whiteToMove;
+        return new Board(getCellsDuplicate(invertColors), asWhiteToMove, forcedPieceCaptureCoordinate, moveLog.getDuplicate(invertColors), positionLog.getDuplicate(invertColors), invertColors ? gameResult.colorInverted() : gameResult);
     }
 
     /**

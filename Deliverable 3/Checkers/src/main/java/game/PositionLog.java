@@ -1,5 +1,6 @@
 package game;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -18,8 +19,22 @@ public class PositionLog {
         this.recentPositions = new LinkedList<>(recentPositions.subList(0, Math.min(recentPositions.size(), maxPositionLogs)));
     }
 
+    public PositionLog getDuplicate(boolean invertColors) {
+        List<int[][]> positionLogs = new LinkedList<>(recentPositions);
+        if (invertColors) {
+            positionLogs.forEach(cells -> {
+                for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
+                    for (int xIdx = (rowIdx % 2 == 0 ? 0 : 1); xIdx < 8; xIdx += 2) {
+                        cells[rowIdx][xIdx] *= -1;
+                    }
+                }
+            });
+        }
+        return new PositionLog(maxPositionLogs, positionLogs);
+    }
+
     /**
-     *  Adds a board position to the log
+     * Adds a board position to the log
      *
      * @param board board to save position of (deep copies it)
      */
