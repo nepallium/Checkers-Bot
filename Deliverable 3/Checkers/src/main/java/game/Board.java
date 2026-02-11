@@ -10,17 +10,22 @@ import java.util.List;
 public class Board {
 
     public int[][] cells; //[row index][column index], row are counted from white side to black side
-    public boolean whiteToMove;
-    public Coordinate forcedPieceCaptureCoordinate = null;
 
-    private static final int MAN_VALUE = 1;
-    private static final int KING_VALUE = 2;
+    public static final int MAN_VALUE = 1;
+    public static final int KING_VALUE = 2;
+    public static final int DRAW_BY_REPETITION_REPEAT_AMOUNT = 3;
+    private static final int SPLIT_CHANNELS_POSITION_COUNT = NeuralNet.CHANNELS / 4 - 4;
+
     private MoveLog moveLog;
     private PositionLog positionLog;
+    private GameResult gameResult;
+    private Coordinate forcedPieceCaptureCoordinate = null;
+    private boolean whiteToMove;
 
     public Board(int[][] cells, boolean whiteToMove) {
         this.cells = cells;
         this.whiteToMove = whiteToMove;
+        this.gameResult = GameResult.PLAYING;
     }
 
 
@@ -28,11 +33,12 @@ public class Board {
         this.cells = getStartingBoard();
         this.whiteToMove = true;
         this.moveLog = new MoveLog();
-        this.positionLog = new PositionLog(NeuralNet.CHANNELS / 4 - 4); //save up to 3 positions for the CNN
+        this.positionLog = new PositionLog(Math.max(SPLIT_CHANNELS_POSITION_COUNT, DRAW_BY_REPETITION_REPEAT_AMOUNT)); //save up to 3 positions for the CNN
     }
 
     /**
      * Generates an array for the starting board
+     *
      * @return 8x8 array of the starting board
      */
     private static int[][] getStartingBoard() {
@@ -52,21 +58,45 @@ public class Board {
         return newCells;
     }
 
-    @Override
-    //The array string is flipped so the board can be perceived through the white player's point of view
-    public String toString() {
-        String str = String.format("%s to move \n", whiteToMove ? "White" : "Black");
-        for (int rowIdx = 7; rowIdx >= 0; rowIdx--) {
-            for (int xIdx = 0; xIdx < 8; xIdx++) {
-                str += String.format("[%4s]", cells[rowIdx][xIdx]);
-            }
-            str += "\n";
+    /**
+     * Checks for if a player has won, if yes, returns true and sets the game result accordingly
+     * @return if a player has won or not
+     */
+    private boolean checkForWinner() {
+        Tuple<Integer, Integer> playerPiecesCount = getPlayerPiecesCount();
+        if (playerPiecesCount.e1 == 0) {
+            gameResult = GameResult.BLACK_WIN;
+            return true;
         }
-        str += String.format("\nLOGS\n%s", moveLog.toString());
-        return str;
+        if (playerPiecesCount.e2 == 0) {
+            gameResult = GameResult.WHITE_WIN;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks for a draw by repetition and changes game state accordingly
+     * @return if the game is drawn
+     */
+    private boolean checkForDraw() {
+        boolean draw = positionLog.checkForDrawByRepetition();
+        gameResult = draw ? GameResult.DRAW : gameResult;
+        return draw;
+    }
+
+    /**
+     * Checks if the game is over from the game result
+     * @return if the game is over
+     */
+    public boolean isGameOver() {
+        return !gameResult.equals(GameResult.PLAYING);
     }
 
     public void applyAction(Action action) {
+        if (isGameOver()) {
+            return;
+        }
         Coordinate start = action.getStart();
 
         int piece = getPieceAt(start);
@@ -83,10 +113,19 @@ public class Board {
             whiteToMove = !whiteToMove;
             forcedPieceCaptureCoordinate = null;
             moveLog.addActionLog(action, true);
+            boolean gameOver = checkForDraw();
+            if (gameOver) {
+                printGameOver();
+            }
             return;
         }
-        System.out.println(capturedCoordinate);
         cells[capturedCoordinate.getY()][capturedCoordinate.getX()] = 0;
+        boolean gameOver = checkForWinner();
+        if (gameOver) {
+            printGameOver();
+            whiteToMove = !whiteToMove;
+            return;
+        }
         List<Action> chainActionSpace = getPieceActionSpace(destination, piece).e1;
 
         forcedPieceCaptureCoordinate = chainActionSpace.isEmpty() ? null : action.getDestination();
@@ -94,16 +133,31 @@ public class Board {
         whiteToMove = chainActionSpace.isEmpty() != whiteToMove;
     }
 
+    /**
+     * Gets the count of each player's pieces (regardless of type)
+     * @return (White pieces count, Black pieces count)
+     */
+    public Tuple<Integer, Integer> getPlayerPiecesCount() {
+        Tuple<Integer, Integer> playerPiecesCount = new Tuple<>(0, 0);
+        for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
+            for (int xIdx = (rowIdx % 2 == 0 ? 0 : 1); xIdx < 8; xIdx += 2) {
+                int piece = cells[rowIdx][xIdx];
+                playerPiecesCount.e1 += piece > 0 ? 1 : 0;
+                playerPiecesCount.e2 += piece < 0 ? 1 : 0;
+            }
+        }
+        return playerPiecesCount;
+    }
 
     /**
      * Gets the action space of the piece
      *
      * @param coordinate coordinate of the piece
      * @param piece      the value of the piece (1 for man, 2 for king, positive for white, negative for black)
-     * @return two lists of all possible actions for the piece with no captures and captures (captures, non captures)
+     * @return two lists of all possible actions for the piece with no captures and captures (captures, non captures) | null if game is over or if coordinate / piece is invalid
      */
     public Tuple<List<Action>, List<Action>> getPieceActionSpace(Coordinate coordinate, int piece) {
-        if (coordinate.isInvalid() || isPieceInvalid(piece)) {
+        if (isGameOver() || coordinate.isInvalid() || isPieceInvalid(piece)) {
             return null;
         }
         List<Action> captureActions = new ArrayList<>();
@@ -128,7 +182,14 @@ public class Board {
         return new Tuple<List<Action>, List<Action>>(captureActions, nonCaptureActions);
     }
 
+    /**
+     * Gets the action space for the current player at the board
+     * @return list of possible actions for the current player | null if game is over
+     */
     public List<Action> getBoardActionSpace() {
+        if (isGameOver()) {
+            return null;
+        }
         if (forcedPieceCaptureCoordinate != null) {
             List<Action> actionSpace = getPieceActionSpace(forcedPieceCaptureCoordinate, getPieceAt(forcedPieceCaptureCoordinate)).e1;
             return actionSpace.isEmpty() ? List.of(new Action(forcedPieceCaptureCoordinate, forcedPieceCaptureCoordinate)) : actionSpace;
@@ -165,10 +226,10 @@ public class Board {
      * @param coordinate coordinate of the piece
      * @param piece      the value of the piece (1 for man, 2 for king, positive for white, negative for black)
      *                   //* @param previousCaptures [used for recursion], stores the previous captures made by the piece (if the move follows a capture)
-     * @return two lists of all possible moves for the piece (captures, non captures)
+     * @return two lists of all possible moves for the piece (captures, non captures) | null if game is over or invalid coordinate / piece
      */
     public Tuple<List<Move>, List<Move>> getPieceMoveSpace(Coordinate coordinate, int piece) {
-        if (coordinate.isInvalid() || isPieceInvalid(piece)) {
+        if (isGameOver() || coordinate.isInvalid() || isPieceInvalid(piece)) {
             return null;
         }
         List<Move> captureMoves = new ArrayList<>();
@@ -206,9 +267,12 @@ public class Board {
      * Gets the move space for every peace for a player
      *
      * @param whiteToMove the player to find actions for
-     * @return a list of every possible move for the player
+     * @return a list of every possible move for the player | null if game is over
      */
     public List<Move> getBoardMoveSpace(boolean whiteToMove) {
+        if (isGameOver()) {
+            return null;
+        }
         List<Move> nonCaptureMoves = new ArrayList<>();
         List<Move> captureMoves = new ArrayList<>();
         boolean captureAvailable = false;
@@ -306,7 +370,7 @@ public class Board {
      * @return the board with pieces split into channels [Ally men, Ally king, Enemy men, Enemy king] for X positions
      */
     public double[][][] splitBoardChannels() {
-        List<int[][]> positionLogs = new LinkedList<>(List.copyOf(positionLog.getRecentPositions())) ;
+        List<int[][]> positionLogs = new LinkedList<>(positionLog.getRecentPositions().subList(0, SPLIT_CHANNELS_POSITION_COUNT));
         positionLogs.addFirst(cells);
         double[][][] boardChannels = new double[NeuralNet.CHANNELS][8][8];
 
@@ -321,90 +385,45 @@ public class Board {
     }
 
 
-
-    private static class MoveLog {
-        private final List<Move> whiteMoves;
-        private final List<Move> blackMoves; //size is either equal to or one less than that of white moves
-        private boolean whiteTurn = true;
-
-        public MoveLog() {
-            this.whiteMoves = new ArrayList<Move>(List.of(new Move()));
-            this.blackMoves = new ArrayList<Move>(List.of(new Move()));
-        }
-
-        /**
-         * Adds an action to the log
-         *
-         * @param action   action to add
-         * @param turnOver whether the turn is over or not
-         */
-        public void addActionLog(Action action, boolean turnOver) {
-            List<Move> playerMoves = whiteTurn ? whiteMoves : blackMoves;
-            playerMoves.getLast().addAction(action);
-            if (!turnOver) {
-                return;
+    @Override
+    //The array string is flipped so the board can be perceived through the white player's point of view
+    public String toString() {
+        String str = gameResult == GameResult.PLAYING ? String.format("%s to move \n", whiteToMove ? "White" : "Black") : String.format("Result: %s\n, Sorry %s, no turn for you.", gameResult.name(), whiteToMove ? "White" : "Black");
+        for (int rowIdx = 7; rowIdx >= 0; rowIdx--) {
+            for (int xIdx = 0; xIdx < 8; xIdx++) {
+                str += String.format("[%4s]", cells[rowIdx][xIdx]);
             }
-            playerMoves.addLast(new Move());
-            whiteTurn = !whiteTurn;
+            str += "\n";
         }
-
-        @Override
-        public String toString() {
-            String str = "";
-            int blackMoveCount = blackMoves.size();
-            for (int i = 0; i < blackMoveCount; i++) {
-                str += String.format("%s | %s\n", whiteMoves.get(i).toString(), blackMoves.get(i).toString());
-            }
-            return str;
-        }
+        str += String.format("\nLOGS\n%s", moveLog.toString());
+        return str;
     }
 
-    private static class PositionLog {
-        private final List<int[][]> recentPositions; //index from most recent to least
-        private final int maxPositionLogs;
 
-        public PositionLog(int maxPositionLogs) {
-            recentPositions = new LinkedList<>();
-            this.maxPositionLogs = maxPositionLogs;
-        }
+    public GameResult getGameResult() {
+        return gameResult;
+    }
 
-        /**
-         * Adds a board position to the log
-         *
-         * @param board board to save position of (deep copies it)
-         */
-        public void addPosition(int[][] board) {
-            int[][] boardCopy = new int[8][8];
-            for (int i = 0; i < 8; i++) {
-                boardCopy[i] = board[i].clone();
-            }
-            recentPositions.addFirst(boardCopy);
-            if (recentPositions.size() > maxPositionLogs) {
-                recentPositions.removeLast();
-            }
-        }
-
-        public List<int[][]> getRecentPositions() {
-            return recentPositions;
-        }
-
-        public int getMaxPositionLogs() {
-            return maxPositionLogs;
-        }
+    private void printGameOver() {
+        System.out.printf("GAME OVER:\n%s", this);
     }
 
     /**
      * Array for the starting board.
      * NOT IMMUTABLE. HANDLE WITH CARE
      */
-    public static final int[][] STARTING_BOARD = new int[][] {
-            new int[] {1,0,1,0,1,0,1,0,},
-            new int[] {0,1,0,1,0,1,0,1,},
-            new int[] {1,0,1,0,1,0,1,0,},
-            new int[] {0,0,0,0,0,0,0,0,},
-            new int[] {0,0,0,0,0,0,0,0,},
-            new int[] {0,-1,0,-1,0,-1,0,-1,},
-            new int[] {-1,0,-1,0,-1,0,-1,0,},
-            new int[] {0,-1,0,-1,0,-1,0,-1,},
+    public static final int[][] STARTING_BOARD = new int[][]{
+            new int[]{1, 0, 1, 0, 1, 0, 1, 0,},
+            new int[]{0, 1, 0, 1, 0, 1, 0, 1,},
+            new int[]{1, 0, 1, 0, 1, 0, 1, 0,},
+            new int[]{0, 0, 0, 0, 0, 0, 0, 0,},
+            new int[]{0, 0, 0, 0, 0, 0, 0, 0,},
+            new int[]{0, -1, 0, -1, 0, -1, 0, -1,},
+            new int[]{-1, 0, -1, 0, -1, 0, -1, 0,},
+            new int[]{0, -1, 0, -1, 0, -1, 0, -1,},
     };
+
+    public enum GameResult {
+        PLAYING, DRAW, WHITE_WIN, BLACK_WIN
+    }
 }
