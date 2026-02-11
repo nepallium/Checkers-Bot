@@ -41,7 +41,7 @@ public class MCTS {
         }
 
         if (!node.isExpanded()) {
-            // expand node, go back to start
+            return expand(node, board);
         }
 
         // select highest ucb score
