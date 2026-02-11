@@ -17,7 +17,7 @@ public class Main {
 
 
         // DANIEL
-        Board b = new Board(3);
+        Board b = new Board();
         System.out.println(b);
         b.applyAction(new Action(new Coordinate(2,2) , new Coordinate(3,3)));
         System.out.println(b);
@@ -69,7 +69,7 @@ public class Main {
     }
 
     private static void neuralNetTest() {
-        Board b = new Board(3);
+        Board b = new Board();
         b.cells[2][3] = 1; // ally man
         b.cells[5][4] = -1; // op man
         b.cells[0][7] = 2; // ally king
