@@ -3,6 +3,7 @@ package game;
 import Util.Tuple;
 import model.NeuralNet;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -112,11 +113,13 @@ public class Board {
      * @param move move to apply
      * @return if applied successfully
      */
-    public boolean applyMove(Move move) {
+    public Board applyMove(Move move) {
+        Board copy = new Board();
+
         for (Action action : move.getActions()) {
             if (!checkValidAction(action)) {
                 System.out.printf("INVALID ACTION: %s", action);
-                return false;
+                throw new InvalidParameterException("INVALID ACTION");
             }
             applyAction(action);
         }
@@ -443,6 +446,10 @@ public class Board {
 
     private void printGameOver() {
         System.out.printf("GAME OVER:\n%s", this);
+    }
+
+    public boolean isWhiteToMove() {
+        return whiteToMove;
     }
 
     /**
