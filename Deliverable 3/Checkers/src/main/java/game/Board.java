@@ -15,16 +15,16 @@ public class Board {
     public static final int KING_VALUE = 2;
     public static final int DRAW_BY_REPETITION_REPEAT_AMOUNT = 3;
 
-    private MoveLog moveLog;
-    private PositionLog positionLog;
+    private final MoveLog moveLog;
+    private final PositionLog positionLog;
     private GameResult gameResult;
     private Coordinate forcedPieceCaptureCoordinate = null;
     private boolean whiteToMove;
 
     public Board(int[][] cells, boolean whiteToMove, Coordinate forcedPieceCaptureCoordinate, MoveLog moveLog, PositionLog positionLog, GameResult gameResult) {
         this.cells = cells;
-        this.moveLog = null;
-        this.positionLog = new PositionLog(positionLog.getMaxPositionLogs(), positionLog.getRecentPositions());
+        this.moveLog = moveLog;
+        this.positionLog = positionLog;
         this.gameResult = gameResult;
         this.forcedPieceCaptureCoordinate = forcedPieceCaptureCoordinate;
         this.whiteToMove = whiteToMove;
