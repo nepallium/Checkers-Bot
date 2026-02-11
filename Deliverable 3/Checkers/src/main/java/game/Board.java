@@ -27,6 +27,14 @@ public class Board {
         this.gameResult = GameResult.ONGOING;
     }
 
+    public Board(int[][] cells, boolean whiteToMove, Coordinate forcedPieceCaptureCoordinate, MoveLog moveLog, PositionLog positionLog, GameResult gameResult) {
+        this.cells = cells;
+        this.moveLog = new MoveLog(moveLog.getWhiteMoves(), moveLog.getBlackMoves(), moveLog.isWhiteTurn());
+        this.positionLog = new PositionLog(positionLog.getMaxPositionLogs(), positionLog.getRecentPositions());
+        this.gameResult = gameResult;
+        this.forcedPieceCaptureCoordinate = forcedPieceCaptureCoordinate;
+        this.whiteToMove = whiteToMove;
+    }
 
     public Board() {
         this.cells = getStartingBoard();
@@ -486,6 +494,19 @@ public class Board {
 
     private void printGameOver() {
         System.out.printf("GAME OVER:\n%s", this);
+    }
+
+
+    public int[][] getCellsDuplicate() {
+        int[][] duplicate = new int[8][8];
+        for (int i = 0; i < 8; i++) {
+            duplicate[i] = cells[i].clone();
+        }
+        return duplicate;
+    }
+
+    public Board getBoardDuplicate() {
+        return new Board(getCellsDuplicate(), whiteToMove, forcedPieceCaptureCoordinate, moveLog, positionLog, gameResult);
     }
 
     /**

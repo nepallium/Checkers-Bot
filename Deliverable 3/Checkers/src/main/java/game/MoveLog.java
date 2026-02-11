@@ -6,15 +6,21 @@ import java.util.List;
 public class MoveLog {
     private final List<Move> whiteMoves;
     private final List<Move> blackMoves; //size is either equal to or one less than that of white moves
-    private boolean whiteTurn = true;
+    private boolean whiteTurn;
 
     public MoveLog() {
-        this.whiteMoves = new ArrayList<Move>(List.of(new Move()));
-        this.blackMoves = new ArrayList<Move>(List.of(new Move()));
+        this(new ArrayList<Move>(List.of(new Move())), new ArrayList<Move>(List.of(new Move())), true);
+
+    }
+
+    public MoveLog(List<Move> whiteMoves, List<Move> blackMoves, boolean whiteTurn) {
+        this.whiteMoves = whiteMoves;
+        this.blackMoves = blackMoves;
+        this.whiteTurn = whiteTurn;
     }
 
     /**
-     /**
+     * /**
      * Adds an action to the log
      *
      * @param action   action to add
@@ -40,5 +46,17 @@ public class MoveLog {
             str += String.format("%s: W:%s B: %s\n", i + 1, whiteMoves.get(i).toString(), blackMoves.get(i).toString());
         }
         return str;
+    }
+
+    public List<Move> getWhiteMoves() {
+        return whiteMoves;
+    }
+
+    public List<Move> getBlackMoves() {
+        return blackMoves;
+    }
+
+    public boolean isWhiteTurn() {
+        return whiteTurn;
     }
 }

@@ -13,6 +13,11 @@ public class PositionLog {
         this.maxPositionLogs = maxPositionLogs;
     }
 
+    public PositionLog(int maxPositionLogs, List<int[][]> recentPositions) {
+        this.maxPositionLogs = maxPositionLogs;
+        this.recentPositions = new LinkedList<>(recentPositions.subList(0, Math.min(recentPositions.size(), maxPositionLogs)));
+    }
+
     /**
      *  Adds a board position to the log
      *
