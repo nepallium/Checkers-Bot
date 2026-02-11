@@ -35,7 +35,7 @@ public class ConvolutionalLayer {
         this.kernels = new double[numInAndOut][channels][width][height];
     }
 
-    public double[][][] forward(double[][][] board) {
+    public double[][][] forwardWithActivation(double[][][] board) {
         double[][][] ans = new double[kernels.length][8][8];
 
         for (int m = 0; m < kernels.length; m++) { // num of kernels/filters per layer
@@ -65,6 +65,36 @@ public class ConvolutionalLayer {
             }
         }
 
+        return ans;
+    }
+
+    public double[][][] forwardNoActivation(double[][][] board) {
+        double[][][] ans = new double[kernels.length][8][8];
+
+        for (int m = 0; m < kernels.length; m++) { // num of kernels/filters per layer
+            for (int r = 0; r < board[0].length; r++) { // current row
+                for (int c = 0; c < board[0][0].length; c++) { // current column
+
+//                    double sum = bias[m]; // bias applied to every index in the board (per filter)
+                    double sum = 0;
+
+                    for (int channel = 0; channel < board.length; channel++) { // num of channels per board/kernel (must be the same)
+                        for (int i = 0; i < kernels[m][channel].length; i++) { // current row (of filter)
+                            for (int j = 0; j < kernels[m][channel][i].length; j++) { // current column (of filter)
+
+                                int x = r - 1 + i; // centers filter around the current index of the board
+                                int y = c - 1 + j; // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+                                if (x >= 0 && x < board[channel].length && // check horizontal bound
+                                        y >= 0 && y < board[channel][0].length) { // check vertical bound
+                                    sum += board[channel][x][y] * kernels[m][channel][i][j]; // add product
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         return ans;
     }
