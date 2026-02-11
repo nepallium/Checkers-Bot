@@ -3,6 +3,7 @@ package main;
 import game.Action;
 import game.Board;
 import game.Coordinate;
+import game.Move;
 import model.ConvolutionalLayer;
 import model.NeuralNet;
 import model.PolicyValue;
@@ -13,19 +14,20 @@ public class Main {
 
     public static void main(String[] args) {
         // ALEX
-        neuralNetTest();
+        //neuralNetTest();
 
 
         // DANIEL
         Board b = new Board();
+        //Test playing
+        for (int i = 0; i < 15; i++) {
+            System.out.println(b);
+            List<Move> ms = b.getBoardMoveSpace();
+            System.out.printf("Move space: %s\n",ms);
+            if (!b.applyMove(ms.get((int)(Math.random() * ms.size())))) break;
+        }
         System.out.println(b);
-        b.applyAction(new Action(new Coordinate(2,2) , new Coordinate(3,3)));
-        System.out.println(b);
-        b.applyAction(new Action(new Coordinate(5,5), new Coordinate(4,4)));
-        System.out.println(b);
-        b.applyAction(new Action(new Coordinate(3,3), new Coordinate(5,5)));
-        System.out.println(b);
-        System.out.println(b.getBoardActionSpace());
+
         //List<Move> globalActionSpace = b.getGlobalMoveSpace(true);
         //globalActionSpace.forEach(System.out::println);
 
