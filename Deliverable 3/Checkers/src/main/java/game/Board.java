@@ -22,6 +22,10 @@ public class Board {
         this.whiteToMove = whiteToMove;
     }
 
+    public Board() {
+        this(3);
+    }
+
     public Board(int positionLogCount) {
         this.cells = getStartingBoard();
         this.whiteToMove = true;
