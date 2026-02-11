@@ -21,7 +21,11 @@ public class Main {
         System.out.println(b);
         b.applyAction(new Action(new Coordinate(2,2) , new Coordinate(3,3)));
         System.out.println(b);
-
+        b.applyAction(new Action(new Coordinate(5,5), new Coordinate(4,4)));
+        System.out.println(b);
+        b.applyAction(new Action(new Coordinate(3,3), new Coordinate(5,5)));
+        System.out.println(b);
+        System.out.println(b.getBoardActionSpace());
         //List<Move> globalActionSpace = b.getGlobalMoveSpace(true);
         //globalActionSpace.forEach(System.out::println);
 
@@ -82,7 +86,7 @@ public class Main {
     }
 
     public static void printConvolution(ConvolutionalLayer layer, double[][][] board) {
-        double[][][] ans = layer.forward(board);
+        double[][][] ans = layer.forwardWithActivation(board);
 
         for (int i = 0; i < ans.length; i++) {
             for (int j = 0; j < ans[i].length; j++) {
