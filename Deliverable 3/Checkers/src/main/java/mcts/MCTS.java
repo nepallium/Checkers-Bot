@@ -62,7 +62,8 @@ public class MCTS {
             }
         }
 
-        Board nextBoard = board.applyMove(bestMove);
+        board.applyMove(bestMove);
+        Board nextBoard = board.getBoardDuplicate();
         double value = -simulate(bestChild, nextBoard);
 
         node.visitCount++;
@@ -77,7 +78,7 @@ public class MCTS {
         double[] policy = pv.policy;
         double value = pv.value;
 
-        List<Move> legalMoves = board.getBoardMoveSpace(board.isWhiteToMove());
+        List<Move> legalMoves = board.getBoardMoveSpace();
 
         double sum = 0.0;
 
@@ -105,8 +106,8 @@ public class MCTS {
     }
 
     private double terminalValue(GameResult result) {
-        if (result == GameResult.WIN) return 1.0;
-        if (result == GameResult.LOSS) return -1.0;
+        if (result == GameResult.WHITE_WIN) return 1.0;
+        if (result == GameResult.BLACK_WIN) return -1.0;
         return 0.0;
     }
 }
