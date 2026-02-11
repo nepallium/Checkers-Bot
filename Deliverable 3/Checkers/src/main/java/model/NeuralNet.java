@@ -6,9 +6,9 @@ import java.util.Arrays;
 
 public class NeuralNet {
 
-    static int KERNEL_SIZE = 3;
-    static int BOARD_SIZE = 8;
-    static int CHANNELS = 4;
+    public static int KERNEL_SIZE = 3;
+    public static int BOARD_SIZE = 8;
+    public static int CHANNELS = 3 * 4; //3 boards x 4 piece types
 
     int numFeatureMaps;
     int numActions;
