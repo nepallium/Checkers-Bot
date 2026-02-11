@@ -57,7 +57,9 @@ public class Action {
         this.start = start;
     }
 
-    public final static Set<Action> globalActionSpace = Collections.unmodifiableSet(Set.of(
+
+
+    public final static List<Action> globalActionSpace = (Arrays.asList(
             new Action(new Coordinate(0, 0), new Coordinate(1, 1)),
             new Action(new Coordinate(2, 0), new Coordinate(3, 1)),
             new Action(new Coordinate(2, 0), new Coordinate(1, 1)),
