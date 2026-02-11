@@ -3,6 +3,7 @@ package game;
 import Util.Tuple;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Board {
@@ -29,6 +30,7 @@ public class Board {
     public Board() {
         this.cells = getStartingBoard();
         this.whiteToMove = true;
+        this.moveLogs = new MoveLogs();
     }
 
     private static int[][] getStartingBoard() {
@@ -58,6 +60,7 @@ public class Board {
             }
             str += "\n";
         }
+        str += String.format("\nLOGS\n%s", moveLogs.toString());
         return str;
     }
 
@@ -71,20 +74,26 @@ public class Board {
         Coordinate destination = action.getDestination();
         Coordinate capturedCoordinate = action.getCaptureCoordinate();
         cells[start.getY()][start.getX()] = 0;
-        cells[destination.getY()][destination.getX()] = piece;
+        cells[destination.getY()][destination.getX()] = destination.getY() == 7 && (piece == 1 || piece == -1) ? 2 * piece : piece;
+
         if (capturedCoordinate == null) {
             whiteToMove = !whiteToMove;
             forcedPieceCaptureCoordinate = null;
+            moveLogs.addActionLog(action, true);
             return;
         }
+        System.out.println(capturedCoordinate);
         cells[capturedCoordinate.getY()][capturedCoordinate.getX()] = 0;
-        Tuple<List<Action>, List<Action>> newActionSpace = getPieceActionSpace(destination, piece);
-        forcedPieceCaptureCoordinate = newActionSpace.e1.isEmpty() ? null : action.getDestination();
+        List<Action> chainActionSpace = getPieceActionSpace(destination, piece).e1;
+
+        forcedPieceCaptureCoordinate = chainActionSpace.isEmpty() ? null : action.getDestination();
+        moveLogs.addActionLog(action, chainActionSpace.isEmpty());
+        whiteToMove = chainActionSpace.isEmpty() != whiteToMove;
     }
 
 
     /**
-     * Gets the action space of the piece | FORCED CAPTURE ACTIVE
+     * Gets the action space of the piece
      *
      * @param coordinate coordinate of the piece
      * @param piece      the value of the piece (1 for man, 2 for king, positive for white, negative for black)
@@ -108,7 +117,7 @@ public class Board {
                 continue;
             }
             Coordinate captureDestination = moveDestination.addedWith(action.getDeltaCoordinate());
-            if (arePiecesSameTeam(destinationPiece, piece) && getPieceAt(captureDestination) == 0) {
+            if (!arePiecesSameTeam(destinationPiece, piece) && getPieceAt(captureDestination) == 0) {
                 captureAvailable = true;
                 captureActions.add(new Action(action.getStart(), captureDestination));
             }
@@ -124,14 +133,14 @@ public class Board {
         List<Action> captureActions = new ArrayList<>();
         List<Action> nonCaptureActions = new ArrayList<>();
         boolean captureAvailable = false;
-        for (int row = 0; row < cells.length; row++) {
-            for (int col = 0; col < cells[0].length; col++) {
-                int piece = cells[row][col];
+        for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
+            for (int xIdx = (rowIdx % 2 == 0 ? 0 : 1); xIdx < 8; xIdx += 2) {
+                int piece = cells[rowIdx][xIdx];
                 //if no piece or piece color is not the color of the player who moves, skip
                 if (piece == 0 || (piece < 0 == whiteToMove)) {
                     continue;
                 }
-                Coordinate coordinate = new Coordinate(col, row);
+                Coordinate coordinate = new Coordinate(xIdx, rowIdx);
                 Tuple<List<Action>, List<Action>> pieceActionSpace = getPieceActionSpace(coordinate, piece);
                 if (!pieceActionSpace.e1.isEmpty()) {
                     captureAvailable = true;
@@ -143,6 +152,7 @@ public class Board {
                 }
             }
         }
+        System.out.println(captureAvailable);
         return captureAvailable ? captureActions : nonCaptureActions;
     }
 
@@ -200,14 +210,14 @@ public class Board {
         List<Move> captureMoves = new ArrayList<>();
         boolean captureAvailable = false;
         //Assuming piece values: Man = 1, King = 2 (+ for white, - for black)
-        for (int row = 0; row < cells.length; row++) {
-            for (int col = 0; col < cells[0].length; col++) {
-                int piece = cells[row][col];
+        for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
+            for (int xIdx = (rowIdx % 2 == 0 ? 0 : 1); xIdx < 8; xIdx += 2) {
+                int piece = cells[rowIdx][xIdx];
                 //if no piece or piece color is not the color of the player who moves, skip
                 if (piece == 0 || (piece < 0 == whiteToMove)) {
                     continue;
                 }
-                Coordinate coordinate = new Coordinate(col, row);
+                Coordinate coordinate = new Coordinate(xIdx, rowIdx);
                 Tuple<List<Move>, List<Move>> pieceMoveSpaces = getPieceMoveSpace(coordinate, piece);
                 if (!pieceMoveSpaces.e1.isEmpty()) {
                     captureAvailable = true;
@@ -224,6 +234,9 @@ public class Board {
 
 
     public int getPieceAt(Coordinate coordinate) {
+        if (coordinate.isInvalid()) {
+            return 0;
+        }
         return cells[coordinate.getY()][coordinate.getX()];
     }
 
@@ -244,33 +257,33 @@ public class Board {
      * <p>
      * Ally / Opponent assumes that it is from the player to move's POV
      *
-     * @return the board with pieces split into 4 channels
+     * @return the board with pieces split into 4 channels [Ally men, Ally king, Enemy men, Enemmy king]
      */
     public double[][][] splitBoardChannels() {
         double[][][] board = new double[4][8][8];
 
-        for (int r = 0; r < 8; r++) {
-            for (int c = 0; c < 8; c++) {
-                int val = cells[r][c];
+        for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
+            for (int xIdx = (rowIdx % 2 == 0 ? 0 : 1); xIdx < 8; xIdx += 2) {
+                int piece = cells[rowIdx][xIdx];
 
-                // ALLY men
-                if (val == 1) {
-                    board[whiteToMove ? 0 : 2][r][c] = 1;
+                // White men
+                if (piece == 1) {
+                    board[whiteToMove ? 0 : 2][rowIdx][xIdx] = 1;
                 }
 
-                // ALLY king
-                else if (val == 2) {
-                    board[whiteToMove ? 1 : 3][r][c] = 1;
+                // White king
+                else if (piece == 2) {
+                    board[whiteToMove ? 1 : 3][rowIdx][xIdx] = 1;
                 }
 
-                // OPPONENT men
-                else if (val == -1) {
-                    board[whiteToMove ? 0 : 2][r][c] = 1;
+                // Black men
+                else if (piece == -1) {
+                    board[whiteToMove ? 0 : 2][rowIdx][xIdx] = 1;
                 }
 
-                // OPPONENT king
-                else if (val == -2) {
-                    board[whiteToMove ? 3 : 1][r][c] = 1;
+                // Black king
+                else if (piece == -2) {
+                    board[whiteToMove ? 3 : 1][rowIdx][xIdx] = 1;
                 }
             }
         }
@@ -278,13 +291,13 @@ public class Board {
     }
 
     public static class MoveLogs {
-        private List<Move> whiteMoves = List.of(new Move());
-        private List<Move> blackMoves = List.of(new Move()); //size is either equal to or one less than that of white moves
+        private List<Move> whiteMoves;
+        private List<Move> blackMoves; //size is either equal to or one less than that of white moves
         private boolean whiteTurn = true;
 
         public MoveLogs() {
-            this.whiteMoves = List.of(new Move());
-            this.blackMoves = List.of(new Move());
+            this.whiteMoves = new ArrayList<Move>(List.of(new Move()));
+            this.blackMoves = new ArrayList<Move>(List.of(new Move()));
         }
 
         public void addActionLog(Action action, boolean turnOver) {
@@ -293,7 +306,7 @@ public class Board {
             if (!turnOver) {
                 return;
             }
-            playerMoves.add(new Move());
+            playerMoves.addLast(new Move());
             whiteTurn = !whiteTurn;
         }
 
@@ -303,9 +316,6 @@ public class Board {
             int blackMoveCount = blackMoves.size();
             for (int i = 0; i < blackMoveCount; i++) {
                 str += String.format("%s | %s\n", whiteMoves.get(i).toString(), blackMoves.get(i).toString());
-            }
-            if (blackMoves.size() < whiteMoves.size()) {
-                str += whiteMoves.get(blackMoveCount).toString();
             }
             return str;
         }
