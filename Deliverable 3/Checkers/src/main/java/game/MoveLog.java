@@ -37,7 +37,7 @@ public class MoveLog {
         String str = "";
         int blackMoveCount = blackMoves.size();
         for (int i = 0; i < blackMoveCount; i++) {
-            str += String.format("W:%s B: %s\n", whiteMoves.get(i).toString(), blackMoves.get(i).toString());
+            str += String.format("%s: W:%s B: %s\n", i + 1, whiteMoves.get(i).toString(), blackMoves.get(i).toString());
         }
         return str;
     }
