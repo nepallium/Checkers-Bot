@@ -1,5 +1,5 @@
 package game;
 
 public enum GameResult {
-    WIN, LOSS, DRAW, ONGOING;
+    WHITE_WIN, BLACK_WIN, DRAW, ONGOING;
 }
