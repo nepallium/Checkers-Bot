@@ -24,7 +24,7 @@ public class Board {
     public Board(int[][] cells, boolean whiteToMove) {
         this.cells = cells;
         this.whiteToMove = whiteToMove;
-        this.gameResult = GameResult.PLAYING;
+        this.gameResult = GameResult.ONGOING;
     }
 
 
@@ -33,7 +33,7 @@ public class Board {
         this.whiteToMove = true;
         this.moveLog = new MoveLog();
         this.positionLog = new PositionLog(Math.max(NeuralNet.CHANNELS / 4 - 4, DRAW_BY_REPETITION_REPEAT_AMOUNT)); //save up to 3 positions for the CNN
-        this.gameResult = GameResult.PLAYING;
+        this.gameResult = GameResult.ONGOING;
     }
 
     /**
@@ -65,11 +65,11 @@ public class Board {
     private boolean checkForWinner() {
         Tuple<Integer, Integer> playerPiecesCount = getPlayerPiecesCount();
         if (playerPiecesCount.e1 == 0) {
-            gameResult = GameResult.BLACK_WIN;
+            gameResult = GameResult.LOSS;
             return true;
         }
         if (playerPiecesCount.e2 == 0) {
-            gameResult = GameResult.WHITE_WIN;
+            gameResult = GameResult.WIN;
             return true;
         }
         return false;
@@ -90,7 +90,7 @@ public class Board {
      * @return if the game is over
      */
     public boolean isGameOver() {
-        return !gameResult.equals(GameResult.PLAYING);
+        return !gameResult.equals(GameResult.ONGOING);
     }
     public void applyAction(Action action) {
         if (isGameOver()) {
@@ -387,7 +387,7 @@ public class Board {
     @Override
     //The array string is flipped so the board can be perceived through the white player's point of view
     public String toString() {
-        String str = gameResult == GameResult.PLAYING ? String.format("%s to move \n", whiteToMove ? "White" : "Black") : String.format("Result: %s\n, Sorry %s, no turn for you.", gameResult.name(), whiteToMove ? "White" : "Black");
+        String str = gameResult == GameResult.ONGOING ? String.format("%s to move \n", whiteToMove ? "White" : "Black") : String.format("Result: %s\n, Sorry %s, no turn for you.", gameResult.name(), whiteToMove ? "White" : "Black");
         for (int rowIdx = 7; rowIdx >= 0; rowIdx--) {
             for (int xIdx = 0; xIdx < 8; xIdx++) {
                 str += String.format("[%4s]", cells[rowIdx][xIdx]);
@@ -421,8 +421,4 @@ public class Board {
             new int[]{-1, 0, -1, 0, -1, 0, -1, 0,},
             new int[]{0, -1, 0, -1, 0, -1, 0, -1,},
     };
-
-    public enum GameResult {
-        PLAYING, DRAW, WHITE_WIN, BLACK_WIN
-    }
 }
