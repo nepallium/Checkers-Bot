@@ -118,12 +118,14 @@ public class Board {
      * @return if applied successfully
      */
     public boolean applyMove(Move move) {
-        for (Action action : move.getActions()) {
+        List<Action> moveActions = move.getActions();
+        for (int i = 0; i < moveActions.size(); i++) {
+            Action action = moveActions.get(i);
             if (!checkValidAction(action)) {
                 System.out.printf("INVALID ACTION: %s", action);
                 return false;
             }
-            if (!applyAction(action)) {
+            if (!applyAction(action, i < (moveActions.size() -1))) {
                 System.out.printf("COULD NOT APPLY ACTION: %s", action);
                 return false;
             }
@@ -138,7 +140,7 @@ public class Board {
      * @param action action to apply
      * @return if the move has been successfully applied
      */
-    public boolean applyAction(Action action) {
+    public boolean applyAction(Action action, boolean chainIfPossible) {
         if (isGameOver()) {
             return false;
         }
@@ -167,13 +169,18 @@ public class Board {
         cells[capturedCoordinate.getY()][capturedCoordinate.getX()] = 0;
         boolean gameOver = checkForWinner();
         if (gameOver) {
-            printGameOver();
             whiteToMove = !whiteToMove;
             moveLog.addActionLog(action, true);
+            printGameOver();
+            return true;
+        }
+        if (!chainIfPossible) {
+            whiteToMove = !whiteToMove;
+            moveLog.addActionLog(action, true);
+            forcedPieceCaptureCoordinate = null;
             return true;
         }
         List<Action> chainActionSpace = getPieceActionSpace(destination, piece).e1;
-        System.out.printf("CAS: %s\n", chainActionSpace);
         forcedPieceCaptureCoordinate = chainActionSpace.isEmpty() ? null : action.getDestination();
         moveLog.addActionLog(action, chainActionSpace.isEmpty());
         whiteToMove = chainActionSpace.isEmpty() != whiteToMove;
@@ -338,6 +345,7 @@ public class Board {
         if (isGameOver()) {
             return null;
         }
+
         List<Move> nonCaptureMoves = new ArrayList<>();
         List<Move> captureMoves = new ArrayList<>();
         boolean captureAvailable = false;
