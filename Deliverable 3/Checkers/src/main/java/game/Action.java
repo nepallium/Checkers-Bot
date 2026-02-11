@@ -30,7 +30,7 @@ public class Action {
 
     public Coordinate getCaptureCoordinate() {
         Coordinate deltaCoordinates = getDeltaCoordinate();
-        if (deltaCoordinates.getX() == 1) {
+        if (deltaCoordinates.getX() == 1 || deltaCoordinates.getX() == -1) {
             return null;
         }
         return getStart().addedWith(deltaCoordinates.halved());
