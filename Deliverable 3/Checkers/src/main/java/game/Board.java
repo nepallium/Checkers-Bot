@@ -1,6 +1,7 @@
 package game;
 
 import Util.Tuple;
+import model.NeuralNet;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -22,17 +23,18 @@ public class Board {
         this.whiteToMove = whiteToMove;
     }
 
-    public Board() {
-        this(3);
-    }
 
-    public Board(int positionLogCount) {
+    public Board() {
         this.cells = getStartingBoard();
         this.whiteToMove = true;
         this.moveLog = new MoveLog();
-        this.positionLog = new PositionLog(positionLogCount); //save up to 3 positions for the CNN
+        this.positionLog = new PositionLog(NeuralNet.CHANNELS / 4 - 4); //save up to 3 positions for the CNN
     }
 
+    /**
+     * Generates an array for the starting board
+     * @return 8x8 array of the starting board
+     */
     private static int[][] getStartingBoard() {
         //empty board
         int[][] newCells = new int[8][8];
@@ -261,7 +263,7 @@ public class Board {
      * @param whiteAsAlly whether to consider white as an ally (or black)
      * @return [board channel]([][] board)
      */
-    public static double[][][] splitBoardChannels(int[][] cells, boolean whiteAsAlly) {
+    public static double[][][] splitPositionChannels(int[][] cells, boolean whiteAsAlly) {
         double[][][] board = new double[4][8][8];
 
         for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
@@ -293,7 +295,7 @@ public class Board {
     }
 
     /**
-     * Splits the board cells into 4 channels:
+     * Splits the board cells into X * 4 channels [X is the amount of positions (current + Y most recent positions)]:
      * 0: ALLY men
      * 1: ALLY king
      * 2: OPPONENT men
@@ -301,10 +303,21 @@ public class Board {
      * <p>
      * Ally / Opponent assumes that it is from the player to move's POV
      *
-     * @return the board with pieces split into 4 channels [Ally men, Ally king, Enemy men, Enemy king]
+     * @return the board with pieces split into channels [Ally men, Ally king, Enemy men, Enemy king] for X positions
      */
     public double[][][] splitBoardChannels() {
-        return splitBoardChannels(cells, whiteToMove);
+        List<int[][]> positionLogs = new LinkedList<>(List.copyOf(positionLog.getRecentPositions())) ;
+        positionLogs.addFirst(cells);
+        double[][][] boardChannels = new double[NeuralNet.CHANNELS][8][8];
+
+        for (int i = 0; i < NeuralNet.CHANNELS / 4; i++) {
+            int[][] position = positionLogs.size() > i ? positionLogs.get(i) : STARTING_BOARD;
+            double[][][] positionChannels = splitPositionChannels(position, whiteToMove);
+            for (int j = 0; j < 4; j++) {
+                boardChannels[i * 4 + j] = positionChannels[j];
+            }
+        }
+        return boardChannels;
     }
 
 
@@ -379,4 +392,19 @@ public class Board {
             return maxPositionLogs;
         }
     }
+
+    /**
+     * Array for the starting board.
+     * NOT IMMUTABLE. HANDLE WITH CARE
+     */
+    public static final int[][] STARTING_BOARD = new int[][] {
+            new int[] {1,0,1,0,1,0,1,0,},
+            new int[] {0,1,0,1,0,1,0,1,},
+            new int[] {1,0,1,0,1,0,1,0,},
+            new int[] {0,0,0,0,0,0,0,0,},
+            new int[] {0,0,0,0,0,0,0,0,},
+            new int[] {0,-1,0,-1,0,-1,0,-1,},
+            new int[] {-1,0,-1,0,-1,0,-1,0,},
+            new int[] {0,-1,0,-1,0,-1,0,-1,},
+    };
 }
