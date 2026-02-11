@@ -56,9 +56,9 @@ public class NeuralNet {
 
         // CONVOLUTIONAL LAYERS
         // numFeatureMaps (m) * 8 * 8, featureMaps[m][r][c] == how strongly pattern m is present around square (r, c)
-        double[][][] featureMaps1 = cl1.forward(board);
-        double[][][] featureMaps2 = cl2.forward(featureMaps1);
-        double[][][] featureMaps3 = cl3.forward(featureMaps2);
+        double[][][] featureMaps1 = cl1.forwardWithActivation(board);
+        double[][][] featureMaps2 = cl2.forwardWithActivation(featureMaps1);
+        double[][][] featureMaps3 = cl3.forwardWithActivation(featureMaps2);
 
         double[] flattenedMaps = flatten(featureMaps3);
 

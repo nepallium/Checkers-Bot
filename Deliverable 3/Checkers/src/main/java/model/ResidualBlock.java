@@ -1,4 +1,5 @@
-
+package model;
+import model.ConvolutionalLayer;
 
 public class ResidualBlock {
     ConvolutionalLayer layer1;
