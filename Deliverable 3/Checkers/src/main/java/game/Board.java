@@ -61,6 +61,7 @@ public class Board {
 
     /**
      * Checks for if a player has won, if yes, returns true and sets the game result accordingly
+     *
      * @return if a player has won or not
      */
     private boolean checkForWinner() {
@@ -78,6 +79,7 @@ public class Board {
 
     /**
      * Checks for a draw by repetition and changes game state accordingly
+     *
      * @return if the game is drawn
      */
     private boolean checkForDraw() {
@@ -88,6 +90,7 @@ public class Board {
 
     /**
      * Checks if the game is over from the game result
+     *
      * @return if the game is over
      */
     public boolean isGameOver() {
@@ -96,13 +99,14 @@ public class Board {
 
     /**
      * Checks if an action is valid
+     *
      * @param action action to check
      * @return true if the action is valid
      */
     public boolean checkValidAction(Action action) {
         int movingPiece = getPieceAt(action.getStart());
         //If the start of the action is invalid / empty or if the destination is invalid / occupied or if there is a capture destination that is empty
-        if (arePiecesNonAllied(movingPiece, whiteToMove ? 1 : -1)|| action.getDestination().isInvalid() || getPieceAt(action.getDestination()) != 0 || (action.getCaptureCoordinate() != null && getPieceAt(action.getCaptureCoordinate()) == 0)) {
+        if (arePiecesNonAllied(movingPiece, whiteToMove ? 1 : -1) || action.getDestination().isInvalid() || getPieceAt(action.getDestination()) != 0 || (action.getCaptureCoordinate() != null && getPieceAt(action.getCaptureCoordinate()) == 0)) {
             return false;
         }
         return (Math.abs(action.getDeltaCoordinate().getY()) == Math.abs(action.getDeltaCoordinate().getX()) && action.getDeltaCoordinate().getX() <= 2) && (Math.abs(movingPiece) == 2 || action.getDeltaCoordinate().getY() > 0 == movingPiece > 0);
@@ -110,6 +114,7 @@ public class Board {
 
     /**
      * Applies a move to the game and checks for any changes in the game result
+     *
      * @param move move to apply
      * @return if applied successfully
      */
@@ -121,7 +126,10 @@ public class Board {
                 System.out.printf("INVALID ACTION: %s", action);
                 throw new InvalidParameterException("INVALID ACTION");
             }
-            applyAction(action);
+            if (!applyAction(action)) {
+                System.out.printf("COULD NOT APPLY ACTION: %s", action);
+                return false;
+            }
         }
         return true;
     }
@@ -129,17 +137,20 @@ public class Board {
 
     /**
      * Applies an action to the game and checks for any changes in the game result
+     *
      * @param action action to apply
+     * @return if the move has been successfully applied
      */
-    public void applyAction(Action action) {
+    public boolean applyAction(Action action) {
         if (isGameOver()) {
-            return;
+            return false;
         }
         Coordinate start = action.getStart();
 
         int piece = getPieceAt(start);
         if (piece == 0 || piece > 0 != whiteToMove || (forcedPieceCaptureCoordinate != null && !start.equals(forcedPieceCaptureCoordinate))) {
-            return;
+            System.out.println(String.format("%s || %s || %s ^ %s", piece == 0, piece > 0 != whiteToMove, forcedPieceCaptureCoordinate != null, !start.equals(forcedPieceCaptureCoordinate)));
+            return false;
         }
         positionLog.addPosition(cells);
         Coordinate destination = action.getDestination();
@@ -147,7 +158,6 @@ public class Board {
         cells[start.getY()][start.getX()] = 0;
         cells[destination.getY()][destination.getX()] = ((destination.getY() == 7 && piece == 1) || (destination.getY() == 0 && piece == -1)) ? (piece == 1 ? KING_VALUE : -KING_VALUE) : piece;
         if (capturedCoordinate == null) {
-
             whiteToMove = !whiteToMove;
             forcedPieceCaptureCoordinate = null;
             moveLog.addActionLog(action, true);
@@ -155,24 +165,27 @@ public class Board {
             if (gameOver) {
                 printGameOver();
             }
-            return;
+            return true;
         }
         cells[capturedCoordinate.getY()][capturedCoordinate.getX()] = 0;
         boolean gameOver = checkForWinner();
         if (gameOver) {
             printGameOver();
             whiteToMove = !whiteToMove;
-            return;
+            moveLog.addActionLog(action, true);
+            return true;
         }
         List<Action> chainActionSpace = getPieceActionSpace(destination, piece).e1;
-
+        System.out.printf("CAS: %s\n", chainActionSpace);
         forcedPieceCaptureCoordinate = chainActionSpace.isEmpty() ? null : action.getDestination();
         moveLog.addActionLog(action, chainActionSpace.isEmpty());
         whiteToMove = chainActionSpace.isEmpty() != whiteToMove;
+        return true;
     }
 
     /**
      * Gets the count of each player's pieces (regardless of type)
+     *
      * @return (White pieces count, Black pieces count)
      */
     public Tuple<Integer, Integer> getPlayerPiecesCount() {
@@ -203,25 +216,27 @@ public class Board {
         List<Action> pieceActions = (Math.abs(piece) > 1 ? coordinate.getPossibleKingActions() : coordinate.getPossibleManActions(piece > 0));
         boolean captureAvailable = false;
         for (Action action : pieceActions) {
-            Coordinate moveDestination = action.getDestination();
-            int destinationPiece = getPieceAt(moveDestination);
+            Coordinate actionDestination = action.getDestination();
+            int destinationPiece = getPieceAt(actionDestination);
             if (destinationPiece == 0) {
                 if (!captureAvailable) {
                     nonCaptureActions.add(action);
                 }
                 continue;
             }
-            Coordinate captureDestination = moveDestination.addedWith(action.getDeltaCoordinate());
-            if (arePiecesNonAllied(destinationPiece, piece) && getPieceAt(captureDestination) == 0) {
-                captureAvailable = true;
-                captureActions.add(new Action(action.getStart(), captureDestination));
+            Coordinate captureDestination = actionDestination.addedWith(action.getDeltaCoordinate());
+            if (captureDestination.isInvalid() || !arePiecesNonAllied(destinationPiece, piece) || getPieceAt(captureDestination) != 0) {
+                continue;
             }
+            captureAvailable = true;
+            captureActions.add(new Action(action.getStart(), captureDestination));
         }
         return new Tuple<List<Action>, List<Action>>(captureActions, nonCaptureActions);
     }
 
     /**
      * Gets the action space for the current player at the board
+     *
      * @return list of possible actions for the current player | null if game is over
      */
     public List<Action> getBoardActionSpace() {
@@ -239,7 +254,7 @@ public class Board {
             for (int xIdx = (rowIdx % 2 == 0 ? 0 : 1); xIdx < 8; xIdx += 2) {
                 int piece = cells[rowIdx][xIdx];
                 //if no piece or piece color is not the color of the player who moves, skip
-                if (piece == 0 || (piece < 0 == whiteToMove)) {
+                if (piece == 0 || (piece > 0 != whiteToMove)) {
                     continue;
                 }
                 Coordinate coordinate = new Coordinate(xIdx, rowIdx);
@@ -262,19 +277,32 @@ public class Board {
      *
      * @param coordinate coordinate of the piece
      * @param piece      the value of the piece (1 for man, 2 for king, positive for white, negative for black)
-     *                   //* @param previousCaptures [used for recursion], stores the previous captures made by the piece (if the move follows a capture)
      * @return two lists of all possible moves for the piece (captures, non captures) | null if game is over or invalid coordinate / piece
      */
     public Tuple<List<Move>, List<Move>> getPieceMoveSpace(Coordinate coordinate, int piece) {
+        return getPieceMoveSpace(coordinate, piece, new ArrayList<>());
+    }
+
+    /**
+     * Gets the move space of the piece
+     *
+     * @param coordinate          coordinate of the piece
+     * @param piece               the value of the piece (1 for man, 2 for king, positive for white, negative for black)
+     * @param filteredCoordinates [used for recursion], stores the coordinates of previous captures to not backtrack | NOT NULL
+     * @return two lists of all possible moves for the piece (captures, non captures) | null if game is over or invalid coordinate / piece
+     */
+    public Tuple<List<Move>, List<Move>> getPieceMoveSpace(Coordinate coordinate, int piece, List<Coordinate> filteredCoordinates) {
         if (isGameOver() || coordinate.isInvalid() || isPieceInvalid(piece)) {
             return null;
         }
         List<Move> captureMoves = new ArrayList<>();
         List<Move> nonCaptureMoves = new ArrayList<>();
-        boolean captureAvailable = false;
         List<Action> pieceActions = (Math.abs(piece) == 2 ? coordinate.getPossibleKingActions() : coordinate.getPossibleManActions(piece > 0));
         for (Action action : pieceActions) {
             Coordinate moveDestination = action.getDestination();
+            if (filteredCoordinates.contains(moveDestination)) {
+                continue;
+            }
             int destinationPiece = getPieceAt(moveDestination);
             //if there is no piece on the square, the move is valid
             if (destinationPiece == 0) {
@@ -283,17 +311,23 @@ public class Board {
             }
             Coordinate captureDestination = action.getDestination().addedWith(action.getDeltaCoordinate());
             //if there is a piece on the square, check if it can be captured
-            if (!captureDestination.isInvalid() && getPieceAt(captureDestination) == 0 && arePiecesNonAllied(destinationPiece, piece)) {
-                captureAvailable = true;
-                captureMoves.add(new Move(action.getStart(), captureDestination));
-                //after captures, can move again if is another capture
-                Tuple<List<Move>, List<Move>> nextActionSpaces = getPieceMoveSpace(captureDestination, piece);
-                for (Move captureMove : nextActionSpaces.e1) {
-                    List<Action> moveActions = new ArrayList<>(captureMove.getActions());
-                    moveActions.addFirst(action);
-                    captureMoves.add(new Move(moveActions));
-                }
+            if (captureDestination.isInvalid() || getPieceAt(captureDestination) != 0 || !arePiecesNonAllied(destinationPiece, piece)) {
+                continue;
             }
+
+            captureMoves.add(new Move(action.getStart(), captureDestination));
+            filteredCoordinates.add(moveDestination);
+            //after captures, can move again if is another capture
+            Tuple<List<Move>, List<Move>> nextActionSpaces = getPieceMoveSpace(captureDestination, piece, filteredCoordinates);
+            for (Move chainMoves : nextActionSpaces.e1) {
+                List<Action> chainActions = new LinkedList<>(chainMoves.getActions());
+                if (chainActions.isEmpty()) {
+                    continue;
+                }
+                chainActions.addFirst(new Action(action.getStart(), captureDestination));
+                captureMoves.add(new Move(chainActions));
+            }
+
         }
         return new Tuple<List<Move>, List<Move>>(captureMoves, nonCaptureMoves);
     }
@@ -343,6 +377,7 @@ public class Board {
 
     /**
      * Checks if pieces are not allies
+     *
      * @param piece1 piece 1
      * @param piece2 piece 2
      * @return false if piece 1 and piece 2 are in the same team, true if not or if one (or both) are not pieces
@@ -428,12 +463,12 @@ public class Board {
     @Override
     //The array string is flipped so the board can be perceived through the white player's point of view
     public String toString() {
-        String str = gameResult == GameResult.ONGOING ? String.format("%s to move \n", whiteToMove ? "White" : "Black") : String.format("Result: %s\n, Sorry %s, no turn for you.", gameResult.name(), whiteToMove ? "White" : "Black");
+        String str = gameResult == GameResult.ONGOING ? String.format("%s to move \n", whiteToMove ? "White" : "Black") : String.format("Result: %s [Would be %s to move]\n", gameResult.name(), whiteToMove ? "White" : "Black");
         for (int rowIdx = 7; rowIdx >= 0; rowIdx--) {
             for (int xIdx = 0; xIdx < 8; xIdx++) {
                 str += String.format("[%4s]", cells[rowIdx][xIdx]);
             }
-            str += "\n";
+            str += rowIdx == 0 ? (forcedPieceCaptureCoordinate == null ? "" : String.format("Forced to capture with piece at: %s", forcedPieceCaptureCoordinate)) : "\n";
         }
         str += String.format("\nLOGS\n%s", moveLog.toString());
         return str;

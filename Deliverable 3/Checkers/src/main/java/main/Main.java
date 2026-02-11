@@ -20,11 +20,16 @@ public class Main {
         // DANIEL
         Board b = new Board();
         //Test playing
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 100; i++) {
             System.out.println(b);
             List<Move> ms = b.getBoardMoveSpace();
+            if (ms == null) {
+                break;
+            }
             System.out.printf("Move space: %s\n",ms);
-            if (!b.applyMove(ms.get((int)(Math.random() * ms.size())))) break;
+            if (!b.applyMove(ms.get((int)(Math.random() * ms.size())))) {
+                break;
+            };
         }
         System.out.println(b);
 
