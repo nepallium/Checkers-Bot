@@ -105,6 +105,10 @@ public class Coordinate {
         return String.format("[%s, %s]", x, y);
     }
 
+    public String toStringNotation() {
+        return String.format("[%s, %s]", x + 1, y + 1);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
