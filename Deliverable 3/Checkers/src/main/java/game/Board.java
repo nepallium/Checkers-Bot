@@ -14,7 +14,6 @@ public class Board {
     public static final int MAN_VALUE = 1;
     public static final int KING_VALUE = 2;
     public static final int DRAW_BY_REPETITION_REPEAT_AMOUNT = 3;
-    private static final int SPLIT_CHANNELS_POSITION_COUNT = NeuralNet.CHANNELS / 4 - 4;
 
     private MoveLog moveLog;
     private PositionLog positionLog;
@@ -33,7 +32,8 @@ public class Board {
         this.cells = getStartingBoard();
         this.whiteToMove = true;
         this.moveLog = new MoveLog();
-        this.positionLog = new PositionLog(Math.max(SPLIT_CHANNELS_POSITION_COUNT, DRAW_BY_REPETITION_REPEAT_AMOUNT)); //save up to 3 positions for the CNN
+        this.positionLog = new PositionLog(Math.max(NeuralNet.CHANNELS / 4 - 4, DRAW_BY_REPETITION_REPEAT_AMOUNT)); //save up to 3 positions for the CNN
+        this.gameResult = GameResult.PLAYING;
     }
 
     /**
@@ -92,7 +92,6 @@ public class Board {
     public boolean isGameOver() {
         return !gameResult.equals(GameResult.PLAYING);
     }
-
     public void applyAction(Action action) {
         if (isGameOver()) {
             return;
@@ -370,7 +369,7 @@ public class Board {
      * @return the board with pieces split into channels [Ally men, Ally king, Enemy men, Enemy king] for X positions
      */
     public double[][][] splitBoardChannels() {
-        List<int[][]> positionLogs = new LinkedList<>(positionLog.getRecentPositions().subList(0, SPLIT_CHANNELS_POSITION_COUNT));
+        List<int[][]> positionLogs = new LinkedList<>(positionLog.getRecentPositions());
         positionLogs.addFirst(cells);
         double[][][] boardChannels = new double[NeuralNet.CHANNELS][8][8];
 
