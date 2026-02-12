@@ -62,8 +62,8 @@ public class MCTS {
             }
         }
 
-        board.applyMove(bestMove);
         Board nextBoard = board.getBoardDuplicate();
+        nextBoard.applyMove(bestMove);
         double value = -simulate(bestChild, nextBoard);
 
         node.visitCount++;
