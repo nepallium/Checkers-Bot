@@ -30,7 +30,7 @@ public class MoveLog {
      * @param action   action to add
      * @param turnOver whether the turn is over or not
      */
-    public void addActionLog(Action action, boolean turnOver) {
+    public void addActionLog(ActionResult action, boolean turnOver) {
         List<Move> playerMoves = whiteTurn ? whiteMoves : blackMoves;
         playerMoves.getLast().addAction(action);
         if (!turnOver) {

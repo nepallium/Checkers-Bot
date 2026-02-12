@@ -117,9 +117,9 @@ public class Board {
      * @return if applied successfully
      */
     public boolean applyMove(Move move) {
-        List<Action> moveActions = move.getActions();
+        List<ActionResult> moveActions = move.getActions();
         for (int i = 0; i < moveActions.size(); i++) {
-            Action action = moveActions.get(i);
+            ActionResult action = moveActions.get(i);
             if (!checkValidAction(action)) {
                 System.out.printf("INVALID ACTION: %s", action);
                 return false;
@@ -139,7 +139,7 @@ public class Board {
      * @param action action to apply
      * @return if the move has been successfully applied
      */
-    public boolean applyAction(Action action, boolean chainIfPossible) {
+    public boolean applyAction(ActionResult action, boolean chainIfPossible) {
         if (isGameOver()) {
             return false;
         }
@@ -147,7 +147,7 @@ public class Board {
 
         int piece = getPieceAt(start);
         if (piece == 0 || piece > 0 != whiteToMove || (forcedPieceCaptureCoordinate != null && !start.equals(forcedPieceCaptureCoordinate))) {
-            System.out.println(String.format("%s || %s || %s ^ %s", piece == 0, piece > 0 != whiteToMove, forcedPieceCaptureCoordinate != null, !start.equals(forcedPieceCaptureCoordinate)));
+            //System.out.println(String.format("%s || %s || %s ^ %s", piece == 0, piece > 0 != whiteToMove, forcedPieceCaptureCoordinate != null, !start.equals(forcedPieceCaptureCoordinate)));
             return false;
         }
         positionLog.addPosition(cells);
@@ -309,7 +309,7 @@ public class Board {
             int destinationPiece = getPieceAt(moveDestination);
             //if there is no piece on the square, the move is valid
             if (destinationPiece == 0) {
-                nonCaptureMoves.add(new Move(action));
+                nonCaptureMoves.add(new Move(new ActionResult(action)));
                 continue;
             }
             Coordinate captureDestination = action.getDestination().addedWith(action.getDeltaCoordinate());
@@ -318,16 +318,16 @@ public class Board {
                 continue;
             }
 
-            captureMoves.add(new Move(action.getStart(), captureDestination));
+            captureMoves.add(new Move(new ActionResult(action.getStart(), captureDestination, destinationPiece)));
             filteredCoordinates.add(moveDestination);
             //after captures, can move again if is another capture
             Tuple<List<Move>, List<Move>> nextActionSpaces = getPieceMoveSpace(captureDestination, piece, filteredCoordinates);
             for (Move chainMoves : nextActionSpaces.e1) {
-                List<Action> chainActions = new LinkedList<>(chainMoves.getActions());
+                List<ActionResult> chainActions = new LinkedList<>(chainMoves.getActions());
                 if (chainActions.isEmpty()) {
                     continue;
                 }
-                chainActions.addFirst(new Action(action.getStart(), captureDestination));
+                chainActions.addFirst(new ActionResult(action.getStart(), captureDestination, destinationPiece));
                 captureMoves.add(new Move(chainActions));
             }
 

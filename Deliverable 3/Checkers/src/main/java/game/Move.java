@@ -6,36 +6,25 @@ import java.util.Objects;
 
 public class Move{
 
-    private final List<Action> actions;
+    private final List<ActionResult> actions;
 
     public Move() {
         this(new ArrayList<>());
     }
 
-    public Move(List<Action> actions) {
+    public Move(List<ActionResult> actions) {
         this.actions = actions;
     }
 
-    public Move(Coordinate start, List<Coordinate> captureCoordinates) {
-        this.actions = new ArrayList<>();
-        Coordinate lastCoordinate = start;
-        for (Coordinate capture : captureCoordinates) {
-            Coordinate endCoordinate = lastCoordinate.addedWith(capture.getSubtracted(lastCoordinate));
-            actions.add(new Action(lastCoordinate, endCoordinate));
-            lastCoordinate = endCoordinate;
-
-        }
-    }
-
-    public Move(Action action) {
+    public Move(ActionResult action) {
         this.actions = List.of(action);
     }
 
-    public Move(Coordinate start, Coordinate destination) {
-        this.actions = List.of(new Action(start, destination));
+    public Move(Coordinate start, Coordinate destination, int capturedPiece) {
+        this.actions = List.of(new ActionResult(start, destination, capturedPiece));
     }
 
-    public void addAction(Action action) {
+    public void addAction(ActionResult action) {
         this.actions.add(action);
     }
 
@@ -61,7 +50,7 @@ public class Move{
         return !(actions.size() >= 2);
     }
 
-    public List<Action> getActions() {
+    public List<ActionResult> getActions() {
         return actions;
     }
 }
