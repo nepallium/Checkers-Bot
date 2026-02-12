@@ -365,11 +365,46 @@ public class Board {
         return captureAvailable ? captureMoves : nonCaptureMoves;
     }
 
+    public boolean undoLastMove() {
+        Move undoingMove = moveLog.popLastMove();
+        if (undoingMove == null) {
+            return false;
+        }
+        System.out.println(undoingMove);
+        boolean result = undoMove(undoingMove);
+        gameResult = GameResult.ONGOING;
+        return result;
+    }
+
     /**
      * Undoes the last move and gives the turn back to the other player
+     * @return if it was undone successfully
      */
-    public void undoMove() {
+    public boolean undoMove(Move move) {
+        for (int i = move.getActions().size() - 1; i >= 0; i--) {
+            if (!undoAction(move.getActions().get(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 
+    /**
+     * Undoes the action if possible
+     * @param action action result to undo
+     * @return if action was undone successfully
+     */
+    public boolean undoAction(ActionResult action) {
+        int piece = getPieceAt(action.getDestination());
+        if (piece == 0) {
+            return false;
+        }
+        cells[action.getDestination().getY()][action.getDestination().getX()] = 0;
+        cells[action.getStart().getY()][action.getStart().getX()] = piece;
+        if (action.getCaptureCoordinate() != null) {
+            cells[action.getStart().getY()][action.getStart().getX()] = action.getCapturedPiece();
+        }
+        return true;
     }
 
     public int getPieceAt(Coordinate coordinate) {
