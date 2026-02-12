@@ -425,7 +425,7 @@ public class Board {
 
                 // Black men
                 else if (piece == -1) {
-                    board[whiteAsAlly ? 0 : 2][rowIdx][xIdx] = 1;
+                    board[whiteAsAlly ? 2 : 0][rowIdx][xIdx] = 1;
                 }
 
                 // Black king
