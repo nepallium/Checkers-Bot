@@ -90,7 +90,7 @@ public class DenseLayer {
         for (int i = 0; i < outputVect.length; i++) {
             this.postActivationOutput[i] = Math.tanh(outputVect[i]);
         }
-        return postActivationOutput;
+        return postActivationOutput[0];
     }
 
     public double[] getPostActOutput() {
