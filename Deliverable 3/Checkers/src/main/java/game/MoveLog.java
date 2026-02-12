@@ -52,6 +52,21 @@ public class MoveLog {
         return str;
     }
 
+    /**
+     * Returns the last move played and removes it from the logs
+     * @return the last move played
+     */
+    public Move popLastMove() {
+        //black moves last, so check for black first
+        if (!blackMoves.getLast().getActions().isEmpty()) {
+            return blackMoves.removeLast();
+        }
+        if (!whiteMoves.getLast().getActions().isEmpty()) {
+            return whiteMoves.removeLast();
+        }
+        return blackMoves.remove(blackMoves.size() - 2);
+    }
+
     public List<Move> getWhiteMoves() {
         return whiteMoves;
     }
