@@ -5,6 +5,8 @@ public class ResidualBlock {
     ConvolutionalLayer layer1;
     ConvolutionalLayer layer2;
 
+    private postActivationOutput2[][][];
+
     public ResidualBlock(ConvolutionalLayer layer1, ConvolutionalLayer layer2) {
         this.layer1 = layer1;
         this.layer2 = layer2;
@@ -22,7 +24,8 @@ public class ResidualBlock {
                 }
             }
         }
-
+        
+        this.postActivationOutput2 = out;
         return out;
     }
 
@@ -40,4 +43,23 @@ public class ResidualBlock {
         return sum;
     }
 
+    public double ReLu(double x) {
+        return Math.max(0, x);
+    }
+
+        public ConvolutionalLayer getLayer1() {
+        return this.layer1;
+    }
+
+    public ConvolutionalLayer getLayer2() {
+        return this.layer1;
+    }
+
+    public double[][][] getPostActOutput1() {
+        return layer1.getPostActOutput();
+    }
+
+    public double[][][] getPostActOutput2() {
+        return this.postActivationOutput2;
+    }
 }

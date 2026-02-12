@@ -3,6 +3,8 @@ package model;
 import java.util.Random;
 
 public class ConvolutionalLayer {
+    private double[][][] postActivationOutput;
+
    public class BoardSize {
        int width;
        int height;
@@ -64,7 +66,7 @@ public class ConvolutionalLayer {
                 }
             }
         }
-
+        this.postActivationOutput = ans;
         return ans;
     }
 
@@ -97,5 +99,9 @@ public class ConvolutionalLayer {
         }
 
         return ans;
+    }
+
+    public double[][][] getPostActOutput() {
+        return postActivationOutput;
     }
 }

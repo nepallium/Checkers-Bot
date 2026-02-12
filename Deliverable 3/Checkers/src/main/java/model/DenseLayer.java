@@ -11,6 +11,7 @@ public class DenseLayer {
     private double[] bias;
     private int inputSize;
     private int outputSize;
+    private double[] postActivationOutput;
 
     public DenseLayer (int inputSize, int outputSize) {
         this.weights = new double[outputSize][inputSize];
@@ -58,8 +59,9 @@ public class DenseLayer {
             }
             outputVect[i] = Activation.relu(outputVect[i] + bias[i]);
         }
+        this.postActivationOutput = outputVect;
 
-        return outputVect;
+        return postActivationOutput;
     }
 
     public double[] policyOutput(double[] inputVector) {
@@ -71,7 +73,9 @@ public class DenseLayer {
             outputVect[i] = outputVect[i] + bias[i];
         }
 
-        return Activation.softmax(outputVect);
+        this.postActivationOutput = softmax(outputVect);
+
+        return postActivationOutput;
     }
 
     public double valueOutput(double[] inputVector) {
@@ -82,7 +86,14 @@ public class DenseLayer {
             }
             outputVect[i] = outputVect[i] + bias[i];
         }
-        
-        return Math.tanh(outputVect[0]);
+
+        for (int i = 0; i < outputVect.length; i++) {
+            this.postActivationOutput[i] = Math.tanh(outputVect[i]);
+        }
+        return postActivationOutput;
+    }
+
+    public double[] getPostActOutput() {
+        return this.postActivationOutput;
     }
 }
