@@ -22,7 +22,7 @@ public class Main {
         //Test playing
         for (int i = 0; i < 100; i++) {
             List<Move> ms = b.getBoardMoveSpace();
-            if (ms == null) {
+            if (ms == null || ms.isEmpty()) {
                 break;
             }
             System.out.printf("Move space: %s\n",ms);
@@ -31,6 +31,13 @@ public class Main {
                 break;
             };
         }
+        for (int i = 0; i < 100; i++) {
+            if(!b.undoLastMove()) {
+                System.out.println("could not undo");
+                break;
+            };
+        }
+        System.out.println(b);
 
         //List<Move> globalActionSpace = b.getGlobalMoveSpace(true);
         //globalActionSpace.forEach(System.out::println);
