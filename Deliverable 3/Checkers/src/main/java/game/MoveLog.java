@@ -59,10 +59,22 @@ public class MoveLog {
     public Move popLastMove() {
         //black moves last, so check for black first
         if (!blackMoves.getLast().getActions().isEmpty()) {
-            return blackMoves.removeLast();
+            whiteTurn = true;
+            Move move = blackMoves.removeLast();
+            blackMoves.add(new Move());
+            return move;
         }
+        //Check for white
         if (!whiteMoves.getLast().getActions().isEmpty()) {
-            return whiteMoves.removeLast();
+            whiteTurn = false;
+            Move move = whiteMoves.removeLast();
+            whiteMoves.add(new Move());
+            return move;
+        }
+        //Must be black's second to last log
+        whiteTurn = true;
+        if (blackMoves.size() <= 1) {
+            return null;
         }
         return blackMoves.remove(blackMoves.size() - 2);
     }
