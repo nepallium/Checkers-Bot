@@ -18,7 +18,7 @@ public class ResidualBlock {
         for (int i = 0; i < out.length; i++) {
             for(int j = 0; j < out[i].length; j++) {
                 for (int k = 0; k < out[i][j].length; k++) {
-                    out[i][j][k] = ReLu(out[i][j][k]);
+                    out[i][j][k] = Activation.relu(out[i][j][k]);
                 }
             }
         }
@@ -39,10 +39,5 @@ public class ResidualBlock {
 
         return sum;
     }
-
-    public double ReLu(double x) {
-        return Math.max(0, x);
-    }
-
 
 }

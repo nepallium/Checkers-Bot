@@ -50,37 +50,13 @@ public class DenseLayer {
         }
     }
 
-    public double ReLu(double x) {
-        return Math.max(0, x);
-    }
-
-    public double[] softmax(double[] input) {
-        double max = input[0];
-
-        for (int i = 1; i < input.length; i++) {
-            if (input[i] > max) max = input[i];
-        }
-
-        double eSum = 0;
-        for (int i = 0; i < outputSize; i++) {
-            input[i] = Math.exp(input[i] - max);
-            eSum += input[i];
-        }
-
-        for (int i = 0; i < outputSize; i++) {
-            input[i] = Math.exp(input[i]) / eSum;
-        }
-
-        return input;
-    }
-
     public double[] forward(double[] inputVector) {
         double[] outputVect = new double[outputSize];
         for (int i = 0; i < outputSize; i++) {
             for(int j = 0; j < inputSize; j++) {
                 outputVect[i] += inputVector[j] * weights[i][j];
             }
-            outputVect[i] = ReLu(outputVect[i] + bias[i]);
+            outputVect[i] = Activation.relu(outputVect[i] + bias[i]);
         }
 
         return outputVect;
@@ -95,7 +71,7 @@ public class DenseLayer {
             outputVect[i] = outputVect[i] + bias[i];
         }
 
-        return softmax(outputVect);
+        return Activation.softmax(outputVect);
     }
 
     public double valueOutput(double[] inputVector) {
