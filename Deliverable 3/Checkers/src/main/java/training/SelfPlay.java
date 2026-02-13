@@ -1,7 +1,9 @@
 package training;
 
+import Util.Tuple;
 import game.Board;
 import game.GameResult;
+import game.Move;
 import mcts.MCTS;
 import model.NeuralNet;
 
@@ -30,14 +32,16 @@ public class SelfPlay {
 
         while (board.getGameResult() == GameResult.ONGOING) {
             // gets mcts policy, aka not improved
-            double[] policy = mcts.run(board);
+            Tuple<double[], List<Move>> output = mcts.run(board);
+            double[] policy = output.e1;
+            List<Move> moves = output.e2;
 
             examples.add(new TrainingExample(board.splitBoardChannels(), policy, !board.isWhiteToMove()));
 
             // TODO pick action with sampling early, then argmax later
-            double bestMove = argmax(policy);
+            int bestMoveIdx = argmax(policy);
 
-            // TODO apply bestMove to board
+            board.applyMove(moves.get(bestMoveIdx));
         }
 
         // UPDATE z-value for training examples
@@ -61,22 +65,26 @@ public class SelfPlay {
     }
 
     /**
-     * Gets the max value (not idx) from a policy array
+     * Gets the index of the max value from the policy array
      *
      * @param policy the policy probability distribution
      * @return the max value from the policy array
      */
-    private Double argmax(double[] policy) {
+    private int argmax(double[] policy) {
         if (policy == null || policy.length == 0) {
-            return Double.NaN;
+            return -1;
         }
 
         double max = policy[0];
+        int idx = 0;
 
-        for (double p : policy) {
-            max = Math.max(max, p);
+        for (int i = 1; i < policy.length; i++) {
+            if (policy[i] > max) {
+                idx = i;
+                max = policy[i];
+            }
         }
 
-        return max;
+        return idx;
     }
 }
