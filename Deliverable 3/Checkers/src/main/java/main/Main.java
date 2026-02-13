@@ -21,7 +21,7 @@ public class Main {
         Board b = new Board();
         //Test playing
         for (int i = 0; i < 100; i++) {
-            Map<Integer, Move> ms = b.getBoardMoveSpace();
+            List<Move> ms = b.getBoardMoveSpace();
             if (ms == null || ms.isEmpty()) {
                 break;
             }
@@ -31,9 +31,7 @@ public class Main {
         }
         System.out.println(b);
         for (int i = 0; i < 100; i++) {
-            System.out.println(b.getMoveLog());
             if(!b.undoLastMove()) {
-                System.out.println("could not undo");
                 break;
             };
         }
