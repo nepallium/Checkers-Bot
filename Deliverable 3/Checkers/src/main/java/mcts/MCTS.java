@@ -9,7 +9,6 @@ import model.NeuralNet;
 import model.PolicyValue;
 
 import java.util.List;
-import java.util.Map;
 
 public class MCTS {
 
@@ -100,7 +99,7 @@ public class MCTS {
         double[] policy = pv.policy;
         double value = pv.value;
 
-        Map<Integer, Move> legalMoves = board.getBoardMoveSpace();
+        List<Move> legalMoves = board.getBoardMoveSpace();
 
         double sum = 0.0;
 
@@ -110,12 +109,12 @@ public class MCTS {
 
         for (int moveIdx = 0; moveIdx < legalMoves.size(); moveIdx++) {
             Move move = legalMoves.get(moveIdx);
-            Action firstAction = move.getActions().getFirst();
+            Action firstAction = move.getActionResults().getFirst();
 
             int idx = -1;
 
             for (int i = 0; i < Action.globalActionSpace.size(); i++) {
-                if (Action.globalActionSpace.get(i).equals(firstAction)) {
+                if (Action.globalActionSpace.get(i).equalsAction(firstAction)) {
                     idx = i;
                     break;
                 }
