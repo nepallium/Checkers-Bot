@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SelfPlay {
-    private NeuralNet net;
     private MCTS mcts;
 
-    public SelfPlay(NeuralNet net) {
-        this.net = net;
-        this.mcts = new MCTS(net);
+    /**
+     * Constructor expects an MCTS object already initialized with a NN object
+     * @param mcts the initialized MCTS object
+     */
+    public SelfPlay(MCTS mcts) {
+        this.mcts = mcts;
     }
 
     /**
