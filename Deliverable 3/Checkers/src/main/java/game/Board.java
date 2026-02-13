@@ -3,9 +3,7 @@ package game;
 import Util.Tuple;
 import model.NeuralNet;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Board {
 
@@ -145,7 +143,6 @@ public class Board {
 
         int piece = getPieceAt(start);
         if (piece == 0 || piece > 0 != isWhiteToMove() || (forcedPieceCaptureCoordinate != null && !start.equals(forcedPieceCaptureCoordinate))) {
-            //System.out.println(String.format("%s || %s || %s ^ %s", piece == 0, piece > 0 != whiteToMove, forcedPieceCaptureCoordinate != null, !start.equals(forcedPieceCaptureCoordinate)));
             return false;
         }
         positionLog.addPosition(cells);
@@ -332,15 +329,15 @@ public class Board {
     /**
      * Gets the move space for every peace for a player
      *
-     * @return a list of every possible move for the player | null if game is over
+     * @return a map of every possible move for the player (index, move) | null if game is over
      */
-    public List<Move> getBoardMoveSpace() {
+    public Map<Integer, Move> getBoardMoveSpace() {
         if (isGameOver()) {
             return null;
         }
-
-        List<Move> nonCaptureMoves = new ArrayList<>();
-        List<Move> captureMoves = new ArrayList<>();
+        int nonCaptureMoveIdx = 0, captureMoveIdx = 0;
+        Map<Integer, Move> nonCaptureMoves = new HashMap<>();
+        Map<Integer, Move> captureMoves = new HashMap<>();
         boolean captureAvailable = false;
         //Assuming piece values: Man = 1, King = 2 (+ for white, - for black)
         for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
@@ -356,9 +353,13 @@ public class Board {
                     captureAvailable = true;
                 }
                 if (captureAvailable) {
-                    captureMoves.addAll(pieceMoveSpaces.e1);
+                    for (Move move : pieceMoveSpaces.e1) {
+                        captureMoves.put(captureMoveIdx++, move);
+                    }
                 } else {
-                    nonCaptureMoves.addAll(pieceMoveSpaces.e2);
+                    for (Move move : pieceMoveSpaces.e2) {
+                        nonCaptureMoves.put(nonCaptureMoveIdx++, move);
+                    }
                 }
             }
         }
@@ -367,10 +368,11 @@ public class Board {
 
     public boolean undoLastMove() {
         Move undoingMove = moveLog.popLastMove();
+        System.out.println(undoingMove);
         if (undoingMove == null) {
             return false;
         }
-        System.out.println(undoingMove);
+
         boolean result = undoMove(undoingMove);
         gameResult = GameResult.ONGOING;
         return result;
@@ -566,6 +568,10 @@ public class Board {
     public Board getBoardWithColorOverride(boolean asWhiteToMove) {
         boolean invertColors = asWhiteToMove != isWhiteToMove();
         return new Board(getCellsDuplicate(invertColors), forcedPieceCaptureCoordinate, moveLog.getDuplicate(invertColors), positionLog.getDuplicate(invertColors), invertColors ? gameResult.colorInverted() : gameResult);
+    }
+
+    public MoveLog getMoveLog() {
+        return moveLog;
     }
 
     /**

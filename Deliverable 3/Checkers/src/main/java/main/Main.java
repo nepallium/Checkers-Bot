@@ -21,17 +21,17 @@ public class Main {
         Board b = new Board();
         //Test playing
         for (int i = 0; i < 100; i++) {
-            List<Move> ms = b.getBoardMoveSpace();
+            Map<Integer, Move> ms = b.getBoardMoveSpace();
             if (ms == null || ms.isEmpty()) {
                 break;
             }
-            System.out.printf("Move space: %s\n",ms);
-            System.out.println(b);
             if (!b.applyMove(ms.get((int)(Math.random() * ms.size())))) {
                 break;
             };
         }
+        System.out.println(b);
         for (int i = 0; i < 100; i++) {
+            System.out.println(b.getMoveLog());
             if(!b.undoLastMove()) {
                 System.out.println("could not undo");
                 break;
