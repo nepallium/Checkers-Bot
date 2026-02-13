@@ -47,36 +47,39 @@ public class MoveLog {
         String str = "";
         int blackMoveCount = blackMoves.size();
         for (int i = 0; i < blackMoveCount; i++) {
-            str += String.format("%s: W:%s B: %s\n", i + 1, whiteMoves.get(i).toString(), blackMoves.get(i).toString());
+            str += String.format("%s: W:%s B: %s\n", i + 1, whiteMoves.size() > i ? whiteMoves.get(i).toString() : "---", blackMoves.size() > i ? blackMoves.get(i).toString() : "---");
         }
         return str;
     }
 
     /**
      * Returns the last move played and removes it from the logs
-     * @return the last move played
+     * @return the last move played | null if no previous move played
      */
     public Move popLastMove() {
-        //black moves last, so check for black first
-        if (!blackMoves.getLast().getActions().isEmpty()) {
-            whiteTurn = true;
-            Move move = blackMoves.removeLast();
-            blackMoves.add(new Move());
-            return move;
-        }
-        //Check for white
-        if (!whiteMoves.getLast().getActions().isEmpty()) {
-            whiteTurn = false;
-            Move move = whiteMoves.removeLast();
-            whiteMoves.add(new Move());
-            return move;
-        }
-        //Must be black's second to last log
-        whiteTurn = true;
-        if (blackMoves.size() <= 1) {
+        System.out.println(whiteTurn);
+        List<Move> currentPlayerTurnLog = whiteTurn ? whiteMoves : blackMoves;
+        List<Move> lastPlayerTurnLog = whiteTurn ? blackMoves : whiteMoves;
+
+        if (currentPlayerTurnLog.isEmpty() || lastPlayerTurnLog.isEmpty()) {
             return null;
         }
-        return blackMoves.remove(blackMoves.size() - 2);
+        whiteTurn = !whiteTurn;
+        Move playingMove = currentPlayerTurnLog.getLast();
+        if (!playingMove.isEmpty()) {
+            currentPlayerTurnLog.set(currentPlayerTurnLog.size() - 1, new Move());
+            return playingMove;
+        }
+
+        Move lastMove = lastPlayerTurnLog.getLast();
+        if(!lastMove.isEmpty()) {
+            lastPlayerTurnLog.set(lastPlayerTurnLog.size() - 1, new Move());
+            return lastMove;
+        }
+        if (lastPlayerTurnLog.size() == 1) {
+            lastPlayerTurnLog.add(new Move());
+        }
+        return lastPlayerTurnLog.remove(lastPlayerTurnLog.size() - 2);
     }
 
     public List<Move> getWhiteMoves() {
