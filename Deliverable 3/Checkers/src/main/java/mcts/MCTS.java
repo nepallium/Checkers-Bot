@@ -39,12 +39,19 @@ public class MCTS {
         double[] policy = new double[legalMoves.size()];
         double sum = 0.0;
 
-        for (Move move : root.children.keySet()) {
-            Node child
+        for (int i = 0; i < legalMoves.size(); i++) {
+            Move m = legalMoves.get(i);
+            Node child = root.children.get(m);
+            policy[i] = (child == null) ? 0.0 : child.visitCount;
+            sum += policy[i];
         }
 
-//        Tuple<double[], List<Move>> output = new Tuple<>();
-//        return new double[5];
+        // Normalize
+        for (int i = 0; i < policy.length; i++) {
+            policy[i] /= sum;
+        }
+
+        return new Tuple<>(policy, legalMoves);
     }
 
     private double simulate(Node node, Board board) {
