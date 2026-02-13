@@ -17,6 +17,10 @@ public class SelfPlay {
         this.mcts = new MCTS(net);
     }
 
+    /**
+     * Plays a single game using MCTS. Stores a TrainingExample for every move in that game
+     * @return the training dataset from a single self-play game
+     */
     public List<TrainingExample> playOneGame() {
         Board board = new Board();
 
@@ -28,11 +32,13 @@ public class SelfPlay {
 
             examples.add(new TrainingExample(board.splitBoardChannels(), policy, !board.isWhiteToMove()));
 
-            // TODO pick action based on policy early, then argmax later
+            // TODO pick action with sampling early, then argmax later
             double bestMove = argmax(policy);
 
             // TODO apply bestMove to board
+        }
 
+        // UPDATE z-value for training examples
         GameResult winner = board.getGameResult();
         int factor = 0; // init at 0 == GameResult.DRAW
         // since a TrainingExample's player is stored as boolean whiteToMove
@@ -48,11 +54,13 @@ public class SelfPlay {
             double player = ex.whiteToMove ? 1.0 : -1.0;
             ex.z = factor * player;
         }
-        }
+
+        return examples;
     }
 
     /**
      * Gets the max value (not idx) from a policy array
+     *
      * @param policy the policy probability distribution
      * @return the max value from the policy array
      */
