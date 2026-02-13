@@ -16,12 +16,17 @@ public class MCTS {
 
     private NeuralNet net;
 
+    public MCTS(NeuralNet net) {
+        this.net = net;
+    }
+
     /**
      * Runs an MCTS on a board, doing x simulations (set on initialization) to determine the best move
+     *
      * @param startingBoard The current board (where the player has not moved yet)
      * @return a score distribution for each move (picking the highest = picking the best move)
      */
-    public double[] run (Board startingBoard) {
+    public double[] run(Board startingBoard) {
 
         Node root = new Node(1.0);
 

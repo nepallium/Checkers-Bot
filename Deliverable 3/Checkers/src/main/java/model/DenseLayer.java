@@ -73,7 +73,7 @@ public class DenseLayer {
             outputVect[i] = outputVect[i] + bias[i];
         }
 
-        this.postActivationOutput = softmax(outputVect);
+        this.postActivationOutput = Activation.softmax(outputVect);
 
         return postActivationOutput;
     }
