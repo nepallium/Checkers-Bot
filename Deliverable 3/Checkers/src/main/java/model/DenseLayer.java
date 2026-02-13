@@ -13,6 +13,9 @@ public class DenseLayer {
     private int outputSize;
     private double[] postActivationOutput;
 
+    private double[][] weightGradients;
+    private double[] biasGradients;
+
     public DenseLayer (int inputSize, int outputSize) {
         this.weights = new double[outputSize][inputSize];
         this.bias = new double[outputSize];
@@ -41,6 +44,7 @@ public class DenseLayer {
             this.outputSize = fileOutputSize;
 
             this.weights = new double[fileOutputSize][fileInputSize];
+            this.bias = new doulbe[fileOutputSize];
 
             for (int i = 0; i < fileOutputSize; i++) {
                 this.bias[i] = 0;
@@ -96,4 +100,40 @@ public class DenseLayer {
     public double[] getPostActOutput() {
         return this.postActivationOutput;
     }
+
+
+    public double[] backward(double[] gradientFromNext, double[] outputFromLast) { //outputfromlast is poastActOupt of last layer
+        this.weightGradients = new double[outputSize][inputSize];
+        this.biasGradient = new double[outputSize];
+
+        double[] gradientPreAct = new double[outputSize];
+        
+        for (int i = 0; i < gradientPreAct.length; i++) {
+            if (postActivationOutput[i] > 0) {
+                gradientPreAct[i] = gradientFromNext[i];
+            } else {
+                gradientPreAct[i] = 0;
+            }
+        }
+        
+        for (int i = 0; i < weightGradients.length; i ++) {
+            for (int j = 0; j < weightGradients[i].length; j++) {
+                this.weightGradients[i][j] = gradientPreAct[j] * outputFromlast[j]; 
+            }
+        }
+
+        for (int i = 0; i < bias.length; i++) {
+            this.biasGradients[i] = gradientPreAct[i];
+        }
+
+        double[] gradientToPass = new double[inputSize];
+        for (int i = 0; i < gradientToPass.length; i ++) {
+            for (int j  = 0; j < weights[i].length; j++) {
+                gradientToPass[i] += weights[j][i] * gradientPreAct[i];
+            }
+        }
+        return gradientToPass;
+    }   
+
+
 }

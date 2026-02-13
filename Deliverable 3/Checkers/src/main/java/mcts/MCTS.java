@@ -1,5 +1,6 @@
 package mcts;
 
+import Util.Tuple;
 import game.Action;
 import game.Board;
 import game.GameResult;
@@ -27,15 +28,30 @@ public class MCTS {
      * @param startingBoard The current board (where the player has not moved yet)
      * @return a score distribution for each move (picking the highest = picking the best move)
      */
-    public double[] run(Board startingBoard) {
-
+    public Tuple<double[], List<Move>> run(Board startingBoard) {
         Node root = new Node(1.0);
 
         for (int i = 0; i < SIMULATIONS; i++) {
             simulate(root, startingBoard);
         }
 
-        return new double[5];
+        List<Move> legalMoves = startingBoard.getBoardMoveSpace();
+        double[] policy = new double[legalMoves.size()];
+        double sum = 0.0;
+
+        for (int i = 0; i < legalMoves.size(); i++) {
+            Move m = legalMoves.get(i);
+            Node child = root.children.get(m);
+            policy[i] = (child == null) ? 0.0 : child.visitCount;
+            sum += policy[i];
+        }
+
+        // Normalize
+        for (int i = 0; i < policy.length; i++) {
+            policy[i] /= sum;
+        }
+
+        return new Tuple<>(policy, legalMoves);
     }
 
     private double simulate(Node node, Board board) {

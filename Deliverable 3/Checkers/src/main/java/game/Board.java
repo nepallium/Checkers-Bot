@@ -327,11 +327,11 @@ public class Board {
     }
 
     /**
-     * Gets the move space for every peace for a player
+     * Gets the move space for every piece for a player
      *
      * @return a map of every possible move for the player (index, move) | null if game is over
      */
-    public Map<Integer, Move> getBoardMoveSpace() {
+    public Map<Move, Integer> getBoardMoveSpace() {
         if (isGameOver()) {
             return null;
         }
