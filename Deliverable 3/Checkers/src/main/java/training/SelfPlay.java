@@ -4,8 +4,8 @@ import Util.Tuple;
 import game.Board;
 import game.GameResult;
 import game.Move;
+import game.MoveResult;
 import mcts.MCTS;
-import model.NeuralNet;
 
 import java.util.ArrayList;
 import java.util.List;

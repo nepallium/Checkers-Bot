@@ -113,14 +113,17 @@ public class Board {
      * @return if applied successfully
      */
     public boolean applyMove(Move move) {
-        List<ActionResult> moveActions = move.getActionResults();
+        if (move == null) {
+            return false;
+        }
+        List<Action> moveActions = move.getActions();
         for (int i = 0; i < moveActions.size(); i++) {
-            ActionResult action = moveActions.get(i);
+            Action action = moveActions.get(i);
             if (!checkValidAction(action)) {
                 System.out.printf("INVALID ACTION: %s", action);
                 return false;
             }
-            if (!applyActionResult(action, i < (moveActions.size() - 1))) {
+            if (!applyAction(action, i < (moveActions.size() - 1))) {
                 System.out.printf("COULD NOT APPLY ACTION: %s", action);
                 return false;
             }
@@ -133,9 +136,9 @@ public class Board {
      * Applies an action to the game and checks for any changes in the game result
      *
      * @param action action to apply
-     * @return if the move has been successfully applied
+     * @return if action was applied successfully
      */
-    public boolean applyActionResult(ActionResult action, boolean chainIfPossible) {
+    public boolean applyAction(Action action, boolean chainIfPossible) {
         if (isGameOver()) {
             return false;
         }
@@ -148,32 +151,34 @@ public class Board {
         positionLog.addPosition(cells);
         Coordinate destination = action.getDestination();
         Coordinate capturedCoordinate = action.getCaptureCoordinate();
+        boolean isPromotion = (piece == 1 || piece == -1) && checkPromotion(destination, piece);
         cells[start.getY()][start.getX()] = 0;
-        cells[destination.getY()][destination.getX()] = action.isPromotion() ? piece * 2 : piece;
+        cells[destination.getY()][destination.getX()] = isPromotion ? piece * 2 : piece;
         if (capturedCoordinate == null) {
             forcedPieceCaptureCoordinate = null;
-            moveLog.addActionLog(action, true);
+            moveLog.addActionLog(new ActionResult(action, 0, isPromotion), true);
             boolean gameOver = checkForDraw();
             if (gameOver) {
                 printGameOver();
             }
             return true;
         }
+        int capturedPiece = getPieceAt(capturedCoordinate);
         cells[capturedCoordinate.getY()][capturedCoordinate.getX()] = 0;
         boolean gameOver = checkForWinner();
         if (gameOver) {
-            moveLog.addActionLog(action, true);
+            moveLog.addActionLog(new ActionResult(action, capturedPiece, isPromotion), true);
             printGameOver();
             return true;
         }
         if (!chainIfPossible) {
-            moveLog.addActionLog(action, true);
+            moveLog.addActionLog(new ActionResult(action, capturedPiece, isPromotion), true);
             forcedPieceCaptureCoordinate = null;
             return true;
         }
         List<Action> chainActionSpace = getPieceActionSpace(destination, piece).e1;
         forcedPieceCaptureCoordinate = chainActionSpace.isEmpty() ? null : action.getDestination();
-        moveLog.addActionLog(action, chainActionSpace.isEmpty());
+        moveLog.addActionLog(new ActionResult(action, capturedPiece, isPromotion), chainActionSpace.isEmpty());
         return true;
     }
 
@@ -289,8 +294,8 @@ public class Board {
         if (isGameOver() || coordinate.isInvalid() || isPieceInvalid(piece)) {
             return null;
         }
-        List<Move> captureMoves = new ArrayList<>();
-        List<Move> nonCaptureMoves = new ArrayList<>();
+        List<Move> captureMoveResults = new ArrayList<>();
+        List<Move> nonCaptureMoveResults = new ArrayList<>();
         List<Action> pieceActions = (Math.abs(piece) == 2 ? coordinate.getPossibleKingActions() : coordinate.getPossibleManActions(piece > 0));
         for (Action action : pieceActions) {
             Coordinate moveDestination = action.getDestination();
@@ -300,7 +305,7 @@ public class Board {
             int destinationPiece = getPieceAt(moveDestination);
             //if there is no piece on the square, the move is valid
             if (destinationPiece == 0) {
-                nonCaptureMoves.add(new Move(new ActionResult(action, 0, checkPromotion(moveDestination, piece))));
+                nonCaptureMoveResults.add(new Move(action));
                 continue;
             }
             Coordinate captureDestination = action.getDestination().addedWith(action.getDeltaCoordinate());
@@ -309,21 +314,21 @@ public class Board {
                 continue;
             }
 
-            captureMoves.add(new Move(new ActionResult(action.getStart(), captureDestination, destinationPiece, checkPromotion(captureDestination, piece))));
+            captureMoveResults.add(new Move(new Action(action.getStart(), captureDestination)));
             filteredCoordinates.add(moveDestination);
             //after captures, can move again if is another capture
             Tuple<List<Move>, List<Move>> nextActionSpaces = getPieceMoveSpace(captureDestination, piece, filteredCoordinates);
             for (Move chainMoves : nextActionSpaces.e1) {
-                List<ActionResult> chainActions = new LinkedList<>(chainMoves.getActionResults());
+                List<Action> chainActions = new LinkedList<>(chainMoves.getActions());
                 if (chainActions.isEmpty()) {
                     continue;
                 }
-                chainActions.addFirst(new ActionResult(action.getStart(), captureDestination, destinationPiece, checkPromotion(captureDestination, piece)));
-                captureMoves.add(new Move(chainActions));
+                chainActions.addFirst(new Action(action.getStart(), captureDestination));
+                captureMoveResults.add(new Move(chainActions));
             }
 
         }
-        return new Tuple<List<Move>, List<Move>>(captureMoves, nonCaptureMoves);
+        return new Tuple<List<Move>, List<Move>>(captureMoveResults, nonCaptureMoveResults);
     }
 
     /**
@@ -335,8 +340,8 @@ public class Board {
         if (isGameOver()) {
             return null;
         }
-        List<Move> nonCaptureMoves = new ArrayList<>();
-        List<Move> captureMoves = new ArrayList<>();
+        List<Move> nonCaptureMoveResults = new ArrayList<>();
+        List<Move> captureMoveResults = new ArrayList<>();
         boolean captureAvailable = false;
         //Assuming piece values: Man = 1, King = 2 (+ for white, - for black)
         for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
@@ -352,22 +357,22 @@ public class Board {
                     captureAvailable = true;
                 }
                 if (captureAvailable) {
-                    captureMoves.addAll(pieceMoveSpaces.e1);
+                    captureMoveResults.addAll(pieceMoveSpaces.e1);
                 } else {
-                    nonCaptureMoves.addAll(pieceMoveSpaces.e2);
+                    nonCaptureMoveResults.addAll(pieceMoveSpaces.e2);
                 }
             }
         }
-        return captureAvailable ? captureMoves : nonCaptureMoves;
+        return captureAvailable ? captureMoveResults : nonCaptureMoveResults;
     }
 
     public boolean undoLastMove() {
-        Move undoingMove = moveLog.popLastMove();
-        if (undoingMove == null) {
+        MoveResult undoingMoveResult = moveLog.popLastMove();
+        if (undoingMoveResult == null) {
             return false;
         }
 
-        boolean result = undoMove(undoingMove);
+        boolean result = undoMove(undoingMoveResult);
         gameResult = GameResult.ONGOING;
         return result;
     }
@@ -377,10 +382,10 @@ public class Board {
      *
      * @return if it was undone successfully
      */
-    public boolean undoMove(Move move) {
-        for (int i = move.getActionResults().size() - 1; i >= 0; i--) {
-            if (!undoActionResult(move.getActionResults().get(i))) {
-                System.out.printf("Could not undo move: %s", move.getActionResults().get(i));
+    public boolean undoMove(MoveResult moveResult) {
+        for (int i = moveResult.getActionResults().size() - 1; i >= 0; i--) {
+            if (!undoActionResult(moveResult.getActionResults().get(i))) {
+                System.out.printf("Could not undo move: %s", moveResult.getActionResults().get(i));
                 return false;
             }
         }

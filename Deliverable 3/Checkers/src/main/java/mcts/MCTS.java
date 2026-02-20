@@ -1,10 +1,7 @@
 package mcts;
 
 import Util.Tuple;
-import game.Action;
-import game.Board;
-import game.GameResult;
-import game.Move;
+import game.*;
 import model.NeuralNet;
 import model.PolicyValue;
 
@@ -50,7 +47,7 @@ public class MCTS {
             policy[i] /= sum;
         }
 
-        return new Tuple<>(policy, legalMoves);
+        return new Tuple<double[], List<Move>>(policy, legalMoves);
     }
 
     private double simulate(Node node, Board board) {
@@ -84,7 +81,10 @@ public class MCTS {
         }
 
         Board nextBoard = board.getBoardDuplicate();
-        nextBoard.applyMove(bestMove);
+        boolean success = nextBoard.applyMove(bestMove);
+        if (!success) {
+            return 0;
+        }
         double value = -simulate(bestChild, nextBoard);
 
         node.visitCount++;
@@ -109,12 +109,12 @@ public class MCTS {
 
         for (int moveIdx = 0; moveIdx < legalMoves.size(); moveIdx++) {
             Move move = legalMoves.get(moveIdx);
-            Action firstAction = move.getActionResults().getFirst();
+            Action firstAction = move.getActions().getFirst();
 
             int idx = -1;
 
             for (int i = 0; i < Action.globalActionSpace.size(); i++) {
-                if (Action.globalActionSpace.get(i).equalsAction(firstAction)) {
+                if (Action.globalActionSpace.get(i).equals(firstAction)) {
                     idx = i;
                     break;
                 }

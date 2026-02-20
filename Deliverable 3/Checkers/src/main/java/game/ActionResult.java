@@ -18,6 +18,10 @@ public class ActionResult extends Action {
         this.promotion = promotion;
     }
 
+    public Action toSuper() {
+        return new Action(this.getStart(), this.getDestination());
+    }
+
     public ActionResult(Coordinate start, Coordinate destination, int capturedPiece, boolean promotion) {
         super(start, destination);
         this.capturedPiece = capturedPiece;

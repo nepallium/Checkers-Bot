@@ -4,60 +4,37 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Move{
-    private final List<ActionResult> actionResults;
-
+public class Move {
+    private final List<Action> actions;
     public Move() {
         this(new ArrayList<>());
     }
 
-    public Move(List<ActionResult> actionResults) {
-        this.actionResults = actionResults;
+    public Move(MoveResult moveResult) {
+        this(moveResult.getActionResults().stream().map(ActionResult::toSuper).toList());
     }
 
-    public Move(ActionResult action) {
-        this.actionResults = List.of(action);
+    public Move(List<Action> actions) {
+        this.actions = actions;
     }
 
-    public Move(Coordinate start, Coordinate destination, int capturedPiece, boolean promotion) {
-        this.actionResults = List.of(new ActionResult(start, destination, capturedPiece, promotion));
+    public Move(Action... actions) {
+        this.actions = new ArrayList<>(List.of(actions));
     }
 
-    public void addAction(ActionResult action) {
-        this.actionResults.add(action);
-    }
-
-    /**
-     * Check if the move is empty
-     * @return true if the move has no actions, false if it does
-     */
-    public boolean isEmpty() {
-        return this.actionResults.isEmpty();
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Move:%s", actionResults.toString());
+    public List<Action> getActions() {
+        return actions;
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Move move = (Move) o;
-        return Objects.equals(actionResults, move.actionResults);
+        Move that = (Move) o;
+        return Objects.equals(actions, that.actions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), actionResults);
-    }
-
-    public boolean isCapture() {
-        return !(actionResults.size() >= 2);
-    }
-
-    public List<ActionResult> getActionResults() {
-        return actionResults;
+        return Objects.hashCode(actions);
     }
 }

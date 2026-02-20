@@ -23,18 +23,8 @@ public class Action {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        Action action = (Action) o;
+        if (!(o instanceof Action action)) return false;
         return Objects.equals(start, action.start) && Objects.equals(destination, action.destination);
-    }
-
-    /**
-     * Check if the action is equal to another by comparing coordinates ONLY
-     * @param action other action
-     * @return if they share the same start and destination
-     */
-    public boolean equalsAction(Action action) {
-        return getStart().equals(action.getStart()) && getDestination().equals(action.getDestination());
     }
 
     public Coordinate getCaptureCoordinate() {

@@ -1,6 +1,7 @@
 package mcts;
 
 import game.Move;
+import game.MoveResult;
 
 import java.util.HashMap;
 import java.util.Map;
