@@ -1,9 +1,6 @@
 package main;
 
-import game.Action;
-import game.Board;
-import game.Coordinate;
-import game.Move;
+import game.*;
 import model.ConvolutionalLayer;
 import model.NeuralNet;
 import model.PolicyValue;
@@ -19,6 +16,10 @@ public class Main {
 
         // DANIEL
         Board b = new Board();
+
+
+
+        /*
         //Test playing
         for (int i = 0; i < 100; i++) {
             List<Move> ms = b.getBoardMoveSpace();
@@ -40,7 +41,7 @@ public class Main {
         //List<Move> globalActionSpace = b.getGlobalMoveSpace(true);
         //globalActionSpace.forEach(System.out::println);
 
-
+*/
         /*
         long startTime = System.nanoTime();
 
@@ -79,6 +80,75 @@ public class Main {
          */
     }
 
+    public static Set<Move> getGlobalMoveSpaceFrom(int x, int y) {
+        Set<Move> results = new HashSet<>();
+
+        int[][] dirs = {
+                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}
+        };
+
+        // simple king moves (1-step diagonals)
+        for (int[] d : dirs) {
+            int nx = x + d[0];
+            int ny = y + d[1];
+
+            if (isInBounds(nx, ny)) {
+                List<Action> list = new ArrayList<>();
+                list.add(new Action(new Coordinate(x, y),
+                        new Coordinate(nx, ny)));
+                results.add(new Move(list));
+            }
+        }
+
+        // multi-jump sequences (abstract, enemy-agnostic)
+        getAllMovesAt(x, y,
+                new ArrayList<>(),
+                results,
+                new HashSet<>());
+
+        return results;
+    }
+
+    private static boolean isInBounds(int x, int y) {
+        return x >= 0 && x < 8 && y >= 0 && y < 8;
+    }
+
+    private static void getAllMovesAt(int x, int y, List<Action> path, Set<Move> results, Set<Coordinate> usedLandings) {
+        if (!isInBounds(x, y)) {
+            return;
+        }
+        int[][] dirs = {
+                {1, 1}, {1, -1}, {-1, 1}, {-1, -1}
+        };
+
+        if (!path.isEmpty()) {
+            results.add(new Move(new ArrayList<>(path)));
+        }
+
+        for (int[] d : dirs) {
+            int newX = x + 2 * d[0]; // landing
+            int newY = y + 2 * d[1];
+
+            if (!isInBounds(newX, newY)) {
+                continue;
+            }
+            Coordinate landing = new Coordinate(newX, newY);
+            //if already passed by, continue
+            if (usedLandings.contains(landing)) {
+                continue;
+            }
+            //Chain moves are captures, assume always enough pieces to capture (12 enemy pieces, too much to capture all in 8x8)
+            path.add(new Action(new Coordinate(x, y), landing));
+            usedLandings.add(landing);
+            getAllMovesAt(newX, newY, path, results, usedLandings);
+
+            // backtrack
+            usedLandings.remove(landing);
+            path.remove(path.size() - 1);
+        }
+    }
+
+
     private static void neuralNetTest() {
         Board b = new Board();
         b.cells[2][3] = 1; // ally man
@@ -108,4 +178,44 @@ public class Main {
             }
         }
     }
+
+     /*
+        Map<Coordinate, Set<MoveIntent>> globalMoveSpace = new HashMap<>();
+        //Loop through every possible position and stack moves
+
+
+        List<Coordinate> keys = new ArrayList<>();
+        for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
+            for (int xIdx = (rowIdx % 2 == 0 ? 0 : 1); xIdx < 8; xIdx += 2) {
+                Set<MoveIntent> possibleMovesHere = getGlobalMoveSpaceFrom(xIdx, rowIdx);
+                Coordinate key = new Coordinate(xIdx, rowIdx);
+                globalMoveSpace.put(key, possibleMovesHere);
+                keys.add(key);
+            }
+        }
+
+        int total = 0;
+        for (Coordinate key : keys) {
+            int size = globalMoveSpace.get(key).size();
+            System.out.printf("%s: %s\n", key, size);
+            total += size;
+        }
+
+        try (FileWriter writer = new FileWriter(new File("Deliverable 3/Checkers/src/main/data/GlobalMoveSpace.csv"), false)) {
+            for (Set<MoveIntent> moveIntents : globalMoveSpace.values()) {
+                for (MoveIntent moveIntent : moveIntents) {
+                    if (moveIntent.getActions().isEmpty()) {
+                        continue;
+                    }
+                    StringBuilder rowCSV = new StringBuilder();
+                    for (Action action : moveIntent.getActions()) {
+                        rowCSV.append(String.format("%s,%s,%s,%s,", action.getStart().getX(), action.getStart().getY(), action.getDestination().getX(), action.getDestination().getY()));
+                    }
+                    writer.write(rowCSV + "\n");
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        */
 }
