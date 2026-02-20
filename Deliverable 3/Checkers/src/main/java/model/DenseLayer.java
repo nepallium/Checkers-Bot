@@ -44,7 +44,7 @@ public class DenseLayer {
             this.outputSize = fileOutputSize;
 
             this.weights = new double[fileOutputSize][fileInputSize];
-            this.bias = new doulbe[fileOutputSize];
+            this.bias = new double[fileOutputSize];
 
             for (int i = 0; i < fileOutputSize; i++) {
                 this.bias[i] = 0;
@@ -104,7 +104,7 @@ public class DenseLayer {
 
     public double[] backward(double[] gradientFromNext, double[] outputFromLast) { //outputfromlast is poastActOupt of last layer
         this.weightGradients = new double[outputSize][inputSize];
-        this.biasGradient = new double[outputSize];
+        this.biasGradients = new double[outputSize];
 
         double[] gradientPreAct = new double[outputSize];
         
@@ -118,7 +118,7 @@ public class DenseLayer {
         
         for (int i = 0; i < weightGradients.length; i ++) {
             for (int j = 0; j < weightGradients[i].length; j++) {
-                this.weightGradients[i][j] = gradientPreAct[j] * outputFromlast[j]; 
+                this.weightGradients[i][j] = gradientPreAct[j] * outputFromLast[j];
             }
         }
 

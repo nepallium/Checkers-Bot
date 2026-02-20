@@ -25,7 +25,7 @@ public class MSEloss {
         double [] gradient = new double[predictions.length];
 
         for (int i = 0; i < gradient.length; i++) {
-            gradient[i] = 2*(predictions[i] - expected[i])/predictions.length
+            gradient[i] = 2*(predictions[i] - expected[i])/predictions.length;
         }
 
         return gradient;
