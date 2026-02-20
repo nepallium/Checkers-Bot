@@ -16,9 +16,9 @@ public class Main {
 
         // DANIEL
         Board b = new Board();
-
-
-
+        Move.init();
+        System.out.println(Arrays.toString(Move.GLOBAL_MOVE_SPACE));
+        System.out.println(Move.GLOBAL_MOVE_SPACE.length);
         /*
         //Test playing
         for (int i = 0; i < 100; i++) {
