@@ -37,7 +37,7 @@ public class MoveResult {
 
     @Override
     public String toString() {
-        return String.format("Move:%s", actionResults.toString());
+        return String.format("MoveResult:%s", actionResults.toString());
     }
 
     @Override
@@ -50,7 +50,7 @@ public class MoveResult {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), actionResults);
+        return Objects.hashCode(actionResults);
     }
 
     public boolean isCapture() {
