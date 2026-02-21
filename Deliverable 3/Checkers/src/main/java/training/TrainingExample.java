@@ -10,7 +10,7 @@ public class TrainingExample {
     public Double z;
 
     public TrainingExample(double[][][] state, double[] pi, boolean whiteToMove) {
-        this.state = state;
+        this.state = state.clone();
         this.pi = pi;
         this.whiteToMove = whiteToMove;
         this.z = null;

@@ -22,6 +22,10 @@ public class NeuralNet {
     DenseLayer policyLayer;
     DenseLayer valueLayer;
 
+    public NeuralNet() {
+
+    }
+
     /**
      * Neural net constructor
      * @param numFeatureMaps num of feature maps / kernels
