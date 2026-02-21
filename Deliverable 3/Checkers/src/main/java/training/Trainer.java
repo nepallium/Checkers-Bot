@@ -31,6 +31,7 @@ public class Trainer {
 
 
             // POLICY loss and gradient
+            // TODO use cross-entropy
 //            totalPolicyLoss += mse.forward(predictedPV.policy, ex.pi);
 //            double[] gradient = mse.backward();
 
