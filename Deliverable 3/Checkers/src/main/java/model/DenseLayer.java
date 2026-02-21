@@ -118,22 +118,32 @@ public class DenseLayer {
         
         for (int i = 0; i < weightGradients.length; i ++) {
             for (int j = 0; j < weightGradients[i].length; j++) {
+<<<<<<< Updated upstream
                 this.weightGradients[i][j] = gradientPreAct[j] * outputFromLast[j];
+=======
+                this.weightGradients[i][j] = gradientPreAct[i] * outputFromlast[j]; 
+>>>>>>> Stashed changes
             }
         }
 
-        for (int i = 0; i < bias.length; i++) {
+        for (int i = 0; i < biasGradients.length; i++) {
             this.biasGradients[i] = gradientPreAct[i];
         }
 
         double[] gradientToPass = new double[inputSize];
         for (int i = 0; i < gradientToPass.length; i ++) {
             for (int j  = 0; j < weights[i].length; j++) {
-                gradientToPass[i] += weights[j][i] * gradientPreAct[i];
+                gradientToPass[i] += weights[j][i] * gradientPreAct[j];
             }
         }
         return gradientToPass;
     }   
 
+    public double[][] getWeightGradients() {
+        return weightGradients;
+    }
 
+    public double[] getBiasGradient() {
+        return biasGradients;
+    }
 }
