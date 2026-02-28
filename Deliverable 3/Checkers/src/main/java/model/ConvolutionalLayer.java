@@ -106,6 +106,7 @@ public class ConvolutionalLayer {
                             }
                         }
                     }
+                    ans[m][r][c] = sum;
                 }
             }
         }
