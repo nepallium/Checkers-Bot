@@ -27,7 +27,19 @@ public class ResidualBlock {
         }
 
         this.postActivationOutput2 = out;
+        layer2.setPostActivationOutput(out);
         return out;
+    }
+
+    public double[][][] backward(double[][][] gradientFromNext, double[][][] inputToBlock) {
+
+        double[][][] grad2 = layer2.backward(gradientFromNext, layer1.getPostActOutput());
+
+        double[][][] grad1 = layer1.backward(grad2, inputToBlock);
+        
+        double[][][] gradientToPass = add3DArrays(grad1, gradientFromNext);
+        
+        return gradientToPass;
     }
 
     public double[][][] add3DArrays(double[][][] x, double[][][] y) {
@@ -53,7 +65,7 @@ public class ResidualBlock {
     }
 
     public ConvolutionalLayer getLayer2() {
-        return this.layer1;
+        return this.layer2;
     }
 
     public double[][][] getPostActOutput1() {

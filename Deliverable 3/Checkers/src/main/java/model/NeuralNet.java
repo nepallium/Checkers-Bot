@@ -13,18 +13,35 @@ public class NeuralNet {
     int numFeatureMaps;
     int numActions;
 
+    //to change
+    ConvolutionalLayer firstLayer;
+    ResidualBlock rb1;
+    ResidualBlock rb2;
+    ResidualBlock rb3;
+    ResidualBlock rb4;
+    ResidualBlock rb5;
+
     ConvolutionalLayer cl1;
     ConvolutionalLayer cl2;
     ConvolutionalLayer cl3;
+    ConvolutionalLayer cl4;
+    ConvolutionalLayer cl5;
+    ConvolutionalLayer cl6;
+    ConvolutionalLayer cl7;
+    ConvolutionalLayer cl8;
+    ConvolutionalLayer cl9;
+    ConvolutionalLayer cl10;
 
+
+    //to change
     DenseLayer fc1;
     DenseLayer fc2;
     DenseLayer policyLayer;
     DenseLayer valueLayer;
 
-    public NeuralNet() {
-
-    }
+    private MSEloss lossFunction;
+    private double learningRate = 0.001;
+    private double weightDecay = 0.0001;
 
     /**
      * Neural net constructor
@@ -35,11 +52,29 @@ public class NeuralNet {
         this.numFeatureMaps = numFeatureMaps;
         this.numActions = numActions;
 
+        //to change
+        this.firstLayer = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
+
         this.cl1 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
         this.cl2 = new ConvolutionalLayer(numFeatureMaps, numFeatureMaps, KERNEL_SIZE, KERNEL_SIZE);
         this.cl3 = new ConvolutionalLayer(numFeatureMaps, numFeatureMaps, KERNEL_SIZE, KERNEL_SIZE);
+        this.cl4 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
+        this.cl5 = new ConvolutionalLayer(numFeatureMaps, numFeatureMaps, KERNEL_SIZE, KERNEL_SIZE);
+        this.cl6 = new ConvolutionalLayer(numFeatureMaps, numFeatureMaps, KERNEL_SIZE, KERNEL_SIZE);
+        this.cl7 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
+        this.cl8 = new ConvolutionalLayer(numFeatureMaps, numFeatureMaps, KERNEL_SIZE, KERNEL_SIZE);
+        this.cl9 = new ConvolutionalLayer(numFeatureMaps, numFeatureMaps, KERNEL_SIZE, KERNEL_SIZE);
+        this.cl10 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
+
+        this.rb1 = new ResidualBlock(cl1, cl2);
+        this.rb2 = new ResidualBlock(cl3, cl4);
+        this.rb3 = new ResidualBlock(cl5, cl6);
+        this.rb4 = new ResidualBlock(cl7, cl8);
+        this.rb5 = new ResidualBlock(cl9, cl10);
+
 
         int flattenedSize = numFeatureMaps * BOARD_SIZE * BOARD_SIZE;
+
         // TODO: outputSize currently arbitrary
         this.fc1 = new DenseLayer(flattenedSize, 256);
         this.fc2 = new DenseLayer(256, 128);
@@ -52,17 +87,23 @@ public class NeuralNet {
      * Applies forward pass to 8x8 checkers board
      * Goes through CNN first, then flattens the feature maps, then feeds the latter through DenseLayers
      *
-     * @param board the current board state
+     * @param boardObj the current board state
      * @return the policy and value heads
      */
-    public PolicyValue forward(double[][][] board) {
+    public PolicyValue forward(Board boardObj) {
+        //have to redo this method with new architecture
+        double[][][] board = boardObj.splitBoardChannels();
+
         // CONVOLUTIONAL LAYERS
         // numFeatureMaps (m) * 8 * 8, featureMaps[m][r][c] == how strongly pattern m is present around square (r, c)
-        double[][][] featureMaps1 = cl1.forwardWithActivation(board);
-        double[][][] featureMaps2 = cl2.forwardWithActivation(featureMaps1);
-        double[][][] featureMaps3 = cl3.forwardWithActivation(featureMaps2);
+        double[][][] featureMaps1 = firstLayer.forwardWithActivation(board);
+        double[][][] featureMaps2 = rb1.forward(featureMaps1);
+        double[][][] featureMaps3 = rb2.forward(featureMaps2);
+        double[][][] featureMaps4 = rb3.forward(featureMaps3);
+        double[][][] featureMaps5 = rb4.forward(featureMaps4);
+        double[][][] featureMaps6 = rb5.forward(featureMaps5);
 
-        double[] flattenedMaps = flatten(featureMaps3);
+        double[] flattenedMaps = flatten(featureMaps5);
 
 
         // FULLY CONNECTED LAYERS
@@ -78,5 +119,10 @@ public class NeuralNet {
         }
 
         return Arrays.stream(nestedArray).flatMap(Arrays::stream).flatMapToDouble(Arrays::stream).toArray();
+    }
+
+
+    public void updateWeights() {
+        //TO DO
     }
 }

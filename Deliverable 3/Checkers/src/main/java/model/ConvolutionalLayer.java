@@ -201,4 +201,8 @@ public class ConvolutionalLayer {
     public double[] getBiasGradients() {
         return biasGradients;
     }
+
+    public void setPostActivationOutput(double[][][] post) {
+        this.postActivationOutput = post;
+    }
 }
