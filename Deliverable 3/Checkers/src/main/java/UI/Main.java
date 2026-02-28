@@ -19,15 +19,15 @@ public class Main extends Application {
     public void start(Stage stage) {
         stage.setTitle("Checkers Bot");
 
-        try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/View/startup.fxml")));
-
-            Scene scene = new Scene(root);
-
-            stage.setScene(scene);
-        } catch (IOException err) {
-            System.out.println("Error loading fxml file, " + err);
-        }
+//        try {
+//            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/View/startup.fxml")));
+//
+//            Scene scene = new Scene(root);
+//
+//            stage.setScene(scene);
+//        } catch (IOException err) {
+//            System.out.println("Error loading fxml file, " + err);
+//        }
 
         stage.show();
     }

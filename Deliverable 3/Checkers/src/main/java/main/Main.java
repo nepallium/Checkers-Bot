@@ -157,7 +157,7 @@ public class Main {
 
         NeuralNet net = new NeuralNet(8, 16);
 
-        PolicyValue pv = net.forward(b);
+        PolicyValue pv = net.forward(b.splitBoardChannels());
 
         System.out.println("Policy:");
         System.out.println(Arrays.toString(pv.policy));

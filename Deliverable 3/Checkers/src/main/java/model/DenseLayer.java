@@ -118,11 +118,7 @@ public class DenseLayer {
         
         for (int i = 0; i < weightGradients.length; i ++) {
             for (int j = 0; j < weightGradients[i].length; j++) {
-<<<<<<< Updated upstream
                 this.weightGradients[i][j] = gradientPreAct[j] * outputFromLast[j];
-=======
-                this.weightGradients[i][j] = gradientPreAct[i] * outputFromlast[j]; 
->>>>>>> Stashed changes
             }
         }
 
