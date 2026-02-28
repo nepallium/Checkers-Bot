@@ -42,4 +42,18 @@ public class Activation {
         System.out.println("PROBABILITY DISTRIBUTION: " + Arrays.toString(out));
         return out;
     }
+
+    /**
+     * Derivative of softmax wrt pre-activation input
+     * @param pred predicted values
+     * @param target actual values
+     * @return update strengths
+     */
+    public static double[] softmaxDeriv(double[] pred, double[] target) {
+        double[] grad = new double[pred.length];
+        for (int i = 0; i < pred.length; i++) {
+            grad[i] = pred[i] - target[i];
+        }
+        return grad;
+    }
 }
