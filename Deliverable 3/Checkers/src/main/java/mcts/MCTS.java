@@ -94,7 +94,7 @@ public class MCTS {
     }
 
     private double expand(Node node, Board board) {
-        PolicyValue pv = net.forward(board);
+        PolicyValue pv = net.forward(board.splitBoardChannels());
 
         double[] policy = pv.policy;
         double value = pv.value;
