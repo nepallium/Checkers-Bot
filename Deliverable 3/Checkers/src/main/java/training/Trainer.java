@@ -1,5 +1,6 @@
 package training;
 
+import model.CrossEntropyLoss;
 import model.MSEloss;
 import model.NeuralNet;
 import model.PolicyValue;
@@ -12,10 +13,12 @@ import java.util.List;
 public class Trainer {
     private NeuralNet net;
     private MSEloss mse;
+    private CrossEntropyLoss ce;
 
     public Trainer(NeuralNet net) {
         this.net = net;
         mse = new MSEloss();
+        ce = new CrossEntropyLoss();
     }
 
     public void trainOnBatch(List<TrainingExample> batch) {
@@ -29,11 +32,9 @@ public class Trainer {
             totalValueLoss += mse.forward(predictedPV.value, ex.z);
             double dLoss_dValue = mse.backward();
 
-
             // POLICY loss and gradient
-            // TODO use cross-entropy
-//            totalPolicyLoss += mse.forward(predictedPV.policy, ex.pi);
-//            double[] gradient = mse.backward();
+            totalPolicyLoss += ce.forward(predictedPV.policy, ex.pi);
+            double[] dLoss_dPolicy = ce.backward();
 
 
             // then net.backward w/ the gradients
