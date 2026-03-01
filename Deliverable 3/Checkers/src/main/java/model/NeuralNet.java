@@ -105,6 +105,12 @@ public class NeuralNet {
         return new PolicyValue(policyLayer.policyOutput(fcOutput2), valueLayer.valueOutput(fcOutput2));
     }
 
+    /**
+     * Backpropagates 
+     * 
+     * @param dLoss_dPolicy gradient from policy wrt its loss
+     * @param dLoss_dValue gradient from value wrt its loss
+     */
     public void backward(double[] dLoss_dPolicy, double dLoss_dValue) {
         double[] gradFromPolicyHead = policyLayer.backward(dLoss_dPolicy, fc2.getPostActOutput());
 
