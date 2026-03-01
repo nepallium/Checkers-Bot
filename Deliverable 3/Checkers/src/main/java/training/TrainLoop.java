@@ -12,7 +12,8 @@ public class TrainLoop {
     private final int batchSize = 10;
 
     public void main(String[] args) {
-        NeuralNet net = new NeuralNet();
+        // TODO actual meaningful args to NN
+        NeuralNet net = new NeuralNet(10, 10);
         MCTS mcts = new MCTS(net);
         SelfPlay selfPlay = new SelfPlay(mcts);
         ReplayBuffer buffer = new ReplayBuffer();

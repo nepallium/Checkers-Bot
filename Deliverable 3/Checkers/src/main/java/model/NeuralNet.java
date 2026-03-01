@@ -82,12 +82,12 @@ public class NeuralNet {
      * Applies forward pass to 8x8 checkers board
      * Goes through CNN first, then flattens the feature maps, then feeds the latter through DenseLayers
      *
-     * @param boardObj the current board state
+     * @param board the current board state
      * @return the policy and value heads
      */
-    public PolicyValue forward(Board boardObj) {
+    public PolicyValue forward(double[][][] board) {
         //have to redo this method with new architecture
-        double[][][] board = boardObj.splitBoardChannels();
+//        double[][][] board = boardObj.splitBoardChannels();
 
         // CONVOLUTIONAL LAYERS
         // numFeatureMaps (m) * 8 * 8, featureMaps[m][r][c] == how strongly pattern m is present around square (r, c)
@@ -152,7 +152,7 @@ public class NeuralNet {
 
     public void updateDenseLayer(DenseLayer layer) {
         double[][] weightGradients = layer.getWeightGradients();
-        double[] biasGrads = layer.getBiasGradients();
+        double[] biasGrads = layer.getBiasGradient();
 
         for (int i = 0; i < weightGradients.length; i ++) {
             for (int j = 0; j < weightGradients[i].length; j++) {
