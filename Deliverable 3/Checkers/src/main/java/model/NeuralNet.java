@@ -6,12 +6,10 @@ import java.util.Arrays;
 
 public class NeuralNet {
 
-    public static int KERNEL_SIZE = 3;
-    public static int BOARD_SIZE = 8;
-    public static int CHANNELS = 3 * 4; //3 boards x 4 piece types
-
-    int numFeatureMaps;
-    int numActions;
+    public static final int KERNEL_SIZE = 3;
+    public static final int BOARD_SIZE = 8;
+    public static final int CHANNELS = 3 * 4; //3 boards x 4 piece types
+    public static final int NUM_ACTIONS = 1666; // len of GlobalMoveSpace.csv
 
     ConvolutionalLayer firstLayer;
     ResidualBlock rb1;
@@ -42,12 +40,8 @@ public class NeuralNet {
     /**
      * Neural net constructor
      * @param numFeatureMaps num of feature maps / kernels
-     * @param numActions global action space length; all possible moves
      */
-    public NeuralNet(int numFeatureMaps, int numActions) {
-        this.numFeatureMaps = numFeatureMaps;
-        this.numActions = numActions;
-
+    public NeuralNet(int numFeatureMaps) {
         this.firstLayer = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
 
         this.cl1 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
@@ -74,7 +68,7 @@ public class NeuralNet {
         this.fc1 = new DenseLayer(flattenedSize, 256);
         this.fc2 = new DenseLayer(256, 128);
 
-        this.policyLayer = new DenseLayer(128, numActions);
+        this.policyLayer = new DenseLayer(128, NUM_ACTIONS);
         this.valueLayer = new DenseLayer(128, 1);
     }
 
@@ -86,9 +80,6 @@ public class NeuralNet {
      * @return the policy and value heads
      */
     public PolicyValue forward(double[][][] board) {
-        //have to redo this method with new architecture
-//        double[][][] board = boardObj.splitBoardChannels();
-
         // CONVOLUTIONAL LAYERS
         // numFeatureMaps (m) * 8 * 8, featureMaps[m][r][c] == how strongly pattern m is present around square (r, c)
         double[][][] featureMaps1 = firstLayer.forwardWithActivation(board);

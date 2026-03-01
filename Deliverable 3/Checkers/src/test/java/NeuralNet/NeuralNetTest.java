@@ -12,12 +12,11 @@ import static org.junit.Assert.*;
 public class NeuralNetTest {
 
     private static final int NUM_FEATURE_MAPS = 8;   // keep small for tests
-    private static final int NUM_ACTIONS = 16;       // fake action space for now
     private NeuralNet net;
 
     @Before
     public void setUp() {
-        net = new NeuralNet(NUM_FEATURE_MAPS, NUM_ACTIONS);
+        net = new NeuralNet(NUM_FEATURE_MAPS);
     }
 
     private Board makeEmptyBoard() {

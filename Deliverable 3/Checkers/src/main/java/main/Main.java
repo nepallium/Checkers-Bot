@@ -155,7 +155,7 @@ public class Main {
         b.cells[5][4] = -1; // op man
         b.cells[0][7] = 2; // ally king
 
-        NeuralNet net = new NeuralNet(8, 16);
+        NeuralNet net = new NeuralNet(8);
 
         PolicyValue pv = net.forward(b.splitBoardChannels());
 
