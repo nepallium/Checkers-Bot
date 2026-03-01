@@ -1,9 +1,11 @@
-
 package model;
+
+import lombok.Getter;
 
 public class CrossEntropyLoss {
     private double[] prediction;
     private double[] target;
+    @Getter
     private double loss;
 
     // pred should already be softmax output (probabilities that sum to 1)
@@ -24,14 +26,6 @@ public class CrossEntropyLoss {
 
     // Combined gradient of Softmax + CrossEntropy: dL/dz[i] = pred[i] - target[i]
     public double[] backward() {
-        double[] grad = new double[prediction.length];
-        for (int i = 0; i < prediction.length; i++) {
-            grad[i] = prediction[i] - target[i];
-        }
-        return grad;
-    }
-
-    public double getLoss() {
-        return this.loss;
+        return Activation.softmaxDeriv(prediction, target);
     }
 }

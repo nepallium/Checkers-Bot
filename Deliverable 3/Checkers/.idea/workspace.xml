@@ -4,50 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="54871252-14ea-486f-9f99-ac0cdac20dab" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.idea/integrative-project-in-csm-project-coding-party.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.idea/jarRepositories.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/View/startup.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/View/startup.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/model/NeuralNet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/NeuralNet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/training/TrainLoop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/training/TrainLoop.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/Util/Tuple.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/game/Action.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/game/ActionResult.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/game/Board.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/game/Coordinate.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/game/GameResult.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/game/Move.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/game/MoveLog.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/game/MoveResult.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/game/PositionLog.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/main/Main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/mcts/MCTS.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/mcts/Node.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/model/Activation.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/model/ConvolutionalLayer$BoardSize.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/model/ConvolutionalLayer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/model/DenseLayer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/model/MSEloss.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/model/NeuralNet.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/model/PolicyValue.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/model/ResidualBlock.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/training/ReplayBuffer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/training/SelfPlay.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/training/TrainLoop.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/training/Trainer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/production/integrative-project-in-csm-project-coding-party/training/TrainingExample.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../out/test/integrative-project-in-csm-project-coding-party/NeuralNet/NeuralNetTest.class" beforeDir="false" />
-    </list>
+    <list default="true" id="54871252-14ea-486f-9f99-ac0cdac20dab" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -79,6 +36,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/Alex/Documents/Alex's Stuff/Programming/integrative-project-in-csm-project-coding-party/Deliverable 3/Checkers",
@@ -104,7 +62,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1770491826404</updated>
-      <workItem from="1772385413361" duration="556000" />
+      <workItem from="1772385413361" duration="911000" />
     </task>
     <servers />
   </component>
