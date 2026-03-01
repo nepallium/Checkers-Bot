@@ -1,11 +1,11 @@
 package training;
 
+import java.util.List;
+
 import model.CrossEntropyLoss;
 import model.MSEloss;
 import model.NeuralNet;
 import model.PolicyValue;
-
-import java.util.List;
 
 /**
  * Takes mini batches from replay buffer to update network through backprop
@@ -31,18 +31,19 @@ public class Trainer {
             PolicyValue predictedPV = net.forward(ex.state);
 
             // LOSS derivatives
-            // VALUE loss and gradient
-            totalValueLoss += mse.forward(predictedPV.value, ex.z);
-            double dLoss_dValue = mse.backward();
-
             // POLICY loss and gradient
             totalPolicyLoss += ce.forward(predictedPV.policy, ex.pi);
             double[] dLoss_dPolicy = ce.backward();
 
+            
+            // VALUE loss and gradient
+            totalValueLoss += mse.forward(predictedPV.value, ex.z);
+            double dLoss_dValue = mse.backward();
+
+
 
             // Propagate loss derivatives (gradients) backwards
-            double[] gradFromValue = net.getValueLayer().backward(dLoss_dValue);
-            double[] gradFromPolicy = net.getPolicyLayer().backward(dLoss_dPolicy);
+            
         }
 
     }

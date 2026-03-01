@@ -9,7 +9,7 @@ public class NeuralNet {
     public static final int KERNEL_SIZE = 3;
     public static final int BOARD_SIZE = 8;
     public static final int CHANNELS = 3 * 4; //3 boards x 4 piece types
-    public static final int NUM_ACTIONS = 1666; // len of GlobalMoveSpace.csv
+    public static final int NUM_ACTIONS = 1666; // length of GlobalMoveSpace.csv
 
     ConvolutionalLayer firstLayer;
     ResidualBlock rb1;
@@ -17,6 +17,7 @@ public class NeuralNet {
     ResidualBlock rb3;
     ResidualBlock rb4;
     ResidualBlock rb5;
+    ResidualBlock[] rbs;
 
     ConvolutionalLayer cl1;
     ConvolutionalLayer cl2;
@@ -28,6 +29,8 @@ public class NeuralNet {
     ConvolutionalLayer cl8;
     ConvolutionalLayer cl9;
     ConvolutionalLayer cl10;
+    
+    double[] flattenedMaps;
 
     @Getter
     DenseLayer fc1;
@@ -64,6 +67,7 @@ public class NeuralNet {
         this.rb3 = new ResidualBlock(cl5, cl6);
         this.rb4 = new ResidualBlock(cl7, cl8);
         this.rb5 = new ResidualBlock(cl9, cl10);
+        this.rbs = new ResidualBlock[]{rb1, rb2, rb3, rb4, rb5};
 
 
         int flattenedSize = numFeatureMaps * BOARD_SIZE * BOARD_SIZE;
@@ -86,14 +90,12 @@ public class NeuralNet {
     public PolicyValue forward(double[][][] board) {
         // CONVOLUTIONAL LAYERS
         // numFeatureMaps (m) * 8 * 8, featureMaps[m][r][c] == how strongly pattern m is present around square (r, c)
-        double[][][] featureMaps1 = firstLayer.forwardWithActivation(board);
-        double[][][] featureMaps2 = rb1.forward(featureMaps1);
-        double[][][] featureMaps3 = rb2.forward(featureMaps2);
-        double[][][] featureMaps4 = rb3.forward(featureMaps3);
-        double[][][] featureMaps5 = rb4.forward(featureMaps4);
-        double[][][] featureMaps6 = rb5.forward(featureMaps5);
+        double[][][] currFeatureMap = firstLayer.forwardWithActivation(board);
+        for (ResidualBlock rb : rbs) {
+            currFeatureMap = rb.forward(currFeatureMap);
+        }
 
-        double[] flattenedMaps = flatten(featureMaps6);
+        this.flattenedMaps = flatten(currFeatureMap);
 
 
         // FULLY CONNECTED LAYERS
@@ -103,12 +105,25 @@ public class NeuralNet {
         return new PolicyValue(policyLayer.policyOutput(fcOutput2), valueLayer.valueOutput(fcOutput2));
     }
 
-    public double[] flatten(double[][][] nestedArray) {
-        if (nestedArray == null) {
-            return null;
+    public void backward(double[] dLoss_dPolicy, double dLoss_dValue) {
+        double[] gradFromPolicyHead = policyLayer.backward(dLoss_dPolicy, fc2.getPostActOutput());
+
+        // convert value gradient (scalar) into array
+        double[] valueGradArray = new double[]{dLoss_dValue};
+        double[] gradFromValueHead = valueLayer.backward(valueGradArray, fc2.getPostActOutput());
+
+        double[] gradToFc2 = new double[fc2.getOutputSize()]; // loss w.r.t fc2 output
+        for (int i = 0; i < gradToFc2.length; i++) {
+            gradToFc2[i] = gradFromPolicyHead[i] + gradFromValueHead[i];
         }
 
-        return Arrays.stream(nestedArray).flatMap(Arrays::stream).flatMapToDouble(Arrays::stream).toArray();
+        double[] gradToFc1 = fc2.backward(gradToFc2, fc1.getPostActOutput());
+        double[] gradToFlattened = fc1.backward(gradToFc1, flattenedMaps);
+
+        // TODO convert 1D gradient into [numFeatureMaps][8][8] aka a convolutional layer, call it gradToFeatureMaps
+        // then backprop through rbs array
+        // then backprop through first conv layer
+        // then updateWeights()
     }
 
 
@@ -117,7 +132,7 @@ public class NeuralNet {
         updateConvLayer(firstLayer);
 
         // Update residual blocks
-        for (ResidualBlock rb : new ResidualBlock[]{rb1, rb2, rb3, rb4, rb5}) {
+        for (ResidualBlock rb : rbs) {
             updateConvLayer(rb.getLayer1());
             updateConvLayer(rb.getLayer2());
         }
@@ -156,5 +171,17 @@ public class NeuralNet {
             layer.bias[i] -= learningRate * (biasGrads[i]);
         }
     }
-        
+    
+    /**
+     * Flattens a 3D tensor into a 1D array
+     * @param nestedArray the 3D tensor
+     * @return the 1D flattened array
+     */
+    public double[] flatten(double[][][] nestedArray) {
+        if (nestedArray == null) {
+            return null;
+        }
+
+        return Arrays.stream(nestedArray).flatMap(Arrays::stream).flatMapToDouble(Arrays::stream).toArray();
+    }
 }

@@ -1,15 +1,16 @@
 package model;
-import java.util.Random;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Random;
+
+import lombok.Getter;
 
 public class DenseLayer {
     public double[][] weights;
     public double[] bias;
     private int inputSize;
+    @Getter
     private int outputSize;
     private double[] postActivationOutput;
 
@@ -103,7 +104,7 @@ public class DenseLayer {
     }
 
 
-    public double[] backward(double[] gradientFromNext, double[] outputFromLast) { //outputfromlast is poastActOupt of last layer
+    public double[] backward(double[] gradientFromNext, double[] outputFromLast) { //outputfromlast is poastActOupt of last layer, aka inputToThisLayer
         this.weightGradients = new double[outputSize][inputSize];
         this.biasGradients = new double[outputSize];
 
