@@ -204,7 +204,7 @@ public class NeuralNet {
         for (int i = 0; i < firstLayer.kernels.length; i++) {
             for (int j = 0; j < BOARD_SIZE; j++) {
                 for (int k = 0; k < BOARD_SIZE; k++) {
-                    finalArray[i][j][k] = flattenedMaps[i * j * k + j * k + k];
+                    finalArray[i][j][k] = flattenedMaps[i * BOARD_SIZE * BOARD_SIZE + j * BOARD_SIZE + k];
                 }
             }
         }
