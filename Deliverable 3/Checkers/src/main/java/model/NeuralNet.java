@@ -13,7 +13,6 @@ public class NeuralNet {
     int numFeatureMaps;
     int numActions;
 
-    //to change
     ConvolutionalLayer firstLayer;
     ResidualBlock rb1;
     ResidualBlock rb2;
@@ -32,14 +31,11 @@ public class NeuralNet {
     ConvolutionalLayer cl9;
     ConvolutionalLayer cl10;
 
-
-    //to change
     DenseLayer fc1;
     DenseLayer fc2;
     DenseLayer policyLayer;
     DenseLayer valueLayer;
 
-    private MSEloss lossFunction;
     private double learningRate = 0.001;
     private double weightDecay = 0.0001;
 
@@ -52,18 +48,17 @@ public class NeuralNet {
         this.numFeatureMaps = numFeatureMaps;
         this.numActions = numActions;
 
-        //to change
         this.firstLayer = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
 
         this.cl1 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
-        this.cl2 = new ConvolutionalLayer(numFeatureMaps, numFeatureMaps, KERNEL_SIZE, KERNEL_SIZE);
-        this.cl3 = new ConvolutionalLayer(numFeatureMaps, numFeatureMaps, KERNEL_SIZE, KERNEL_SIZE);
+        this.cl2 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
+        this.cl3 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
         this.cl4 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
-        this.cl5 = new ConvolutionalLayer(numFeatureMaps, numFeatureMaps, KERNEL_SIZE, KERNEL_SIZE);
-        this.cl6 = new ConvolutionalLayer(numFeatureMaps, numFeatureMaps, KERNEL_SIZE, KERNEL_SIZE);
+        this.cl5 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
+        this.cl6 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
         this.cl7 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
-        this.cl8 = new ConvolutionalLayer(numFeatureMaps, numFeatureMaps, KERNEL_SIZE, KERNEL_SIZE);
-        this.cl9 = new ConvolutionalLayer(numFeatureMaps, numFeatureMaps, KERNEL_SIZE, KERNEL_SIZE);
+        this.cl8 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
+        this.cl9 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
         this.cl10 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
 
         this.rb1 = new ResidualBlock(cl1, cl2);
@@ -103,7 +98,7 @@ public class NeuralNet {
         double[][][] featureMaps5 = rb4.forward(featureMaps4);
         double[][][] featureMaps6 = rb5.forward(featureMaps5);
 
-        double[] flattenedMaps = flatten(featureMaps5);
+        double[] flattenedMaps = flatten(featureMaps6);
 
 
         // FULLY CONNECTED LAYERS
@@ -123,6 +118,48 @@ public class NeuralNet {
 
 
     public void updateWeights() {
-        //TO DO
+        // Update first conv layer
+        updateConvLayer(firstLayer);
+
+        // Update residual blocks
+        for (ResidualBlock rb : new ResidualBlock[]{rb1, rb2, rb3, rb4, rb5}) {
+            updateConvLayer(rb.getLayer1());
+            updateConvLayer(rb.getLayer2());
+        }
+
+        // Update dense layers
+        updateDenseLayer(fc1);
+        updateDenseLayer(fc2);
+        updateDenseLayer(policyLayer);
+        updateDenseLayer(valueLayer);
     }
+
+    public void updateConvLayer(ConvolutionalLayer layer) {
+        double[][][][] kernelGrads = layer.getKernelGradients();
+        double[] biasGrads = layer.getBiasGradients();
+
+        for (int i = 0; i < layer.kernels.length; i++) {
+            for (int j = 0; j < layer.kernels[i].length; j++) {
+                for (int k = 0; k < layer.kernels[i][j].length; k++) {
+                    for (int l = 0; l < layer.kernels[i][j][k].length; l++) {
+                        layer.kernels[i][j][k][l] -= learningRate * (kernelGrads[i][j][k][l] + weightDecay * layer.kernels[i][j][k][l]);
+                    } 
+                }    
+            }   
+            layer.bias[i] -= learningRate * (biasGrads[i]);
+        }
+    }
+
+    public void updateDenseLayer(DenseLayer layer) {
+        double[][] weightGradients = layer.getWeightGradients();
+        double[] biasGrads = layer.getBiasGradients();
+
+        for (int i = 0; i < weightGradients.length; i ++) {
+            for (int j = 0; j < weightGradients[i].length; j++) {
+                layer.weights[i][j] -= learningRate * (weightGradients[i][j] + weightDecay * layer.weights[i][j]);
+            }
+            layer.bias[i] -= learningRate * (biasGrads[i]);
+        }
+    }
+        
 }

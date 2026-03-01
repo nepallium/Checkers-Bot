@@ -11,7 +11,7 @@ public class ConvolutionalLayer {
    }
 
    public double[][][][] kernels;
-   private double[] bias;
+   public double[] bias;
 
    private double[][][][] kernelGradients;
    private double[] biasGradients;

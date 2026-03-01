@@ -1,0 +1,37 @@
+
+package model;
+
+public class CrossEntropyLoss {
+    private double[] prediction;
+    private double[] target;
+    private double loss;
+
+    // pred should already be softmax output (probabilities that sum to 1)
+    public double forward(double[] prediction, double[] target) {
+        this.prediction = prediction;
+        this.target = target;
+
+        double sum = 0;
+        for (int i = 0; i < prediction.length; i++) {
+            // clip to avoid log(0)
+            double clipped = Math.max(prediction[i], 1e-15);
+            sum += target[i] * Math.log(clipped);
+        }
+
+        this.loss = -sum;
+        return this.loss;
+    }
+
+    // Combined gradient of Softmax + CrossEntropy: dL/dz[i] = pred[i] - target[i]
+    public double[] backward() {
+        double[] grad = new double[prediction.length];
+        for (int i = 0; i < prediction.length; i++) {
+            grad[i] = prediction[i] - target[i];
+        }
+        return grad;
+    }
+
+    public double getLoss() {
+        return this.loss;
+    }
+}

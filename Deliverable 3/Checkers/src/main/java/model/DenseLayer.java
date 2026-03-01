@@ -7,8 +7,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class DenseLayer {
-    private double[][] weights;
-    private double[] bias;
+    public double[][] weights;
+    public double[] bias;
     private int inputSize;
     private int outputSize;
     private double[] postActivationOutput;
@@ -84,6 +84,7 @@ public class DenseLayer {
 
     public double valueOutput(double[] inputVector) {
         double[] outputVect = new double[outputSize];
+        this.postActivationOutput = new double[outputSize];
         for (int i = 0; i < outputSize; i++) {
             for(int j = 0; j < inputSize; j++) {
                 outputVect[i] += inputVector[j] * weights[i][j];
@@ -118,7 +119,7 @@ public class DenseLayer {
         
         for (int i = 0; i < weightGradients.length; i ++) {
             for (int j = 0; j < weightGradients[i].length; j++) {
-                this.weightGradients[i][j] = gradientPreAct[j] * outputFromLast[j];
+                this.weightGradients[i][j] = gradientPreAct[i] * outputFromLast[j];
             }
         }
 

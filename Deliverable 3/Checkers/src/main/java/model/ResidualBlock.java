@@ -69,7 +69,7 @@ public class ResidualBlock {
     }
 
     public double[][][] getPostActOutput1() {
-        return layer1.getPostActOutput();
+        return this.layer1.getPostActOutput();
     }
 
     public double[][][] getPostActOutput2() {
