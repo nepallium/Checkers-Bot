@@ -5,6 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="54871252-14ea-486f-9f99-ac0cdac20dab" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/model/NeuralNet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/NeuralNet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/model/ResidualBlock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/ResidualBlock.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/training/Trainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/training/Trainer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -64,7 +67,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1770491826404</updated>
-      <workItem from="1772385413361" duration="1303000" />
+      <workItem from="1772385413361" duration="5581000" />
     </task>
     <servers />
   </component>

@@ -56,10 +56,6 @@ public class ResidualBlock {
         return sum;
     }
 
-    public double ReLu(double x) {
-        return Math.max(0, x);
-    }
-
     public ConvolutionalLayer getLayer1() {
         return this.layer1;
     }

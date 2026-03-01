@@ -1,8 +1,8 @@
 package model;
 
-import game.Board;
-
 import java.util.Arrays;
+
+import lombok.Getter;
 
 public class NeuralNet {
 
@@ -29,9 +29,13 @@ public class NeuralNet {
     ConvolutionalLayer cl9;
     ConvolutionalLayer cl10;
 
+    @Getter
     DenseLayer fc1;
+    @Getter
     DenseLayer fc2;
+    @Getter
     DenseLayer policyLayer;
+    @Getter
     DenseLayer valueLayer;
 
     private double learningRate = 0.001;

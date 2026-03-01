@@ -24,10 +24,13 @@ public class Trainer {
     public void trainOnBatch(List<TrainingExample> batch) {
         double totalPolicyLoss = 0.0, totalValueLoss = 0.0;
 
+        // TODO mini-batch gradients instead of stochastic gradient descent
+        // double[] accumulatedGradients
+
         for (TrainingExample ex : batch) {
             PolicyValue predictedPV = net.forward(ex.state);
 
-
+            // LOSS derivatives
             // VALUE loss and gradient
             totalValueLoss += mse.forward(predictedPV.value, ex.z);
             double dLoss_dValue = mse.backward();
@@ -37,7 +40,9 @@ public class Trainer {
             double[] dLoss_dPolicy = ce.backward();
 
 
-            // then net.backward w/ the gradients
+            // Propagate loss derivatives (gradients) backwards
+            double[] gradFromValue = net.getValueLayer().backward(dLoss_dValue);
+            double[] gradFromPolicy = net.getPolicyLayer().backward(dLoss_dPolicy);
         }
 
     }
