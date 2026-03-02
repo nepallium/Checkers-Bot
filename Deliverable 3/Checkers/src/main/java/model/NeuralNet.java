@@ -126,6 +126,8 @@ public class NeuralNet {
         double[] gradToFc1 = fc2.backward(gradToFc2, fc1.getPostActOutput());
         double[] gradToFlattened = fc1.backward(gradToFc1, flattenedMaps);
 
+
+
         // TODO convert 1D gradient into [numFeatureMaps][8][8] aka a convolutional layer, call it gradToFeatureMaps
         // then backprop through rbs array
         // then backprop through first conv layer
@@ -189,5 +191,24 @@ public class NeuralNet {
         }
 
         return Arrays.stream(nestedArray).flatMap(Arrays::stream).flatMapToDouble(Arrays::stream).toArray();
+    }
+
+    /**
+     * Converts a flattened array into an unflattened (from dense layer to convolutional layer format)
+     * @param flattenedMaps the flattened array
+     * @return an unflatted array of feature maps and channels
+     */
+    public double[][][] unFlatten(double[] flattenedMaps) {
+        double finalArray[][][] = new double[firstLayer.kernels.length][BOARD_SIZE][BOARD_SIZE];
+
+        for (int i = 0; i < firstLayer.kernels.length; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                for (int k = 0; k < BOARD_SIZE; k++) {
+                    finalArray[i][j][k] = flattenedMaps[i * BOARD_SIZE * BOARD_SIZE + j * BOARD_SIZE + k];
+                }
+            }
+        }
+
+        return finalArray;
     }
 }
