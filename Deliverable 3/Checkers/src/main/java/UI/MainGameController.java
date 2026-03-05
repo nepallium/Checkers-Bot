@@ -7,15 +7,12 @@ import game.Board;
 import game.Coordinate;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 import main.App;
@@ -38,8 +35,24 @@ public class MainGameController {
     public Pane boardPane;
     public Pane boardParentPane;
 
+    public ImageView homeImg;
+    public ImageView undoImg;
+
     @FXML
     private void initialize() {
+        initializeSideBar();
+        initializeBoard();
+    }
+
+    private void initializeSideBar() {
+//        Image undo = new Image(getClass().getResource(App.IMAGES_FILE_PATH_PREFIX + App.UNDO_IMAGE_PATH).toExternalForm());
+//        undoImg.setImage(undo);
+//
+//        Image home = new Image(getClass().getResource(App.IMAGES_FILE_PATH_PREFIX + App.HOME_IMAGE_PATH).toExternalForm());
+//        homeImg.setImage(home);
+    }
+
+    private void initializeBoard() {
         boardPane.setPrefSize(8 * GRID_ENTRY_SIDE_LENGTH, 8 * GRID_ENTRY_SIDE_LENGTH);
         for (int x = 0; x < 8; x++) {
             for (int y = x % 2 == 0 ? 1 : 0; y < 8; y += 2) { //for invalid coordinates, just put colored squares
@@ -79,6 +92,7 @@ public class MainGameController {
             targetIcons[i].setMouseTransparent(true);
         }
         boardParentPane.getChildren().addAll(targetIcons);
+
     }
 
 
