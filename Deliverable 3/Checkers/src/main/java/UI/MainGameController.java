@@ -73,6 +73,7 @@ public class MainGameController {
             targetIcons[i].setFitHeight(GRID_ENTRY_SIDE_LENGTH);
             targetIcons[i].setFitWidth(GRID_ENTRY_SIDE_LENGTH);
             targetIcons[i].setVisible(false);
+            targetIcons[i].setMouseTransparent(true);
         }
         boardParentPane.getChildren().addAll(targetIcons);
     }
