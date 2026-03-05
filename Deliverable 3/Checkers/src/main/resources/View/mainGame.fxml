@@ -9,7 +9,10 @@
          <children>
             <BorderPane style="-fx-background-color: #101930;">
                <center>
-                  <Pane fx:id="boardPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                  <Pane fx:id="boardParentPane" prefHeight="800.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Pane fx:id="boardPane" prefHeight="800.0" prefWidth="800.0" />
+                     </children></Pane>
                </center>
             </BorderPane>
          </children>
