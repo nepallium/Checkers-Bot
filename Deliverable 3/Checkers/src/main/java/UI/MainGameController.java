@@ -37,16 +37,19 @@ public class MainGameController {
     private final ImageView[] targetIcons = new ImageView[4];
     public Pane boardPane;
     public Pane boardParentPane;
+
     @FXML
     private void initialize() {
         boardPane.setPrefSize(8 * GRID_ENTRY_SIDE_LENGTH, 8 * GRID_ENTRY_SIDE_LENGTH);
         for (int x = 0; x < 8; x++) {
             for (int y = x % 2 == 0 ? 1 : 0; y < 8; y += 2) { //for invalid coordinates, just put colored squares
                 Button gridBtn = createGridButton(false);
+                gridBtn.setOnAction((ActionEvent e) -> {
+                    selectCoordinate(null);
+                });
                 boardPane.getChildren().add(gridBtn);
                 positionElementAtBoardCoordinate(gridBtn, new Coordinate(x, y));
             }
-
 
 
             for (int y = x % 2 == 0 ? 0 : 1; y < 8; y += 2) { //for valid coordinates, put squares, handle actions, put pieces (if there are)
@@ -116,13 +119,6 @@ public class MainGameController {
             setSelectedPieceCoordinate(null);
             return;
         }
-        //Select piece if possible
-        ImageView selectedPieceUI = pieceUIMap.get(coordinate);
-        if (selectedPieceUI == null) {
-            setSelectedPieceCoordinate(null);
-            return;
-        }
-        selectedPieceUI.setEffect(PIECE_SELECT_EFFECT);
         setSelectedPieceCoordinate(coordinate);
     }
 
@@ -170,12 +166,22 @@ public class MainGameController {
     }
 
     private void setSelectedPieceCoordinate(Coordinate coordinate) {
+        if (coordinate != null && (boardActionSpaceState.e2.get(coordinate) == null || boardActionSpaceState.e2.get(coordinate) == null)) {
+            coordinate = null;
+        }
+
         selectedPieceCoordinate = coordinate;
         showPossibleActions(coordinate);
-        if (coordinate == null) {
-            showPieceActions();
+        if (coordinate != null) {
+            ImageView selectedPieceUI = pieceUIMap.get(coordinate);
+            if (selectedPieceUI != null) {
+                selectedPieceUI.setEffect(PIECE_SELECT_EFFECT);
+            }
+            return;
         }
+        showPieceActions();
     }
+
 
     private void showPossibleActions(Coordinate atCoordinate) {
         List<Action> possibleActions = boardActionSpaceState.e2.get(atCoordinate);
@@ -209,4 +215,5 @@ public class MainGameController {
         imgView.setMouseTransparent(true);
         return imgView;
     }
+
 }
