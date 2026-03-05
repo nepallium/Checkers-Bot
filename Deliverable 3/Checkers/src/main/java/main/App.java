@@ -36,6 +36,7 @@ public class App {
         try {
             Parent parent = loadFXML(FXML_SCENES_FILE_PATH_PREFIX + fxmlName);
             if (parent == null) {
+                System.out.println("No parent found for fxml file: " + fxmlName);
                 return false;
             }
             stage.setScene(new Scene(parent));
