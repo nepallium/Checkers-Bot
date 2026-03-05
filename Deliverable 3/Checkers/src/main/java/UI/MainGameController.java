@@ -27,12 +27,12 @@ public class MainGameController {
     public Board board = new Board();
 
     private Coordinate selectedPieceCoordinate = null;
-    Map<Coordinate, List<Action>> boardActionSpace = board.getBoardActionSpace();
+    Tuple<Boolean, Map<Coordinate, List<Action>>> boardActionSpaceState = board.getBoardActionSpace();
     HashMap<Coordinate, ImageView> pieceUIMap = new HashMap<>();
 
-
+    private static final ColorAdjust PIECE_FORCED_ACTION_EFFECT = new ColorAdjust(0, 0, .15, 0.85);
     private static final ColorAdjust PIECE_SELECT_EFFECT = new ColorAdjust(0, 0, -0.15, 0.5);
-    private static final ColorAdjust DEFAULT_EFFECT = new ColorAdjust();
+    private static final ColorAdjust PIECE_DEFAULT_EFFECT = new ColorAdjust();
 
     private final ImageView[] targetIcons = new ImageView[4];
     public Pane boardPane;
@@ -95,9 +95,8 @@ public class MainGameController {
         if (selectedPieceCoordinate != null) {
             //Check if can make the action
             Action requestedAction = null;
-            List<Action> actions = boardActionSpace.get(selectedPieceCoordinate);
+            List<Action> actions = boardActionSpaceState.e2.get(selectedPieceCoordinate);
             if (actions != null && !actions.isEmpty()) {
-
                 for (Action action : actions) {
                     if (action.getDestination().equals(coordinate)) {
                         requestedAction = action;
@@ -105,16 +104,19 @@ public class MainGameController {
                     }
                 }
             }
+            //Unselect piece
+            ImageView prevSelectedPieceUI = pieceUIMap.get(selectedPieceCoordinate);
+            if (prevSelectedPieceUI != null) {
+                prevSelectedPieceUI.setEffect(PIECE_DEFAULT_EFFECT);
+            }
+            //Apply action if possible
             if (requestedAction != null) {
                 applyActionToBoard(requestedAction);
             }
-            //Unselect
-            ImageView prevSelectedPieceUI = pieceUIMap.get(selectedPieceCoordinate);
-            if (prevSelectedPieceUI != null) {
-                prevSelectedPieceUI.setEffect(DEFAULT_EFFECT);
-                setSelectedPieceCoordinate(null);
-            }
+            setSelectedPieceCoordinate(null);
+            return;
         }
+        //Select piece if possible
         ImageView selectedPieceUI = pieceUIMap.get(coordinate);
         if (selectedPieceUI == null) {
             setSelectedPieceCoordinate(null);
@@ -126,7 +128,8 @@ public class MainGameController {
 
     private void applyActionToBoard(Action action) {
         ActionResult actionResult = board.applyAction(action, true);
-        boardActionSpace = board.getBoardActionSpace();
+        //Update values relative to board
+        boardActionSpaceState = board.getBoardActionSpace();
         //Show the action being done
         ImageView movingPieceImg = pieceUIMap.get(action.getStart());
         TranslateTransition moveTrans = new TranslateTransition(Duration.seconds(App.PIECE_MOVE_DURATION));
@@ -147,13 +150,35 @@ public class MainGameController {
         }
     }
 
+    private void showPieceActions() {
+        if (!boardActionSpaceState.e1) {
+            pieceUIMap.forEach(((coordinate, imageView) -> {
+                imageView.setEffect(PIECE_DEFAULT_EFFECT);
+            }));
+            return;
+        }
+
+        Map<Coordinate, List<Action>> boardActionSpace = boardActionSpaceState.e2;
+        for (Coordinate coordinate : boardActionSpace.keySet()) {
+            ImageView pieceImg = pieceUIMap.get(coordinate);
+            if (pieceImg == null) {
+                continue;
+            }
+            pieceImg.setEffect(PIECE_FORCED_ACTION_EFFECT);
+        }
+
+    }
+
     private void setSelectedPieceCoordinate(Coordinate coordinate) {
         selectedPieceCoordinate = coordinate;
         showPossibleActions(coordinate);
+        if (coordinate == null) {
+            showPieceActions();
+        }
     }
 
     private void showPossibleActions(Coordinate atCoordinate) {
-        List<Action> possibleActions = boardActionSpace.get(atCoordinate);
+        List<Action> possibleActions = boardActionSpaceState.e2.get(atCoordinate);
         if (possibleActions == null || possibleActions.isEmpty()) {
             Arrays.stream(targetIcons).forEach(targetIcon -> {
                 targetIcon.setVisible(false);
