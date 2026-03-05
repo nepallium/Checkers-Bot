@@ -16,7 +16,7 @@ public class Board {
     private final MoveLog moveLog;
     private final PositionLog positionLog;
     private GameResult gameResult;
-    private Coordinate forcedPieceCaptureCoordinate = null;
+    private Coordinate forcedPieceCaptureCoordinate;
 
     public Board(int[][] cells, Coordinate forcedPieceCaptureCoordinate, MoveLog moveLog, PositionLog positionLog, GameResult gameResult) {
         this.cells = cells;
@@ -245,15 +245,15 @@ public class Board {
     /**
      * Gets the action space for the current player at the board
      *
-     * @return list of possible actions for the current player | null if there is no action possible (end of multi capture)
+     * @return if it is a forced capture and map of possible actions for the current player with piece coordinates as key | null if there is no action possible (end of multi capture)
      */
-    public Map<Coordinate, List<Action>> getBoardActionSpace() {
+    public Tuple<Boolean, Map<Coordinate, List<Action>>> getBoardActionSpace() {
         if (isGameOver()) {
             return null;
         }
         if (forcedPieceCaptureCoordinate != null) {
             List<Action> actionSpace = getPieceActionSpace(forcedPieceCaptureCoordinate, getPieceAt(forcedPieceCaptureCoordinate)).e1;
-            return actionSpace.isEmpty() ? null : new HashMap<>(Map.of(forcedPieceCaptureCoordinate, actionSpace) );
+            return new Tuple<>(true, actionSpace.isEmpty() ? null : new HashMap<>(Map.of(forcedPieceCaptureCoordinate, actionSpace) )) ;
         }
         Map<Coordinate, List<Action>> captureActions = new HashMap<>();
         Map<Coordinate, List<Action>> nonCaptureActions = new HashMap<>();
@@ -271,13 +271,17 @@ public class Board {
                     captureAvailable = true;
                 }
                 if (captureAvailable) {
-                    captureActions.put(coordinate ,pieceActionSpace.e1);
+                    if (!pieceActionSpace.e1.isEmpty()) {
+                        captureActions.put(coordinate , pieceActionSpace.e1);
+                    }
                 } else {
-                    nonCaptureActions.put(coordinate, pieceActionSpace.e2);
+                    if (!pieceActionSpace.e2.isEmpty()) {
+                        nonCaptureActions.put(coordinate, pieceActionSpace.e2);
+                    }
                 }
             }
         }
-        return captureAvailable ? captureActions : nonCaptureActions;
+        return new Tuple<>(captureAvailable, captureAvailable ? captureActions : nonCaptureActions) ;
     }
 
     /**
