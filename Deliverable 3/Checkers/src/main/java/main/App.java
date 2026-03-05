@@ -1,5 +1,6 @@
 package main;
 
+import game.Board;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -11,6 +12,21 @@ import java.net.URL;
 public class App {
     public static Stage stage;
     private static final String FXML_SCENES_FILE_PATH_PREFIX = "/View/";
+    private static final String IMAGES_FILE_PATH_PREFIX = "/Images/";
+    private static final String WHITE_MAN_IMAGE_PATH = "Samurai_Cheems_Cropped_Light_Theme.png";
+    private static final String WHITE_KING_IMAGE_PATH = "King_Cheems_Cropped_Light_Theme.png";
+    private static final String BLACK_MAN_IMAGE_PATH = "Samurai_Cheems_Cropped_Dark_Theme.png";
+    private static final String BLACK_KING_IMAGE_PATH = "King_Cheems_Cropped_Dark_Theme.png";
+    public static final String BLACK_GRID_COLOR = "#101930";
+    public static final String WHITE_GRID_COLOR = "#86a0e3";
+
+    public static String getPieceImagePath(int piece) {
+        if (Board.isPieceInvalid(piece)) {
+            return "";
+        }
+        return App.class.getResource(IMAGES_FILE_PATH_PREFIX + new String[] {BLACK_KING_IMAGE_PATH, BLACK_MAN_IMAGE_PATH, "", WHITE_MAN_IMAGE_PATH, WHITE_KING_IMAGE_PATH,}[piece + 2]).toExternalForm();
+    }
+
     /**
      * Sets the scene to that of the fxml and returns the success status
      * @param fxmlName name of the fxml file
