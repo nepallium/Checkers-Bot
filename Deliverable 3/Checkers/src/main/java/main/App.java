@@ -12,13 +12,15 @@ import java.net.URL;
 public class App {
     public static Stage stage;
     private static final String FXML_SCENES_FILE_PATH_PREFIX = "/View/";
-    private static final String IMAGES_FILE_PATH_PREFIX = "/Images/";
+    public static final String IMAGES_FILE_PATH_PREFIX = "/Images/";
     private static final String WHITE_MAN_IMAGE_PATH = "Samurai_Cheems_Cropped_Light_Theme.png";
     private static final String WHITE_KING_IMAGE_PATH = "King_Cheems_Cropped_Light_Theme.png";
     private static final String BLACK_MAN_IMAGE_PATH = "Samurai_Cheems_Cropped_Dark_Theme.png";
     private static final String BLACK_KING_IMAGE_PATH = "King_Cheems_Cropped_Dark_Theme.png";
+    public static final String TARGET_ICON_IMAGE_PATH = "Target_Icon.png";
     public static final String BLACK_GRID_COLOR = "#101930";
     public static final String WHITE_GRID_COLOR = "#86a0e3";
+    public static final double PIECE_MOVE_DURATION = 0.25;
 
     public static String getPieceImagePath(int piece) {
         if (Board.isPieceInvalid(piece)) {
