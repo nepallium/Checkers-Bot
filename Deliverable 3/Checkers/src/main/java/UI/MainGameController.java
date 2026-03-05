@@ -147,20 +147,9 @@ public class MainGameController {
     }
 
     private void showPieceActions() {
-        if (!boardActionSpaceState.e1) {
-            pieceUIMap.forEach(((coordinate, imageView) -> {
-                imageView.setEffect(PIECE_DEFAULT_EFFECT);
-            }));
-            return;
-        }
-
-        Map<Coordinate, List<Action>> boardActionSpace = boardActionSpaceState.e2;
-        for (Coordinate coordinate : boardActionSpace.keySet()) {
+        for (Coordinate coordinate : pieceUIMap.keySet()) {
             ImageView pieceImg = pieceUIMap.get(coordinate);
-            if (pieceImg == null) {
-                continue;
-            }
-            pieceImg.setEffect(PIECE_FORCED_ACTION_EFFECT);
+            pieceImg.setEffect(boardActionSpaceState.e2.get(coordinate) == null || !boardActionSpaceState.e1 ? PIECE_DEFAULT_EFFECT : PIECE_FORCED_ACTION_EFFECT);
         }
 
     }
