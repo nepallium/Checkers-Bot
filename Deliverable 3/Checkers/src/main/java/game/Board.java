@@ -48,8 +48,15 @@ public class Board {
             //row[0] starts with a valid square and alternates every row, place pieces space out by 1
             for (int xIdx = (rowIdx % 2 == 0 ? 0 : 1); xIdx < 8; xIdx += 2) {
                 newCells[rowIdx][xIdx] = rowIdx < 3 ? MAN_VALUE : -MAN_VALUE;
+                //kings in the center top/bottom (testing)
+                //if (rowIdx == 0 || rowIdx == 7) {
+                //    if (xIdx == 3 || xIdx == 4) {
+                //        newCells[rowIdx][xIdx] = rowIdx < 3 ? KING_VALUE : -KING_VALUE;
+                //    }
+                //}
             }
         }
+
         return newCells;
     }
 
@@ -123,7 +130,7 @@ public class Board {
                 System.out.printf("INVALID ACTION: %s", action);
                 return false;
             }
-            if (!applyAction(action, i < (moveActions.size() - 1))) {
+            if (applyAction(action, i < (moveActions.size() - 1)) == null) {
                 System.out.printf("COULD NOT APPLY ACTION: %s", action);
                 return false;
             }
@@ -136,17 +143,17 @@ public class Board {
      * Applies an action to the game and checks for any changes in the game result
      *
      * @param action action to apply
-     * @return if action was applied successfully
+     * @return the action result or null
      */
-    public boolean applyAction(Action action, boolean chainIfPossible) {
+    public ActionResult applyAction(Action action, boolean chainIfPossible) {
         if (isGameOver()) {
-            return false;
+            return null;
         }
         Coordinate start = action.getStart();
 
         int piece = getPieceAt(start);
         if (piece == 0 || piece > 0 != isWhiteToMove() || (forcedPieceCaptureCoordinate != null && !start.equals(forcedPieceCaptureCoordinate))) {
-            return false;
+            return null;
         }
         positionLog.addPosition(cells);
         Coordinate destination = action.getDestination();
@@ -156,30 +163,32 @@ public class Board {
         cells[destination.getY()][destination.getX()] = isPromotion ? piece * 2 : piece;
         if (capturedCoordinate == null) {
             forcedPieceCaptureCoordinate = null;
-            moveLog.addActionLog(new ActionResult(action, 0, isPromotion), true);
+            ActionResult actionResult = new ActionResult(action, 0, isPromotion);
+            moveLog.addActionLog(actionResult, true);
             boolean gameOver = checkForDraw();
             if (gameOver) {
                 printGameOver();
             }
-            return true;
+            return actionResult;
         }
         int capturedPiece = getPieceAt(capturedCoordinate);
         cells[capturedCoordinate.getY()][capturedCoordinate.getX()] = 0;
         boolean gameOver = checkForWinner();
+        ActionResult actionResult = new ActionResult(action, capturedPiece, isPromotion);
         if (gameOver) {
-            moveLog.addActionLog(new ActionResult(action, capturedPiece, isPromotion), true);
+            moveLog.addActionLog(actionResult,  true);
             printGameOver();
-            return true;
+            return actionResult;
         }
         if (!chainIfPossible) {
-            moveLog.addActionLog(new ActionResult(action, capturedPiece, isPromotion), true);
+            moveLog.addActionLog(actionResult, true);
             forcedPieceCaptureCoordinate = null;
-            return true;
+            return actionResult;
         }
         List<Action> chainActionSpace = getPieceActionSpace(destination, piece).e1;
         forcedPieceCaptureCoordinate = chainActionSpace.isEmpty() ? null : action.getDestination();
-        moveLog.addActionLog(new ActionResult(action, capturedPiece, isPromotion), chainActionSpace.isEmpty());
-        return true;
+        moveLog.addActionLog(actionResult, chainActionSpace.isEmpty());
+        return actionResult;
     }
 
     /**
@@ -236,18 +245,18 @@ public class Board {
     /**
      * Gets the action space for the current player at the board
      *
-     * @return list of possible actions for the current player | null if game is over
+     * @return list of possible actions for the current player | null if there is no action possible (end of multi capture)
      */
-    public List<Action> getBoardActionSpace() {
+    public Map<Coordinate, List<Action>> getBoardActionSpace() {
         if (isGameOver()) {
             return null;
         }
         if (forcedPieceCaptureCoordinate != null) {
             List<Action> actionSpace = getPieceActionSpace(forcedPieceCaptureCoordinate, getPieceAt(forcedPieceCaptureCoordinate)).e1;
-            return actionSpace.isEmpty() ? new ArrayList<>(List.of(new Action(forcedPieceCaptureCoordinate, forcedPieceCaptureCoordinate))) : actionSpace;
+            return actionSpace.isEmpty() ? null : new HashMap<>(Map.of(forcedPieceCaptureCoordinate, actionSpace) );
         }
-        List<Action> captureActions = new ArrayList<>();
-        List<Action> nonCaptureActions = new ArrayList<>();
+        Map<Coordinate, List<Action>> captureActions = new HashMap<>();
+        Map<Coordinate, List<Action>> nonCaptureActions = new HashMap<>();
         boolean captureAvailable = false;
         for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
             for (int xIdx = (rowIdx % 2 == 0 ? 0 : 1); xIdx < 8; xIdx += 2) {
@@ -262,9 +271,9 @@ public class Board {
                     captureAvailable = true;
                 }
                 if (captureAvailable) {
-                    captureActions.addAll(pieceActionSpace.e1);
+                    captureActions.put(coordinate ,pieceActionSpace.e1);
                 } else {
-                    nonCaptureActions.addAll(pieceActionSpace.e2);
+                    nonCaptureActions.put(coordinate, pieceActionSpace.e2);
                 }
             }
         }
@@ -522,8 +531,9 @@ public class Board {
 
     /**
      * Check if a piece should be promoted
+     *
      * @param destination where the piece arrived
-     * @param piece the piece
+     * @param piece       the piece
      * @return if the piece should be promoted
      */
     private boolean checkPromotion(Coordinate destination, int piece) {
