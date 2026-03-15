@@ -10,7 +10,7 @@ import main.App;
 import java.io.IOException;
 import java.util.Objects;
 
-public class Main extends Application {
+public class UiLaunch extends Application {
     public static void main(String[] args) {
         launch(args);
     }

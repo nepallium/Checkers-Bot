@@ -27,6 +27,7 @@ public class ConvolutionalLayer {
         this.height = height;
 
         this.kernels = new double[numInAndOut][channels][width][height];
+        this.bias = new double[numInAndOut];
 
         Random random = new Random();   
 

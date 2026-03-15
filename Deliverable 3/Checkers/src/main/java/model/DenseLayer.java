@@ -141,6 +141,10 @@ public class DenseLayer {
         return weightGradients;
     }
 
+    public int getOutputSize() {
+        return outputSize;
+    }
+
     public double[] getBiasGradient() {
         return biasGradients;
     }
