@@ -1,10 +1,12 @@
 package training;
 
+import UI.MainGameController;
 import Util.Tuple;
 import game.Board;
 import game.GameResult;
 import game.Move;
 import game.MoveResult;
+import javafx.stage.Stage;
 import mcts.MCTS;
 
 import java.util.ArrayList;
@@ -42,6 +44,7 @@ public class SelfPlay {
             int bestMoveIdx = argmax(policy);
 
             board.applyMove(moves.get(bestMoveIdx));
+            System.out.println("Move: " + moves.get(bestMoveIdx).toString());
         }
 
         // UPDATE z-value for training examples

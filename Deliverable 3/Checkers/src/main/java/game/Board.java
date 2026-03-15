@@ -351,7 +351,7 @@ public class Board {
      */
     public List<Move> getBoardMoveSpace() {
         if (isGameOver()) {
-            return null;
+            return new ArrayList<Move>();
         }
         List<Move> nonCaptureMoveResults = new ArrayList<>();
         List<Move> captureMoveResults = new ArrayList<>();

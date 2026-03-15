@@ -23,7 +23,7 @@ public class Activation {
 
 
     public static double[] softmax(double[] x) {
-        System.out.println("POSSIBLY RAW POLICY: " + Arrays.toString(x));
+//        System.out.println("POSSIBLY RAW POLICY: " + Arrays.toString(x));
 
         double max = Double.NEGATIVE_INFINITY;
         for (double v : x) max = Math.max(max, v);
@@ -39,7 +39,7 @@ public class Activation {
             out[i] /= sum;
         }
 
-        System.out.println("PROBABILITY DISTRIBUTION: " + Arrays.toString(out));
+//        System.out.println("PROBABILITY DISTRIBUTION: " + Arrays.toString(out));
         return out;
     }
 

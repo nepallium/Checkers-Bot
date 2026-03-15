@@ -1,16 +1,21 @@
 package UI;
 
+import game.Move;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import main.App;
+import mcts.MCTS;
+import model.NeuralNet;
+import training.SelfPlay;
+import training.Trainer;
 
 import java.io.IOException;
 import java.util.Objects;
 
-public class UiLaunch extends Application {
+public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
@@ -29,6 +34,16 @@ public class UiLaunch extends Application {
         } catch (IOException err) {
             System.out.println("Error loading fxml file, " + err);
         }
+
+        NeuralNet net = new NeuralNet(12);
+
+        Trainer trainer = new Trainer(net);
+        MCTS mcts = new MCTS(net);
+        SelfPlay selfPlay = new SelfPlay(mcts);
+
+        Move.init();
+
+        trainer.trainOnBatch(selfPlay.playOneGame());
 
         stage.show();
     }
