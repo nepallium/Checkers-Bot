@@ -600,6 +600,10 @@ public class Board {
         return new Board(getCellsDuplicate(invertColors), forcedPieceCaptureCoordinate, moveLog.getDuplicate(invertColors), positionLog.getDuplicate(invertColors), invertColors ? gameResult.colorInverted() : gameResult);
     }
 
+    public GameResult getGameResult() {
+        return gameResult;
+    }
+
     /**
      * Array for the starting board.
      * NOT IMMUTABLE. HANDLE WITH CARE

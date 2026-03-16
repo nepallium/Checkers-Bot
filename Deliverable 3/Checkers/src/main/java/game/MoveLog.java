@@ -95,6 +95,10 @@ public class MoveLog {
         return blackMoveResults;
     }
 
+    public int getNoCaptureMoveStreak() {
+        return noCaptureMoveStreak;
+    }
+
     public boolean isWhiteTurn() {
         return whiteTurn;
     }
