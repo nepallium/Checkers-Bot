@@ -1,5 +1,7 @@
 package game;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +9,8 @@ public class MoveLog {
     private final List<MoveResult> whiteMoveResults;
     private final List<MoveResult> blackMoveResults; //size is either equal to or one less than that of white moves
     private boolean whiteTurn;
+    @Getter
+    private int noCaptureMoveStreak = 0;
 
     public MoveLog() {
         this(new ArrayList<MoveResult>(List.of(new MoveResult())), new ArrayList<MoveResult>(List.of(new MoveResult())), true);
@@ -34,6 +38,7 @@ public class MoveLog {
         List<MoveResult> playerMoveResults = whiteTurn ? whiteMoveResults : blackMoveResults;
         playerMoveResults.getLast().addAction(action);
         if (!turnOver) {
+            noCaptureMoveStreak = action.getCaptureCoordinate() != null ? 0 : noCaptureMoveStreak + 1;
             return;
         }
 
@@ -54,6 +59,7 @@ public class MoveLog {
 
     /**
      * Returns the last move played and removes it from the logs
+     *
      * @return the last move played | null if no previous move played
      */
     public MoveResult popLastMove() {
@@ -71,7 +77,7 @@ public class MoveLog {
         }
 
         MoveResult lastMoveResult = lastPlayerTurnLog.getLast();
-        if(!lastMoveResult.isEmpty()) {
+        if (!lastMoveResult.isEmpty()) {
             lastPlayerTurnLog.set(lastPlayerTurnLog.size() - 1, new MoveResult());
             return lastMoveResult;
         }

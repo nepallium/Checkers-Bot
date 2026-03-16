@@ -1,6 +1,7 @@
 package game;
 
 import Util.Tuple;
+import lombok.Getter;
 import model.NeuralNet;
 
 import java.util.*;
@@ -12,9 +13,12 @@ public class Board {
     public static final int MAN_VALUE = 1;
     public static final int KING_VALUE = 2;
     public static final int DRAW_BY_REPETITION_REPEAT_AMOUNT = 3;
+    public static final int DRAW_BY_NOTHING_HAPPENING_MOVE_AMOUNT = 50;
 
+    @Getter
     private final MoveLog moveLog;
     private final PositionLog positionLog;
+    @Getter
     private GameResult gameResult;
     private Coordinate forcedPieceCaptureCoordinate;
 
@@ -84,7 +88,7 @@ public class Board {
      * @return if the game is drawn
      */
     private boolean checkForDraw() {
-        boolean draw = positionLog.checkForDrawByRepetition();
+        boolean draw = positionLog.checkForDrawByRepetition() || moveLog.getNoCaptureMoveStreak() >= DRAW_BY_NOTHING_HAPPENING_MOVE_AMOUNT;
         gameResult = draw ? GameResult.DRAW : gameResult;
         return draw;
     }
@@ -327,10 +331,13 @@ public class Board {
                 continue;
             }
 
-            captureMoveResults.add(new Move(new Action(action.getStart(), captureDestination)));
             filteredCoordinates.add(moveDestination);
-            //after captures, can move again if is another capture
+            //after captures, must move again if is another capture
             Tuple<List<Move>, List<Move>> nextActionSpaces = getPieceMoveSpace(captureDestination, piece, filteredCoordinates);
+            //if there are no more capture moves, add this move to the capture move results
+            if (nextActionSpaces.e1.isEmpty()) {
+                captureMoveResults.add(new Move(new Action(action.getStart(), captureDestination)));
+            }
             for (Move chainMoves : nextActionSpaces.e1) {
                 List<Action> chainActions = new LinkedList<>(chainMoves.getActions());
                 if (chainActions.isEmpty()) {
@@ -339,7 +346,6 @@ public class Board {
                 chainActions.addFirst(new Action(action.getStart(), captureDestination));
                 captureMoveResults.add(new Move(chainActions));
             }
-
         }
         return new Tuple<List<Move>, List<Move>>(captureMoveResults, nonCaptureMoveResults);
     }
@@ -544,10 +550,6 @@ public class Board {
         return (destination.getY() == 7 && piece == 1) || (destination.getY() == 0 && piece == -1);
     }
 
-    public GameResult getGameResult() {
-        return gameResult;
-    }
-
     public Boolean isWhiteToMove() {
         return moveLog.isWhiteTurn();
     }
@@ -596,10 +598,6 @@ public class Board {
     public Board getBoardWithColorOverride(boolean asWhiteToMove) {
         boolean invertColors = asWhiteToMove != isWhiteToMove();
         return new Board(getCellsDuplicate(invertColors), forcedPieceCaptureCoordinate, moveLog.getDuplicate(invertColors), positionLog.getDuplicate(invertColors), invertColors ? gameResult.colorInverted() : gameResult);
-    }
-
-    public MoveLog getMoveLog() {
-        return moveLog;
     }
 
     /**
