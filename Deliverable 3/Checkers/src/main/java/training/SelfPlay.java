@@ -33,6 +33,8 @@ public class SelfPlay {
         List<TrainingExample> examples = new ArrayList<>();
 
         while (board.getGameResult() == GameResult.ONGOING) {
+            System.out.println("Result: " + board.getGameResult());
+
             // gets mcts policy, aka not improved
             Tuple<double[], List<Move>> output = mcts.run(board);
             double[] policy = output.e1;
@@ -46,6 +48,8 @@ public class SelfPlay {
             board.applyMove(moves.get(bestMoveIdx));
             System.out.println("Move: " + moves.get(bestMoveIdx).toString());
         }
+
+        System.out.println("Result: " + board.getGameResult());
 
         // UPDATE z-value for training examples
         GameResult winner = board.getGameResult();

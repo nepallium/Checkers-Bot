@@ -555,7 +555,7 @@ public class Board {
     }
 
     private void printGameOver() {
-        System.out.printf("GAME OVER:\n%s", this);
+        System.out.println("GAME OVER");
     }
 
     /**

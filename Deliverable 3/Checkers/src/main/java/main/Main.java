@@ -24,7 +24,7 @@ public class Main {
 
         Move.init();
 
-        trainer.trainOnBatch(selfPlay.playOneGame());
+        selfPlay.playOneGame();
 
 
         // DANIEL

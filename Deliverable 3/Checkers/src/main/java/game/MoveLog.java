@@ -38,13 +38,12 @@ public class MoveLog {
         List<MoveResult> playerMoveResults = whiteTurn ? whiteMoveResults : blackMoveResults;
         playerMoveResults.getLast().addAction(action);
         if (!turnOver) {
-            noCaptureMoveStreak = action.getCaptureCoordinate() != null ? 0 : noCaptureMoveStreak + 1;
             return;
         }
 
         playerMoveResults.addLast(new MoveResult());
         whiteTurn = !whiteTurn;
-        return;
+        noCaptureMoveStreak = action.getCaptureCoordinate() != null ? 0 : noCaptureMoveStreak + 1;
     }
 
     @Override
