@@ -6,6 +6,8 @@ public class ResidualBlock {
     ConvolutionalLayer layer1;
     ConvolutionalLayer layer2;
 
+    public double[][][] inputToBlock;
+
     private double[][][] postActivationOutput2;
 
     public ResidualBlock(ConvolutionalLayer layer1, ConvolutionalLayer layer2) {
@@ -14,6 +16,8 @@ public class ResidualBlock {
     }
 
     public double[][][] forward(double[][][] input) {
+        this.inputToBlock = input;
+
         double[][][] x;
         x = layer1.forwardWithActivation(input);
         x = layer2.forwardNoActivation(x);
@@ -31,15 +35,20 @@ public class ResidualBlock {
         return out;
     }
 
-    public double[][][] backward(double[][][] gradientFromNext, double[][][] inputToBlock) {
+    public double[][][] backward(double[][][] gradientFromNext) {
 
-        double[][][] grad2 = layer2.backward(gradientFromNext, layer1.getPostActOutput());
+        double[][][] gradAfterRelu = new double[gradientFromNext.length][8][8];
+        for (int i = 0; i < gradAfterRelu.length; i++)
+            for (int j = 0; j < 8; j++)
+                for (int k = 0; k < 8; k++)
+                    gradAfterRelu[i][j][k] = postActivationOutput2[i][j][k] > 0
+                            ? gradientFromNext[i][j][k] : 0;
 
-        double[][][] grad1 = layer1.backward(grad2, inputToBlock);
-        
-        double[][][] gradientToPass = add3DArrays(grad1, gradientFromNext);
-        
-        return gradientToPass;
+        double[][][] grad2 = layer2.backwardNoActivation(gradAfterRelu, layer1.getPostActOutput());
+
+        double[][][] grad1 = layer1.backwardWithActivation(grad2, inputToBlock);
+
+        return add3DArrays(grad1, gradAfterRelu);
     }
 
     public double[][][] add3DArrays(double[][][] x, double[][][] y) {

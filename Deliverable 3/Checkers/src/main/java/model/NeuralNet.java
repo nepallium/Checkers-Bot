@@ -11,6 +11,8 @@ public class NeuralNet {
     public static final int CHANNELS = 3 * 4; //3 boards x 4 piece types
     public static final int NUM_ACTIONS = 1666; // length of GlobalMoveSpace.csv
 
+    public int numFeatureMaps;
+
     ConvolutionalLayer firstLayer;
     ResidualBlock rb1;
     ResidualBlock rb2;
@@ -49,6 +51,7 @@ public class NeuralNet {
      * @param numFeatureMaps num of feature maps / kernels
      */
     public NeuralNet(int numFeatureMaps) {
+        this.numFeatureMaps = numFeatureMaps;
         this.firstLayer = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
 
         this.cl1 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
@@ -126,12 +129,24 @@ public class NeuralNet {
         double[] gradToFc1 = fc2.backward(gradToFc2, fc1.getPostActOutput());
         double[] gradToFlattened = fc1.backward(gradToFc1, flattenedMaps);
 
+        double[][][] gradToFeatureMaps = new double[numFeatureMaps][8][8];
+        int idx = 0;
+        for (int f = 0; f < numFeatureMaps; f++) {
+            for (int r = 0; r < 8; r++) {
+                for (int c = 0; c < 8; c++) {
+                    gradToFeatureMaps[f][r][c] = gradToFlattened[idx++];
+                }
+            }
+        }
 
+        double[][][] grad = gradToFeatureMaps;
+        for (int i = rbs.length - 1; i >= 0; i--) {
+            grad = rbs[i].backward(grad);
+        }
 
-        // TODO convert 1D gradient into [numFeatureMaps][8][8] aka a convolutional layer, call it gradToFeatureMaps
-        // then backprop through rbs array
-        // then backprop through first conv layer
-        // then updateWeights()
+        firstLayer.backwardWithActivation(grad, firstLayer.originalInput);
+
+        updateWeights();
     }
 
 

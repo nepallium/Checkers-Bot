@@ -15,6 +15,8 @@ public class ConvolutionalLayer {
 
    private double[][][][] kernelGradients;
    private double[] biasGradients;
+   public double[][][] originalInput;
+
    private int numInAndOut;
    private int channels;
    private int width;
@@ -51,6 +53,8 @@ public class ConvolutionalLayer {
     }
 
     public double[][][] forwardWithActivation(double[][][] board) {
+        this.originalInput = board;
+
         double[][][] ans = new double[kernels.length][8][8];
 
         for (int m = 0; m < kernels.length; m++) { // num of kernels/filters per layer
@@ -115,12 +119,98 @@ public class ConvolutionalLayer {
         return ans;
     }
 
+    public double[][][] backwardWithActivation(double[][][] gradientFromNext, double[][][] inputToThisLayer) {
+
+        // apply ReLU deriv
+        double[][][] gradientPreAct = new double[kernels.length][8][8];
+        for (int i = 0; i < kernels.length; i++)
+            for (int j = 0; j < 8; j++)
+                for (int k = 0; k < 8; k++)
+                    gradientPreAct[i][j][k] = postActivationOutput[i][j][k] > 0
+                            ? gradientFromNext[i][j][k] : 0;
+
+        // bias gradients
+        for (int f = 0; f < kernels.length; f++)
+            for (int r = 0; r < 8; r++)
+                for (int c = 0; c < 8; c++)
+                    biasGradients[f] += gradientPreAct[f][r][c];
+
+        // kernel gradients
+        for (int f = 0; f < kernels.length; f++)
+            for (int ch = 0; ch < channels; ch++)
+                for (int kr = 0; kr < width; kr++)
+                    for (int kc = 0; kc < height; kc++)
+                        for (int r = 0; r < 8; r++)
+                            for (int c = 0; c < 8; c++) {
+                                int inR = r + kr - 1;
+                                int inC = c + kc - 1;
+                                if (inR >= 0 && inR < 8 && inC >= 0 && inC < 8)
+                                    kernelGradients[f][ch][kr][kc] += gradientPreAct[f][r][c] * inputToThisLayer[ch][inR][inC];
+                            }
+
+        double[][][] inputGradient = new double[channels][8][8];
+        for (int f = 0; f < kernels.length; f++)
+            for (int ch = 0; ch < channels; ch++)
+                for (int r = 0; r < 8; r++)
+                    for (int c = 0; c < 8; c++)
+                        for (int kr = 0; kr < width; kr++)
+                            for (int kc = 0; kc < height; kc++) {
+                                int inR = r + kr - 1;
+                                int inC = c + kc - 1;
+                                if (inR >= 0 && inR < 8 && inC >= 0 && inC < 8)
+                                    inputGradient[ch][r][c] += gradientPreAct[f][inR][inC] * kernels[f][ch][kr][kc];
+                            }
+
+        return inputGradient;
+    }
+
+
+    public double[][][] backwardNoActivation(double[][][] gradientFromNext, double[][][] inputToThisLayer) {
+
+        double[][][] gradientPreAct = gradientFromNext;
+
+        // bias gradients
+        for (int f = 0; f < kernels.length; f++)
+            for (int r = 0; r < 8; r++)
+                for (int c = 0; c < 8; c++)
+                    biasGradients[f] += gradientPreAct[f][r][c];
+
+        // kernel gradients
+        for (int f = 0; f < kernels.length; f++)
+            for (int ch = 0; ch < channels; ch++)
+                for (int kr = 0; kr < width; kr++)
+                    for (int kc = 0; kc < height; kc++)
+                        for (int r = 0; r < 8; r++)
+                            for (int c = 0; c < 8; c++) {
+                                int inR = r + kr - 1;
+                                int inC = c + kc - 1;
+                                if (inR >= 0 && inR < 8 && inC >= 0 && inC < 8)
+                                    kernelGradients[f][ch][kr][kc] += gradientPreAct[f][r][c] * inputToThisLayer[ch][inR][inC];
+                            }
+
+        double[][][] inputGradient = new double[channels][8][8];
+        for (int f = 0; f < kernels.length; f++)
+            for (int ch = 0; ch < channels; ch++)
+                for (int r = 0; r < 8; r++)
+                    for (int c = 0; c < 8; c++)
+                        for (int kr = 0; kr < width; kr++)
+                            for (int kc = 0; kc < height; kc++) {
+                                int inR = r + kr - 1;
+                                int inC = c + kc - 1;
+                                if (inR >= 0 && inR < 8 && inC >= 0 && inC < 8)
+                                    inputGradient[ch][r][c] += gradientPreAct[f][inR][inC] * kernels[f][ch][kr][kc];
+                            }
+
+        return inputGradient;
+    }
+
+//    OLD BACKWARD
     public double[][][] backward(double[][][] gradientFromNext, double[][][] outputFromLast) { //outputfromlast is poastActOupt of last layer
         this.kernelGradients = new double[numInAndOut][channels][width][height];
         this.biasGradients = new double[numInAndOut];
 
         double[][][] gradientPreAct = new double[kernels.length][8][8];
-        
+
         for (int i = 0; i < kernels.length; i++) {
             for (int j = 0; j < width; j++) {
                 for (int k = 0; k < height; k++) {
