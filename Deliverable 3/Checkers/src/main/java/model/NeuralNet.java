@@ -137,47 +137,19 @@ public class NeuralNet {
 
     public void updateWeights() {
         // Update first conv layer
-        updateConvLayer(firstLayer);
+        firstLayer.update(learningRate, weightDecay);
 
         // Update residual blocks
         for (ResidualBlock rb : rbs) {
-            updateConvLayer(rb.getLayer1());
-            updateConvLayer(rb.getLayer2());
+            rb.getLayer1().update(learningRate, weightDecay);
+            rb.getLayer2().update(learningRate, weightDecay);
         }
 
         // Update dense layers
-        updateDenseLayer(fc1);
-        updateDenseLayer(fc2);
-        updateDenseLayer(policyLayer);
-        updateDenseLayer(valueLayer);
-    }
-
-    public void updateConvLayer(ConvolutionalLayer layer) {
-        double[][][][] kernelGrads = layer.getKernelGradients();
-        double[] biasGrads = layer.getBiasGradients();
-
-        for (int i = 0; i < layer.kernels.length; i++) {
-            for (int j = 0; j < layer.kernels[i].length; j++) {
-                for (int k = 0; k < layer.kernels[i][j].length; k++) {
-                    for (int l = 0; l < layer.kernels[i][j][k].length; l++) {
-                        layer.kernels[i][j][k][l] -= learningRate * (kernelGrads[i][j][k][l] + weightDecay * layer.kernels[i][j][k][l]);
-                    } 
-                }    
-            }   
-            layer.bias[i] -= learningRate * (biasGrads[i]);
-        }
-    }
-
-    public void updateDenseLayer(DenseLayer layer) {
-        double[][] weightGradients = layer.getWeightGradients();
-        double[] biasGrads = layer.getBiasGradient();
-
-        for (int i = 0; i < weightGradients.length; i ++) {
-            for (int j = 0; j < weightGradients[i].length; j++) {
-                layer.weights[i][j] -= learningRate * (weightGradients[i][j] + weightDecay * layer.weights[i][j]);
-            }
-            layer.bias[i] -= learningRate * (biasGrads[i]);
-        }
+        fc1.update(learningRate, weightDecay);
+        fc2.update(learningRate, weightDecay);
+        policyLayer.update(learningRate, weightDecay);
+        valueLayer.update(learningRate, weightDecay);
     }
     
     /**
