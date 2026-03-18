@@ -135,7 +135,19 @@ public class DenseLayer {
             }
         }
         return gradientToPass;
-    }   
+    }
+
+    public void update(double learningRate) {
+        for (int i = 0; i < weights.length; i++) {
+            bias[i] -= learningRate * biasGradients[i];
+            biasGradients[i] = 0;
+
+            for (int j = 0; j < weights[i].length; j++) {
+                weights[i][j] -= learningRate * weightGradients[i][j];
+                weightGradients[i][j] = 0;
+            }
+        }
+    }
 
     public double[][] getWeightGradients() {
         return weightGradients;

@@ -193,7 +193,7 @@ public class ConvolutionalLayer {
     }
 
     public void update(double learningRate) {
-        
+
         for (int i = 0; i < kernels.length; i++) {
             bias[i] -= learningRate * biasGradients[i];
             biasGradients[i] = 0;
