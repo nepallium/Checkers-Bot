@@ -32,7 +32,7 @@ public class Trainer {
 
             // LOSS derivatives
             // POLICY loss and gradient
-            totalPolicyLoss += ce.forward(predictedPV.policy, ex.pi);
+            totalPolicyLoss += ce.forward(predictedPV.policy, ex.pi, ex.legalMoves);
             double[] dLoss_dPolicy = ce.backward();
 
             
@@ -40,7 +40,7 @@ public class Trainer {
             totalValueLoss += mse.forward(predictedPV.value, ex.z);
             double dLoss_dValue = mse.backward();
 
-
+            System.out.println("DONE!!!");
 
             // Propagate loss derivatives (gradients) backwards
             

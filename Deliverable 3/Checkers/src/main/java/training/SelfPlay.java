@@ -40,7 +40,7 @@ public class SelfPlay {
             double[] policy = output.e1;
             List<Move> moves = output.e2;
 
-            examples.add(new TrainingExample(board.splitBoardChannels(), policy, !board.isWhiteToMove()));
+            examples.add(new TrainingExample(board.splitBoardChannels(), policy, moves, !board.isWhiteToMove()));
 
             // TODO pick action with sampling early, then argmax later
             int bestMoveIdx = argmax(policy);
