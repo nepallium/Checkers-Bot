@@ -1,10 +1,7 @@
 package UI;
 
 import Util.Tuple;
-import game.Action;
-import game.ActionResult;
-import game.Board;
-import game.Coordinate;
+import game.*;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -16,8 +13,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 import main.App;
+import mcts.MCTS;
+import model.NeuralNet;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainGameController {
     private static final int GRID_ENTRY_SIDE_LENGTH = 100;
@@ -38,10 +41,23 @@ public class MainGameController {
     public ImageView homeImg;
     public ImageView undoImg;
 
+    private NeuralNet neuralNet;
+    private MCTS mcts;
+    private boolean isModelTurn = false;
+
     @FXML
     private void initialize() {
         initializeSideBar();
         initializeBoard();
+
+        neuralNet = new NeuralNet(12);
+        try {
+            neuralNet.load("checkersModel.bin");
+            System.out.println("Model loaded!!");
+        } catch (IOException e) {
+            System.out.println("No saved model found, using random weights");
+        }
+        mcts = new MCTS(neuralNet);
     }
 
     private void initializeSideBar() {
@@ -109,6 +125,12 @@ public class MainGameController {
     }
 
     private void selectCoordinate(Coordinate coordinate) {
+        if (isModelTurn) return;
+        if (board.isGameOver()) {
+            System.out.println("Game over, no more moves can be made");
+            return;
+        }
+
         if (selectedPieceCoordinate != null) {
             //Check if can make the action
             Action requestedAction = null;
@@ -128,7 +150,7 @@ public class MainGameController {
             }
             //Apply action if possible
             if (requestedAction != null) {
-                applyActionToBoard(requestedAction);
+                applyActionToBoard(requestedAction, true);
             }
             setSelectedPieceCoordinate(null);
             return;
@@ -136,7 +158,7 @@ public class MainGameController {
         setSelectedPieceCoordinate(coordinate);
     }
 
-    private void applyActionToBoard(Action action) {
+    private void applyActionToBoard(Action action, boolean isHumanTurn) {
         ActionResult actionResult = board.applyAction(action, true);
         //Update values relative to board
         boardActionSpaceState = board.getBoardActionSpace();
@@ -158,6 +180,43 @@ public class MainGameController {
         if (actionResult.isPromotion()) {
             pieceUI.setImage(new Image(App.getPieceImagePath(board.getPieceAt(actionResult.getDestination()))));
         }
+
+        if (!board.isGameOver() && isHumanTurn) {
+            isModelTurn = true;
+            javafx.application.Platform.runLater(this::doAIMove);
+        }
+    }
+
+    private void doAIMove() {
+        // run MCTS on a background thread so UI doesn't freeze
+        Thread aiThread = new Thread(() -> {
+            double[][][] boardState = board.splitBoardChannels();
+            Tuple<double[], List<Move>> output = mcts.run(board);
+
+            int best = 0;
+
+            for (int i = 0; i < output.e1.length; i++) {
+                if (output.e1[i] > output.e1[best]) {
+                    best = i;
+                }
+            }
+
+            Move bestMove = output.e2.get(best);
+
+            javafx.application.Platform.runLater(() -> {
+                for (Action action : bestMove.getActions()) {
+                    applyActionToBoard(action, false);
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        System.out.println("Error in sleep: " + e.getMessage());;
+                    }
+                }
+                isModelTurn = false;
+            });
+        });
+        aiThread.setDaemon(true);
+        aiThread.start();
     }
 
     private void showPieceActions() {

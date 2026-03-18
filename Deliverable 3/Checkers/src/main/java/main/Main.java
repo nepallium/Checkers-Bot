@@ -19,7 +19,7 @@ public class Main {
 
         NeuralNet net = new NeuralNet(12);
 
-//        net.load("src/main/data/checkersModel.bin");
+        net.load("src/main/data/checkersModel.bin");
 
         Trainer trainer = new Trainer(net);
         MCTS mcts = new MCTS(net);
@@ -27,15 +27,15 @@ public class Main {
 
         Move.init();
 
-        for (int i = 0; i < 100; i++) {
-            try {
-                trainer.trainOnBatch(selfPlay.playOneGame());
-            } catch (Exception err) {
-                System.out.println("An error occured in training + self play for this iteration: " + err.getMessage());
-            }
-        }
-
-        net.save("src/main/data/checkersModel.bin");
+//        for (int i = 0; i < 100; i++) {
+//            try {
+//                trainer.trainOnBatch(selfPlay.playOneGame());
+//            } catch (Exception err) {
+//                System.out.println("An error occured in training + self play for this iteration: " + err.getMessage());
+//            }
+//        }
+//
+//        net.save("src/main/data/checkersModel.bin");
 
 
 

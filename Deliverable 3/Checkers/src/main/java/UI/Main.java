@@ -35,15 +35,7 @@ public class Main extends Application {
             System.out.println("Error loading fxml file, " + err);
         }
 
-        NeuralNet net = new NeuralNet(12);
-
-        Trainer trainer = new Trainer(net);
-        MCTS mcts = new MCTS(net);
-        SelfPlay selfPlay = new SelfPlay(mcts);
-
         Move.init();
-
-        trainer.trainOnBatch(selfPlay.playOneGame());
 
         stage.show();
     }
