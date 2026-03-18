@@ -190,7 +190,24 @@ public class ConvolutionalLayer {
         }    
 
         return gradientToPass;
-    }   
+    }
+
+    public void update(double learningRate) {
+        
+        for (int i = 0; i < kernels.length; i++) {
+            bias[i] -= learningRate * biasGradients[i];
+            biasGradients[i] = 0;
+
+            for (int j = 0; j < kernels[i].length; j++) {
+                for (int k = 0; k < kernels[i][j].length; k++) {
+                    for (int l = 0; l < kernels[i][j][k].length; l++) {
+                        kernels[i][j][k][l] -= learningRate * kernelGradients[i][j][k][l];
+                        kernelGradients[i][j][k][l] = 0;
+                    }
+                }
+            }
+        }
+    }
 
     public double[][][] getPostActOutput() {
         return postActivationOutput;
