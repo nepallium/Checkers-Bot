@@ -1,5 +1,6 @@
 package model;
 
+import java.io.*;
 import java.util.Arrays;
 
 import lombok.Getter;
@@ -197,5 +198,91 @@ public class NeuralNet {
         }
 
         return finalArray;
+    }
+
+// DATA SAVING & LOADING
+
+    /**
+     * Saves all weights and biases to a binary file
+     * @param filePath path to save the model
+     */
+    public void save(String filePath) throws IOException {
+        try (DataOutputStream dos = new DataOutputStream(
+                new BufferedOutputStream(new FileOutputStream(filePath)))) {
+
+            saveConvLayer(dos, firstLayer);
+
+            for (ResidualBlock rb : rbs) {
+                saveConvLayer(dos, rb.getLayer1());
+                saveConvLayer(dos, rb.getLayer2());
+            }
+
+            saveDenseLayer(dos, fc1);
+            saveDenseLayer(dos, fc2);
+            saveDenseLayer(dos, policyLayer);
+            saveDenseLayer(dos, valueLayer);
+        }
+    }
+
+    /**
+     * Loads all weights and biases from a binary file
+     * @param filePath path to load the model from
+     */
+    public void load(String filePath) throws IOException {
+        try (DataInputStream dis = new DataInputStream(
+                new BufferedInputStream(new FileInputStream(filePath)))) {
+
+            loadConvLayer(dis, firstLayer);
+
+            for (ResidualBlock rb : rbs) {
+                loadConvLayer(dis, rb.getLayer1());
+                loadConvLayer(dis, rb.getLayer2());
+            }
+
+            loadDenseLayer(dis, fc1);
+            loadDenseLayer(dis, fc2);
+            loadDenseLayer(dis, policyLayer);
+            loadDenseLayer(dis, valueLayer);
+        }
+    }
+
+    private void saveConvLayer(DataOutputStream dos, ConvolutionalLayer layer) throws IOException {
+        for (int i = 0; i < layer.kernels.length; i++)
+            for (int j = 0; j < layer.kernels[i].length; j++)
+                for (int k = 0; k < layer.kernels[i][j].length; k++)
+                    for (int l = 0; l < layer.kernels[i][j][k].length; l++)
+                        dos.writeDouble(layer.kernels[i][j][k][l]);
+
+        for (int i = 0; i < layer.bias.length; i++)
+            dos.writeDouble(layer.bias[i]);
+    }
+
+    private void loadConvLayer(DataInputStream dis, ConvolutionalLayer layer) throws IOException {
+        for (int i = 0; i < layer.kernels.length; i++)
+            for (int j = 0; j < layer.kernels[i].length; j++)
+                for (int k = 0; k < layer.kernels[i][j].length; k++)
+                    for (int l = 0; l < layer.kernels[i][j][k].length; l++)
+                        layer.kernels[i][j][k][l] = dis.readDouble();
+
+        for (int i = 0; i < layer.bias.length; i++)
+            layer.bias[i] = dis.readDouble();
+    }
+
+    private void saveDenseLayer(DataOutputStream dos, DenseLayer layer) throws IOException {
+        for (int i = 0; i < layer.weights.length; i++)
+            for (int j = 0; j < layer.weights[i].length; j++)
+                dos.writeDouble(layer.weights[i][j]);
+
+        for (int i = 0; i < layer.bias.length; i++)
+            dos.writeDouble(layer.bias[i]);
+    }
+
+    private void loadDenseLayer(DataInputStream dis, DenseLayer layer) throws IOException {
+        for (int i = 0; i < layer.weights.length; i++)
+            for (int j = 0; j < layer.weights[i].length; j++)
+                layer.weights[i][j] = dis.readDouble();
+
+        for (int i = 0; i < layer.bias.length; i++)
+            layer.bias[i] = dis.readDouble();
     }
 }

@@ -8,15 +8,18 @@ import model.PolicyValue;
 import training.SelfPlay;
 import training.Trainer;
 
+import java.io.IOException;
 import java.util.*;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // ALEX
         //neuralNetTest();
 
         NeuralNet net = new NeuralNet(12);
+
+//        net.load("src/main/data/checkersModel.bin");
 
         Trainer trainer = new Trainer(net);
         MCTS mcts = new MCTS(net);
@@ -24,7 +27,17 @@ public class Main {
 
         Move.init();
 
-        trainer.trainOnBatch(selfPlay.playOneGame());
+        for (int i = 0; i < 100; i++) {
+            try {
+                trainer.trainOnBatch(selfPlay.playOneGame());
+            } catch (Exception err) {
+                System.out.println("An error occured in training + self play for this iteration: " + err.getMessage());
+            }
+        }
+
+        net.save("src/main/data/checkersModel.bin");
+
+
 
 
         // DANIEL

@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import mcts.MCTS;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SelfPlay {
@@ -38,6 +39,7 @@ public class SelfPlay {
             // gets mcts policy, aka not improved
             Tuple<double[], List<Move>> output = mcts.run(board);
             double[] policy = output.e1;
+
             List<Move> moves = output.e2;
 
             examples.add(new TrainingExample(board.splitBoardChannels(), policy, moves, !board.isWhiteToMove()));
@@ -79,6 +81,7 @@ public class SelfPlay {
      */
     private int argmax(double[] policy) {
         if (policy == null || policy.length == 0) {
+            System.out.println("POLICY : " + Arrays.toString(policy));
             return -1;
         }
 
