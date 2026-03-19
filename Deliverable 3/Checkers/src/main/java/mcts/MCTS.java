@@ -81,8 +81,8 @@ public class MCTS {
         }
 
         Board nextBoard = board.getBoardDuplicate();
-        boolean success = nextBoard.applyMove(bestMove);
-        if (!success) {
+        MoveResult moveResult = nextBoard.applyMove(bestMove);
+        if (moveResult == null) {
             return 0;
         }
         double value = -simulate(bestChild, nextBoard);
