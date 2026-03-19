@@ -2,6 +2,7 @@ package UI;
 
 import Util.Tuple;
 import game.*;
+import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -21,11 +22,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class MainGameController {
     private static final int GRID_ENTRY_SIDE_LENGTH = 100;
     public Board board = new Board();
 
+    private final boolean playerPlaysAsWhite = true;
+    private boolean inputsDisabled = false;
     private Coordinate selectedPieceCoordinate = null;
     Tuple<Boolean, Map<Coordinate, List<Action>>> boardActionSpaceState = board.getBoardActionSpace();
     HashMap<Coordinate, ImageView> pieceUIMap = new HashMap<>();
@@ -43,7 +50,6 @@ public class MainGameController {
 
     private NeuralNet neuralNet;
     private MCTS mcts;
-    private boolean isModelTurn = false;
 
     @FXML
     private void initialize() {
@@ -125,7 +131,7 @@ public class MainGameController {
     }
 
     private void selectCoordinate(Coordinate coordinate) {
-        if (isModelTurn) return;
+        if (inputsDisabled) return;
         if (board.isGameOver()) {
             System.out.println("Game over, no more moves can be made");
             return;
@@ -150,7 +156,7 @@ public class MainGameController {
             }
             //Apply action if possible
             if (requestedAction != null) {
-                applyActionToBoard(requestedAction, true);
+                applyActionToBoard(requestedAction);
             }
             setSelectedPieceCoordinate(null);
             return;
@@ -158,33 +164,110 @@ public class MainGameController {
         setSelectedPieceCoordinate(coordinate);
     }
 
-    private void applyActionToBoard(Action action, boolean isHumanTurn) {
+
+    private void applyActionToBoard(Action action) {
         ActionResult actionResult = board.applyAction(action, true);
+        if (actionResult == null) {
+            System.out.println("INVALID ACTION TO APPLY TO BOARD: " + action);
+            return;
+        }
         //Update values relative to board
         boardActionSpaceState = board.getBoardActionSpace();
-        //Show the action being done
-        ImageView movingPieceImg = pieceUIMap.get(action.getStart());
-        TranslateTransition moveTrans = new TranslateTransition(Duration.seconds(App.PIECE_MOVE_DURATION));
-        moveTrans.setNode(movingPieceImg);
-        Tuple<Double, Double> layoutXY1 = getLayoutAtBoardCoordinate(action.getStart());
-        Tuple<Double, Double> layoutXY2 = getLayoutAtBoardCoordinate(action.getDestination());
-        moveTrans.setByX(layoutXY2.e1 - layoutXY1.e1);
-        moveTrans.setByY(layoutXY2.e2 - layoutXY1.e2);
-        moveTrans.play();
+
         ImageView pieceUI = pieceUIMap.remove(action.getStart());
         pieceUIMap.put(action.getDestination(), pieceUI);
-        Coordinate captureCoordinate = action.getCaptureCoordinate();
-        if (captureCoordinate != null) {
-            pieceUIMap.remove(captureCoordinate).setVisible(false);
-        }
-        if (actionResult.isPromotion()) {
-            pieceUI.setImage(new Image(App.getPieceImagePath(board.getPieceAt(actionResult.getDestination()))));
-        }
 
-        if (!board.isGameOver() && isHumanTurn) {
-            isModelTurn = true;
-            javafx.application.Platform.runLater(this::doAIMove);
+        Coordinate captureCoordinate = action.getCaptureCoordinate();
+        showPieceAction(actionResult, pieceUI, captureCoordinate == null ? null : pieceUIMap.remove(captureCoordinate), true);
+        //Check if is AI turn
+        if (board.isGameOver() || (board.isWhiteToMove() == playerPlaysAsWhite)) {
+            return;
         }
+        inputsDisabled = true;
+        //Delay thread (halting thread cancels transitions)
+        ScheduledExecutorService AIScheduler = Executors.newScheduledThreadPool(1);
+        AIScheduler.schedule((() -> {
+            javafx.application.Platform.runLater(this::doAIMove);
+            AIScheduler.close();
+        }), 500, TimeUnit.MILLISECONDS);
+    }
+
+    private void applyMoveToBoard(Move move) throws InterruptedException {
+        MoveResult moveResult = board.applyMove(move);
+        if (moveResult == null) {
+            System.out.println("INVALID MOVE TO APPLY TO BOARD " + move);
+            return;
+        }
+        boardActionSpaceState = board.getBoardActionSpace();
+        inputsDisabled = true;
+        ImageView pieceUI = pieceUIMap.remove(moveResult.getStart());
+        pieceUIMap.put(move.getDestination(), pieceUI);
+
+        ScheduledExecutorService actionScheduler = Executors.newScheduledThreadPool(1);
+        Consumer<Integer> actionApplication = new Consumer<Integer>() {
+            @Override
+            public void accept(Integer actionIdx) {
+                ActionResult actionResult = actionIdx < moveResult.getActionResults().size() ? moveResult.getActionResults().get(actionIdx) : null;
+                Runnable application = actionResult != null ? ()  -> {
+                    Coordinate captureCoordinate = actionResult.getCaptureCoordinate();
+                    showPieceAction(actionResult, pieceUI, captureCoordinate == null ? null : pieceUIMap.remove(captureCoordinate), false);
+                    this.accept(actionIdx + 1);
+
+                } : () -> {
+                    inputsDisabled = false;
+                    actionScheduler.close();
+                };
+
+                actionScheduler.schedule(application, 500, TimeUnit.MILLISECONDS);
+            }
+        };
+        actionApplication.accept(0);
+/*
+        for (ActionResult actionResult : moveResult.getActionResults()) {
+            Coordinate captureCoordinate = actionResult.getCaptureCoordinate();
+            showPieceAction(actionResult, pieceUI, captureCoordinate == null ? null : pieceUIMap.remove(captureCoordinate), false);
+            Thread.sleep((long) (App.PIECE_MOVE_DURATION * 3000));
+            System.out.println(System.currentTimeMillis());
+        }*/
+    }
+
+    private void showPieceAction(ActionResult actionResult, ImageView movingPieceImg, ImageView capturedPieceImg, boolean toggleInputEnabled) {
+        //Temporarily disable inputs while the UI is moving if should
+        if (toggleInputEnabled) {
+            inputsDisabled = true;
+        }
+        Thread thread = new Thread(() -> {
+
+        });
+        //Transition for moving the piece
+        TranslateTransition moveTrans = new TranslateTransition(Duration.seconds(App.PIECE_MOVE_DURATION));
+        moveTrans.setNode(movingPieceImg);
+        Tuple<Double, Double> layoutXY1 = getLayoutAtBoardCoordinate(actionResult.getStart());
+        Tuple<Double, Double> layoutXY2 = getLayoutAtBoardCoordinate(actionResult.getDestination());
+        moveTrans.setByX(layoutXY2.e1 - layoutXY1.e1);
+        moveTrans.setByY(layoutXY2.e2 - layoutXY1.e2);
+
+        moveTrans.setOnFinished(e -> {
+            if (toggleInputEnabled) {
+                inputsDisabled = false;
+            }
+            if (actionResult.isPromotion()) {
+                movingPieceImg.setImage(new Image(App.getPieceImagePath(board.getPieceAt(actionResult.getDestination()))));
+            }
+        });
+        moveTrans.play();
+        //Transition for hiding captured piece
+        if (capturedPieceImg == null) {
+            return;
+        }
+        ScaleTransition shrinkTrans = new ScaleTransition(Duration.seconds(App.PIECE_MOVE_DURATION * 0.5));
+        shrinkTrans.setToX(0);
+        shrinkTrans.setToY(0);
+        shrinkTrans.setNode(capturedPieceImg);
+        shrinkTrans.setOnFinished(e -> {
+            capturedPieceImg.setVisible(false);
+        });
+        shrinkTrans.play();
     }
 
     private void doAIMove() {
@@ -204,15 +287,11 @@ public class MainGameController {
             Move bestMove = output.e2.get(best);
 
             javafx.application.Platform.runLater(() -> {
-                for (Action action : bestMove.getActions()) {
-                    applyActionToBoard(action, false);
-                    try {
-                        Thread.sleep(300);
-                    } catch (InterruptedException e) {
-                        System.out.println("Error in sleep: " + e.getMessage());;
-                    }
+                try {
+                    applyMoveToBoard(bestMove);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
-                isModelTurn = false;
             });
         });
         aiThread.setDaemon(true);
