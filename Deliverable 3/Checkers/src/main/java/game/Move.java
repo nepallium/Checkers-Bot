@@ -27,6 +27,14 @@ public class Move {
         return actions;
     }
 
+    public Coordinate getStart() {
+        return actions.getFirst().getStart();
+    }
+
+    public Coordinate getDestination() {
+        return actions.getLast().getDestination();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
