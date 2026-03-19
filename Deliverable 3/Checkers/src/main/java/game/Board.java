@@ -121,25 +121,28 @@ public class Board {
      * Applies a move to the game and checks for any changes in the game result
      *
      * @param move move to apply
-     * @return if applied successfully
+     * @return result of move
      */
-    public boolean applyMove(Move move) {
+    public MoveResult applyMove(Move move) {
         if (move == null) {
-            return false;
+            return null;
         }
         List<Action> moveActions = move.getActions();
+        MoveResult moveResult = new MoveResult();
         for (int i = 0; i < moveActions.size(); i++) {
             Action action = moveActions.get(i);
             if (!checkValidAction(action)) {
                 System.out.printf("INVALID ACTION: %s", action);
-                return false;
+                return null;
             }
-            if (applyAction(action, i < (moveActions.size() - 1)) == null) {
+            ActionResult actionResult = applyAction(action, i < (moveActions.size() - 1));
+            if (actionResult == null) {
                 System.out.printf("COULD NOT APPLY ACTION: %s", action);
-                return false;
+                return null;
             }
+            moveResult.addAction(actionResult);
         }
-        return true;
+        return moveResult;
     }
 
 
@@ -555,7 +558,7 @@ public class Board {
     }
 
     private void printGameOver() {
-        System.out.println("GAME OVER");
+        //System.out.println("GAME OVER");
     }
 
     /**
