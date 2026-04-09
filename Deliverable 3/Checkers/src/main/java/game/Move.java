@@ -27,6 +27,14 @@ public class Move {
         return actions;
     }
 
+    public Coordinate getStart() {
+        return actions.getFirst().getStart();
+    }
+
+    public Coordinate getDestination() {
+        return actions.getLast().getDestination();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -44,7 +52,7 @@ public class Move {
     }
 
     /// GLOBAL ACTION SPACE
-    public static final String GLOBAL_MOVE_SPACE_FILE_PATH = "Deliverable 3/Checkers/src/main/data/GlobalMoveSpace.csv";
+    public static final String GLOBAL_MOVE_SPACE_FILE_PATH = "src/main/data/GlobalMoveSpace.csv";
     public static final int GLOBAL_MOVE_SPACE_SIZE = 1666;
     public static final Move[] GLOBAL_MOVE_SPACE = new Move[GLOBAL_MOVE_SPACE_SIZE];
 

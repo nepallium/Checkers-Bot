@@ -81,8 +81,8 @@ public class MCTS {
         }
 
         Board nextBoard = board.getBoardDuplicate();
-        boolean success = nextBoard.applyMove(bestMove);
-        if (!success) {
+        MoveResult moveResult = nextBoard.applyMove(bestMove);
+        if (moveResult == null) {
             return 0;
         }
         double value = -simulate(bestChild, nextBoard);
@@ -109,15 +109,18 @@ public class MCTS {
 
         for (int moveIdx = 0; moveIdx < legalMoves.size(); moveIdx++) {
             Move move = legalMoves.get(moveIdx);
-            Action firstAction = move.getActions().getFirst();
 
             int idx = -1;
 
-            for (int i = 0; i < Action.globalActionSpace.size(); i++) {
-                if (Action.globalActionSpace.get(i).equals(firstAction)) {
+            for (int i = 0; i < Move.GLOBAL_MOVE_SPACE.length; i++) {
+                if (Move.GLOBAL_MOVE_SPACE[i].equals(move)) {
                     idx = i;
                     break;
                 }
+            }
+
+            if (idx == -1) {
+                throw new ArrayIndexOutOfBoundsException("Index not found for a move in the global action space: " + move.toString());
             }
 
             double policyAmount = policy[idx] / sum;

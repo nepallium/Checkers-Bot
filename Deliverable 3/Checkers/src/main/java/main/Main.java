@@ -1,24 +1,50 @@
 package main;
 
 import game.*;
+import mcts.MCTS;
 import model.ConvolutionalLayer;
 import model.NeuralNet;
 import model.PolicyValue;
+import training.SelfPlay;
+import training.Trainer;
 
+import java.io.IOException;
 import java.util.*;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // ALEX
         //neuralNetTest();
 
+        NeuralNet net = new NeuralNet(12);
+
+        net.load("src/main/data/checkersModel.bin");
+
+        Trainer trainer = new Trainer(net);
+        MCTS mcts = new MCTS(net);
+        SelfPlay selfPlay = new SelfPlay(mcts);
+
+        Move.init();
+
+//        for (int i = 0; i < 100; i++) {
+//            try {
+//                trainer.trainOnBatch(selfPlay.playOneGame());
+//            } catch (Exception err) {
+//                System.out.println("An error occured in training + self play for this iteration: " + err.getMessage());
+//            }
+//        }
+//
+//        net.save("src/main/data/checkersModel.bin");
+
+
+
 
         // DANIEL
-        Board b = new Board();
-        Move.init();
-        System.out.println(Arrays.toString(Move.GLOBAL_MOVE_SPACE));
-        System.out.println(Move.GLOBAL_MOVE_SPACE.length);
+//        Board b = new Board();
+//        Move.init();
+//        System.out.println(Arrays.toString(Move.GLOBAL_MOVE_SPACE));
+//        System.out.println(Move.GLOBAL_MOVE_SPACE.length);
         /*
         //Test playing
         for (int i = 0; i < 100; i++) {

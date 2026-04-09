@@ -1,11 +1,16 @@
 package UI;
 
+import game.Move;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import main.App;
+import mcts.MCTS;
+import model.NeuralNet;
+import training.SelfPlay;
+import training.Trainer;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -29,6 +34,8 @@ public class Main extends Application {
         } catch (IOException err) {
             System.out.println("Error loading fxml file, " + err);
         }
+
+        Move.init();
 
         stage.show();
     }

@@ -1,13 +1,16 @@
 package training;
 
+import UI.MainGameController;
 import Util.Tuple;
 import game.Board;
 import game.GameResult;
 import game.Move;
 import game.MoveResult;
+import javafx.stage.Stage;
 import mcts.MCTS;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SelfPlay {
@@ -31,18 +34,24 @@ public class SelfPlay {
         List<TrainingExample> examples = new ArrayList<>();
 
         while (board.getGameResult() == GameResult.ONGOING) {
+            System.out.println("Result: " + board.getGameResult());
+
             // gets mcts policy, aka not improved
             Tuple<double[], List<Move>> output = mcts.run(board);
             double[] policy = output.e1;
+
             List<Move> moves = output.e2;
 
-            examples.add(new TrainingExample(board.splitBoardChannels(), policy, !board.isWhiteToMove()));
+            examples.add(new TrainingExample(board.splitBoardChannels(), policy, moves, !board.isWhiteToMove()));
 
             // TODO pick action with sampling early, then argmax later
             int bestMoveIdx = argmax(policy);
 
             board.applyMove(moves.get(bestMoveIdx));
+            System.out.println("Move: " + moves.get(bestMoveIdx).toString());
         }
+
+        System.out.println("Result: " + board.getGameResult());
 
         // UPDATE z-value for training examples
         GameResult winner = board.getGameResult();
@@ -72,6 +81,7 @@ public class SelfPlay {
      */
     private int argmax(double[] policy) {
         if (policy == null || policy.length == 0) {
+            System.out.println("POLICY : " + Arrays.toString(policy));
             return -1;
         }
 

@@ -27,6 +27,14 @@ public class MoveResult {
         this.actionResults.add(action);
     }
 
+    public Coordinate getStart() {
+        return actionResults.getFirst().getStart();
+    }
+
+    public Coordinate getDestination() {
+        return actionResults.getLast().getDestination();
+    }
+
     /**
      * Check if the move is empty
      * @return true if the move has no actions, false if it does

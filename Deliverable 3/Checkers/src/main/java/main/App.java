@@ -20,7 +20,7 @@ public class App {
     public static final String TARGET_ICON_IMAGE_PATH = "target.png";
     public static final String BLACK_GRID_COLOR = "#101930";
     public static final String WHITE_GRID_COLOR = "#86a0e3";
-    public static final double PIECE_MOVE_DURATION = 0.25;
+    public static final double PIECE_MOVE_DURATION = 0.5;
 
     public static String getPieceImagePath(int piece) {
         if (Board.isPieceInvalid(piece)) {
