@@ -58,7 +58,7 @@ public class PositionLog {
         if (recentPositions.size() < 6) {
             return false;
         }
-        for (int i = 2; i < Board.DRAW_BY_REPETITION_REPEAT_AMOUNT; i++) {
+        for (int i = 2; i < Board.DRAW_BY_REPETITION_REPEAT_AMOUNT; i += 2) {
             //Check this position equals last position (rewind by 2, because by 1 is last player's turn if there was no double capture [wouldn't be a draw])
             if (!Arrays.deepEquals(recentPositions.getFirst(), recentPositions.get(i))) {
                 return false;
