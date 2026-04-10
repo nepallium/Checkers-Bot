@@ -3,6 +3,7 @@ package model;
 import java.io.*;
 import java.util.Arrays;
 
+import game.Move;
 import lombok.Getter;
 
 public class NeuralNet {
@@ -10,7 +11,7 @@ public class NeuralNet {
     public static final int KERNEL_SIZE = 3;
     public static final int BOARD_SIZE = 8;
     public static final int CHANNELS = 3 * 4; //3 boards x 4 piece types
-    public static final int NUM_ACTIONS = 1666; // length of GlobalMoveSpace.csv
+    public static final int NUM_ACTIONS = Move.GLOBAL_MOVE_SPACE_SIZE; // length of GlobalMoveSpace.csv
 
     public int numFeatureMaps;
 
