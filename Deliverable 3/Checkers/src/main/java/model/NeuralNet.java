@@ -16,13 +16,18 @@ public class NeuralNet {
     public int numFeatureMaps;
 
     ConvolutionalLayer firstLayer;
+    private final int RESIDUAL_BLOCK_COUNT = 5;
+    /*
     ResidualBlock rb1;
     ResidualBlock rb2;
     ResidualBlock rb3;
     ResidualBlock rb4;
     ResidualBlock rb5;
-    ResidualBlock[] rbs;
+    */
 
+    ResidualBlock[] rbs = new ResidualBlock[RESIDUAL_BLOCK_COUNT];
+
+    /*
     ConvolutionalLayer cl1;
     ConvolutionalLayer cl2;
     ConvolutionalLayer cl3;
@@ -33,7 +38,8 @@ public class NeuralNet {
     ConvolutionalLayer cl8;
     ConvolutionalLayer cl9;
     ConvolutionalLayer cl10;
-    
+    ConvolutionalLayer[] cls = new ConvolutionalLayer[2 * RESIDUAL_BLOCK_COUNT];
+     */
     double[] flattenedMaps;
 
     @Getter
@@ -45,8 +51,8 @@ public class NeuralNet {
     @Getter
     DenseLayer valueLayer;
 
-    private double learningRate = 0.001;
-    private double weightDecay = 0.0001;
+    private final double LEARNING_RATE = 0.001;
+    private final double WEIGHT_DECAY = 0.0001;
 
     /**
      * Neural net constructor
@@ -56,6 +62,7 @@ public class NeuralNet {
         this.numFeatureMaps = numFeatureMaps;
         this.firstLayer = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
 
+        /*
         this.cl1 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
         this.cl2 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
         this.cl3 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
@@ -67,13 +74,22 @@ public class NeuralNet {
         this.cl9 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
         this.cl10 = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
 
+        for (int i = 0; i < CONVOLUTIONAL_LAYER_COUNT; i++) {
+            cls[i] = new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE);
+        }
+        */
+
+        /*
         this.rb1 = new ResidualBlock(cl1, cl2);
         this.rb2 = new ResidualBlock(cl3, cl4);
         this.rb3 = new ResidualBlock(cl5, cl6);
         this.rb4 = new ResidualBlock(cl7, cl8);
         this.rb5 = new ResidualBlock(cl9, cl10);
         this.rbs = new ResidualBlock[]{rb1, rb2, rb3, rb4, rb5};
-
+        */
+        for (int i = 0; i < RESIDUAL_BLOCK_COUNT; i++) {
+            rbs[i] = new ResidualBlock(new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE), new ConvolutionalLayer(numFeatureMaps, CHANNELS, KERNEL_SIZE, KERNEL_SIZE));
+        }
 
         int flattenedSize = numFeatureMaps * BOARD_SIZE * BOARD_SIZE;
 
@@ -154,19 +170,19 @@ public class NeuralNet {
 
     public void updateWeights() {
         // Update first conv layer
-        firstLayer.update(learningRate, weightDecay);
+        firstLayer.update(LEARNING_RATE, WEIGHT_DECAY);
 
         // Update residual blocks
         for (ResidualBlock rb : rbs) {
-            rb.getLayer1().update(learningRate, weightDecay);
-            rb.getLayer2().update(learningRate, weightDecay);
+            rb.getLayer1().update(LEARNING_RATE, WEIGHT_DECAY);
+            rb.getLayer2().update(LEARNING_RATE, WEIGHT_DECAY);
         }
 
         // Update dense layers
-        fc1.update(learningRate, weightDecay);
-        fc2.update(learningRate, weightDecay);
-        policyLayer.update(learningRate, weightDecay);
-        valueLayer.update(learningRate, weightDecay);
+        fc1.update(LEARNING_RATE, WEIGHT_DECAY);
+        fc2.update(LEARNING_RATE, WEIGHT_DECAY);
+        policyLayer.update(LEARNING_RATE, WEIGHT_DECAY);
+        valueLayer.update(LEARNING_RATE, WEIGHT_DECAY);
     }
     
     /**
