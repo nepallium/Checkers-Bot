@@ -40,7 +40,7 @@ public class Trainer {
             totalValueLoss += mse.forward(predictedPV.value, ex.z);
             double dLoss_dValue = mse.backward();
 
-            System.out.println("DONE!!!");
+//            System.out.println("DONE!!!");
 
             // Propagate loss derivatives (gradients) backwards
             

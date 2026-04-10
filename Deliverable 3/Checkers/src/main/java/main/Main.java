@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         // ALEX
         //neuralNetTest();
-
+    	System.out.println("Working.....");
         NeuralNet net = new NeuralNet(12);
 
         net.load("src/main/data/checkersModel.bin");
@@ -27,15 +27,22 @@ public class Main {
 
         Move.init();
 
-//        for (int i = 0; i < 100; i++) {
-//            try {
-//                trainer.trainOnBatch(selfPlay.playOneGame());
-//            } catch (Exception err) {
-//                System.out.println("An error occured in training + self play for this iteration: " + err.getMessage());
-//            }
-//        }
-//
-//        net.save("src/main/data/checkersModel.bin");
+        for (int i = 0; i < 25000; i++) {
+            try {
+                trainer.trainOnBatch(selfPlay.playOneGame());
+                if (i % 10 == 0) {
+                    System.out.println("Games played: " + i + " / 100 000");
+                }
+                if (i % 100 == 0) {
+                    net.save("src/main/data/checkersModel.bin");
+                    System.out.println("----- Saved a model -----");
+                }
+            } catch (Exception err) {
+                System.out.println("An error occured in training + self play for this iteration: " + err.getMessage());
+            }
+        }
+
+        net.save("src/main/data/checkersModel.bin");
 
 
 

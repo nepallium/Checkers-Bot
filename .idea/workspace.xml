@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="73bd672d-c493-4f66-942a-e601d590e4c1" name="Changes" comment="" />
+    <list default="true" id="73bd672d-c493-4f66-942a-e601d590e4c1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Deliverable 3/Checkers/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Deliverable 3/Checkers/src/main/java/main/Main.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -20,23 +23,22 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "sebastianbo2"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;sebastianbo2&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/adinashby-vanier-college/integrative-project-in-csm-project-coding-party.git",
-    "accountId": "7145c702-0960-4b9e-9544-11e42ca25d06"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/adinashby-vanier-college/integrative-project-in-csm-project-coding-party.git&quot;,
+    &quot;accountId&quot;: &quot;7145c702-0960-4b9e-9544-11e42ca25d06&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
   <component name="ProjectId" id="39OWXW2pgtZsqiyTR6EK70mcJQ0" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -55,12 +57,13 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/seb/IdeaProjects/integrative-project-in-csm-project-coding-party/Deliverable 3/Checkers",
+    "last_opened_file_path": "C:/Users/Cheero/Documents/project/integrative-project-in-csm-project-coding-party",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
+    "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2137931",
     "settings.editor.selected.configurable": "reference.settings.ide.settings.uml",
@@ -127,6 +130,7 @@
       <workItem from="1771680764696" duration="285000" />
       <workItem from="1771681061085" duration="18000" />
       <workItem from="1772384149468" duration="1258000" />
+      <workItem from="1775695709291" duration="256000" />
     </task>
     <servers />
   </component>
