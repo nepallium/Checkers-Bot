@@ -41,7 +41,7 @@ public class SelfPlay {
         List<TrainingExample> examples = new ArrayList<>();
 
         int moveCount = 0;
-
+        boolean flag = false;
         while (board.getGameResult() == GameResult.ONGOING) {
             moveCount++;
 //            System.out.println("Result: " + board.getGameResult());
@@ -60,6 +60,7 @@ public class SelfPlay {
                 System.out.println("POLICY IS NULL");
             } else if (policy.length == 0) {
                 System.out.println("No legal moves found");
+                flag = true;
                 break;
             }
 
@@ -78,7 +79,7 @@ public class SelfPlay {
         // +1 white, -1 black, 0 draw
         if (GameResult.WHITE_WIN == winner) {
             factor = 1;
-        } else if (GameResult.BLACK_WIN == winner) {
+        } else if (GameResult.BLACK_WIN == winner || flag) {
             factor = -1;
         }
 

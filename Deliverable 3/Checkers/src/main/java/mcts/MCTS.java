@@ -10,7 +10,7 @@ import java.util.List;
 public class MCTS {
 
     private static final double C_PUCT = 1.4;
-    private static final int SIMULATIONS = 500; // arbitrary number of simulations to run for every search of ONE ouputted prior policy
+    private static final int SIMULATIONS = 100; // arbitrary number of simulations to run for every search of ONE ouputted prior policy
 
     private NeuralNet net;
 
