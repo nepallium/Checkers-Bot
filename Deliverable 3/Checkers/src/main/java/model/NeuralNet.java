@@ -116,19 +116,19 @@ public class NeuralNet {
      * @param dLoss_dValue gradient from value wrt its loss
      */
     public void backward(double[] dLoss_dPolicy, double dLoss_dValue) {
-        double[] gradFromPolicyHead = policyLayer.backward(dLoss_dPolicy, fc2.getPostActOutput());
+        double[] gradFromPolicyHead = policyLayer.backwardNoActivation(dLoss_dPolicy, fc2.getPostActOutput());
 
         // convert value gradient (scalar) into array
         double[] valueGradArray = new double[]{dLoss_dValue};
-        double[] gradFromValueHead = valueLayer.backward(valueGradArray, fc2.getPostActOutput());
+        double[] gradFromValueHead = valueLayer.backwardTanh(valueGradArray, fc2.getPostActOutput());
 
         double[] gradToFc2 = new double[fc2.getOutputSize()]; // loss w.r.t fc2 output
         for (int i = 0; i < gradToFc2.length; i++) {
             gradToFc2[i] = gradFromPolicyHead[i] + gradFromValueHead[i];
         }
 
-        double[] gradToFc1 = fc2.backward(gradToFc2, fc1.getPostActOutput());
-        double[] gradToFlattened = fc1.backward(gradToFc1, flattenedMaps);
+        double[] gradToFc1 = fc2.backwardReLU(gradToFc2, fc1.getPostActOutput());
+        double[] gradToFlattened = fc1.backwardReLU(gradToFc1, flattenedMaps);
 
         double[][][] gradToFeatureMaps = new double[numFeatureMaps][8][8];
         int idx = 0;

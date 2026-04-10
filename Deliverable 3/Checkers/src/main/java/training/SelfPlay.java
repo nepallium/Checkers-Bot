@@ -8,6 +8,7 @@ import game.Move;
 import game.MoveResult;
 import javafx.stage.Stage;
 import mcts.MCTS;
+import model.NeuralNet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import java.util.List;
 
 public class SelfPlay {
     private MCTS mcts;
+    private NeuralNet net;
 
     /**
      * Constructor expects an MCTS object already initialized with a NN object
@@ -24,16 +26,24 @@ public class SelfPlay {
         this.mcts = mcts;
     }
 
+    public SelfPlay(NeuralNet net) {
+        this.net = net;
+    }
+
     /**
      * Plays a single game using MCTS. Stores a TrainingExample for every move in that game
      * @return the training dataset from a single self-play game
      */
     public List<TrainingExample> playOneGame() {
+        MCTS mcts = new MCTS(net);
         Board board = new Board();
 
         List<TrainingExample> examples = new ArrayList<>();
 
+        int moveCount = 0;
+
         while (board.getGameResult() == GameResult.ONGOING) {
+            moveCount++;
 //            System.out.println("Result: " + board.getGameResult());
 
             // gets mcts policy, aka not improved
@@ -45,6 +55,14 @@ public class SelfPlay {
             examples.add(new TrainingExample(board.splitBoardChannels(), policy, moves, !board.isWhiteToMove()));
 
             // TODO pick action with sampling early, then argmax later
+
+            if (policy == null) {
+                System.out.println("POLICY IS NULL");
+            } else if (policy.length == 0) {
+                System.out.println("No legal moves found");
+                break;
+            }
+
             int bestMoveIdx = argmax(policy);
 
             board.applyMove(moves.get(bestMoveIdx));
@@ -70,6 +88,7 @@ public class SelfPlay {
             ex.z = factor * player;
         }
 
+        System.out.println("Game over after " + moveCount + " moves, result: " + board.getGameResult());
         return examples;
     }
 

@@ -55,7 +55,7 @@ public class MCTS {
         GameResult result = board.getGameResult();
 
         if (result != GameResult.ONGOING) {
-            // terminal state reached
+            return terminalValue(result);
         }
 
         if (!node.isExpanded()) {
@@ -86,6 +86,9 @@ public class MCTS {
             return 0;
         }
         double value = -simulate(bestChild, nextBoard);
+
+        bestChild.visitCount++;
+        bestChild.valueSum += value;
 
         node.visitCount++;
         node.valueSum += value;

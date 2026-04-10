@@ -19,13 +19,16 @@ public class Main {
     	System.out.println("Working.....");
         NeuralNet net = new NeuralNet(12);
 
-        net.load("src/main/data/checkersModel.bin");
+//        net.load("src/main/data/checkersModel.bin");
 
         Trainer trainer = new Trainer(net);
-        MCTS mcts = new MCTS(net);
-        SelfPlay selfPlay = new SelfPlay(mcts);
+        SelfPlay selfPlay = new SelfPlay(net);
+
+        System.out.println("Checkpoint 1");
 
         Move.init();
+
+        System.out.println("Checkpoint 2");
 
         for (int i = 0; i < 100; i++) {
             try {
@@ -39,6 +42,8 @@ public class Main {
                 }
             } catch (Exception err) {
                 System.out.println("An error occured in training + self play for this iteration: " + err.getMessage());
+                System.out.println("Printing Stack Trace...");
+                System.err.println(Arrays.toString(err.getStackTrace()));
             }
         }
 

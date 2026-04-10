@@ -120,6 +120,8 @@ public class ConvolutionalLayer {
     }
 
     public double[][][] backwardWithActivation(double[][][] gradientFromNext, double[][][] inputToThisLayer) {
+        this.kernelGradients = new double[numInAndOut][channels][width][height];
+        this.biasGradients = new double[numInAndOut];
 
         // apply ReLU deriv
         double[][][] gradientPreAct = new double[kernels.length][8][8];
@@ -166,14 +168,14 @@ public class ConvolutionalLayer {
 
 
     public double[][][] backwardNoActivation(double[][][] gradientFromNext, double[][][] inputToThisLayer) {
-
-        double[][][] gradientPreAct = gradientFromNext;
+        this.kernelGradients = new double[numInAndOut][channels][width][height];
+        this.biasGradients = new double[numInAndOut];
 
         // bias gradients
         for (int f = 0; f < kernels.length; f++)
             for (int r = 0; r < 8; r++)
                 for (int c = 0; c < 8; c++)
-                    biasGradients[f] += gradientPreAct[f][r][c];
+                    biasGradients[f] += gradientFromNext[f][r][c];
 
         // kernel gradients
         for (int f = 0; f < kernels.length; f++)
@@ -185,7 +187,7 @@ public class ConvolutionalLayer {
                                 int inR = r + kr - 1;
                                 int inC = c + kc - 1;
                                 if (inR >= 0 && inR < 8 && inC >= 0 && inC < 8)
-                                    kernelGradients[f][ch][kr][kc] += gradientPreAct[f][r][c] * inputToThisLayer[ch][inR][inC];
+                                    kernelGradients[f][ch][kr][kc] += gradientFromNext[f][r][c] * inputToThisLayer[ch][inR][inC];
                             }
 
         double[][][] inputGradient = new double[channels][8][8];
@@ -198,7 +200,7 @@ public class ConvolutionalLayer {
                                 int inR = r + kr - 1;
                                 int inC = c + kc - 1;
                                 if (inR >= 0 && inR < 8 && inC >= 0 && inC < 8)
-                                    inputGradient[ch][r][c] += gradientPreAct[f][inR][inC] * kernels[f][ch][kr][kc];
+                                    inputGradient[ch][r][c] += gradientFromNext[f][inR][inC] * kernels[f][ch][kr][kc];
                             }
 
         return inputGradient;

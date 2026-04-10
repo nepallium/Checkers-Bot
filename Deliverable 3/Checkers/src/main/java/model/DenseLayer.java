@@ -137,6 +137,59 @@ public class DenseLayer {
         return gradientToPass;
     }
 
+    public double[] backwardReLU(double[] gradientFromNext, double[] outputFromLast) {
+        this.weightGradients = new double[outputSize][inputSize];
+        this.biasGradients = new double[outputSize];
+
+        double[] gradientPreAct = new double[outputSize];
+        for (int i = 0; i < gradientPreAct.length; i++) {
+            gradientPreAct[i] = postActivationOutput[i] > 0 ? gradientFromNext[i] : 0;
+        }
+
+        return computeGradients(gradientPreAct, outputFromLast);
+    }
+
+    public double[] backwardTanh(double[] gradientFromNext, double[] outputFromLast) {
+        this.weightGradients = new double[outputSize][inputSize];
+        this.biasGradients = new double[outputSize];
+
+        double[] gradientPreAct = new double[outputSize];
+        for (int i = 0; i < gradientPreAct.length; i++) {
+            gradientPreAct[i] = gradientFromNext[i] * (Activation.tanhDeriv(postActivationOutput[i]));
+        }
+
+        return computeGradients(gradientPreAct, outputFromLast);
+    }
+
+    public double[] backwardNoActivation(double[] gradientFromNext, double[] outputFromLast) {
+        this.weightGradients = new double[outputSize][inputSize];
+        this.biasGradients = new double[outputSize];
+
+        return computeGradients(gradientFromNext, outputFromLast);
+    }
+
+    /**
+     * Helper function which is common for all backward functions
+     * @param gradientPreAct
+     * @param outputFromLast
+     * @return
+     */
+    private double[] computeGradients(double[] gradientPreAct, double[] outputFromLast) {
+        for (int i = 0; i < weightGradients.length; i++)
+            for (int j = 0; j < weightGradients[i].length; j++)
+                weightGradients[i][j] = gradientPreAct[i] * outputFromLast[j];
+
+        for (int i = 0; i < biasGradients.length; i++)
+            biasGradients[i] = gradientPreAct[i];
+
+        double[] gradientToPass = new double[inputSize];
+        for (int i = 0; i < inputSize; i++)
+            for (int j = 0; j < outputSize; j++)
+                gradientToPass[i] += weights[j][i] * gradientPreAct[j];
+
+        return gradientToPass;
+    }
+
     public void update(double learningRate, double weightDecay) {
         for (int i = 0; i < weightGradients.length; i ++) {
             for (int j = 0; j < weightGradients[i].length; j++) {
