@@ -43,6 +43,7 @@ public class Trainer {
 //            System.out.println("DONE!!!");
 
             // Propagate loss derivatives (gradients) backwards
+            net.backward(dLoss_dPolicy, dLoss_dValue);
             
         }
 

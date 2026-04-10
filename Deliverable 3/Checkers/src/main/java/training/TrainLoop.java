@@ -13,7 +13,7 @@ public class TrainLoop {
 
     public void main(String[] args) {
         // TODO actual meaningful args to NN
-        NeuralNet net = new NeuralNet(2);
+        NeuralNet net = new NeuralNet(12);
         MCTS mcts = new MCTS(net);
         SelfPlay selfPlay = new SelfPlay(mcts);
         ReplayBuffer buffer = new ReplayBuffer();

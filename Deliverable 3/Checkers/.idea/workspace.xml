@@ -5,12 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="54871252-14ea-486f-9f99-ac0cdac20dab" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/game/PositionLog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/game/PositionLog.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/main/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/mcts/MCTS.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/mcts/MCTS.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/training/SelfPlay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/training/SelfPlay.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/training/TrainLoop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/training/TrainLoop.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/training/Trainer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/training/Trainer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -76,7 +74,7 @@
       <recent name="C:\Users\2476382\Downloads\checkers\Deliverable 3\Checkers\src\main\resources\Images" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Main">
+  <component name="RunManager" selected="Application.main.Main">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="UI.Main" />
       <module name="Checkers" />
@@ -105,8 +103,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Main" />
         <item itemvalue="Application.main.Main" />
+        <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>
   </component>

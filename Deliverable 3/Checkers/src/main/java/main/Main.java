@@ -27,13 +27,13 @@ public class Main {
 
         Move.init();
 
-        for (int i = 0; i < 25000; i++) {
+        for (int i = 0; i < 100; i++) {
             try {
                 trainer.trainOnBatch(selfPlay.playOneGame());
-                if (i % 10 == 0) {
+                if (i % 1 == 0) {
                     System.out.println("Games played: " + i + " / 100 000");
                 }
-                if (i % 100 == 0) {
+                if (i % 5 == 0) {
                     net.save("src/main/data/checkersModel.bin");
                     System.out.println("----- Saved a model -----");
                 }
