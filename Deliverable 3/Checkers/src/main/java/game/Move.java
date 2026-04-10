@@ -15,6 +15,18 @@ public class Move {
         this(moveResult.getActionResults().stream().map(ActionResult::toSuper).toList());
     }
 
+    public Move(int... coordinateBases) {
+        this.actions = new ArrayList<>();
+        if (coordinateBases.length % 4 ==0) {
+            for (int i = 0; i < coordinateBases.length; i += 4) {
+                Action action = new Action(new Coordinate(coordinateBases[i], coordinateBases[i + 1]), new Coordinate(coordinateBases[i + 2], coordinateBases[i + 3]));
+                actions.add(action);
+            }
+        } else {
+            System.out.println("INVALID CONSTRUCTOR FOR MOVE WITH INT... " + coordinateBases.toString());
+        }
+    }
+
     public Move(List<Action> actions) {
         this.actions = actions;
     }
@@ -53,7 +65,7 @@ public class Move {
 
     /// GLOBAL ACTION SPACE
     public static final String GLOBAL_MOVE_SPACE_FILE_PATH = "src/main/data/GlobalMoveSpace.csv";
-    public static final int GLOBAL_MOVE_SPACE_SIZE = 1666;
+    public static final int GLOBAL_MOVE_SPACE_SIZE = 1426;
     public static final Move[] GLOBAL_MOVE_SPACE = new Move[GLOBAL_MOVE_SPACE_SIZE];
 
     /**
