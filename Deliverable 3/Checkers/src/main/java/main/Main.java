@@ -5,15 +5,20 @@ import mcts.MCTS;
 import model.ConvolutionalLayer;
 import model.NeuralNet;
 import model.PolicyValue;
+import org.w3c.dom.ls.LSOutput;
 import training.SelfPlay;
 import training.Trainer;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
+        Move.init();
+
         // ALEX
         //neuralNetTest();
     	System.out.println("Working.....");
@@ -25,8 +30,6 @@ public class Main {
         SelfPlay selfPlay = new SelfPlay(net);
 
         System.out.println("Checkpoint 1");
-
-        Move.init();
 
         System.out.println("Checkpoint 2");
 
@@ -118,6 +121,48 @@ public class Main {
          */
     }
 
+    /**
+     * [not used in application]
+     * Call to set the global move space into the CSV file
+     */
+    private static void logGlobalMoveSpace() {
+        Map<Coordinate, Set<Move>> globalMoveSpace = new HashMap<>();
+
+        for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
+            for (int xIdx = (rowIdx % 2 == 0 ? 0 : 1); xIdx < 8; xIdx += 2) {
+                Set<Move> localMoveSpace = getGlobalMoveSpaceFrom(xIdx, rowIdx);
+                globalMoveSpace.put(new Coordinate(xIdx, rowIdx), localMoveSpace);
+            }
+        }
+        int moveCounter = 0;
+        File file = new File(Move.GLOBAL_MOVE_SPACE_FILE_PATH);
+        try (FileWriter writer = new FileWriter(file)) {
+            for (Coordinate coordinate : globalMoveSpace.keySet()) {
+                for (Move move : globalMoveSpace.get(coordinate)) {
+                    String line = "";
+                    for (Action action : move.getActions()) {
+                        Coordinate start = action.getStart();
+                        Coordinate end = action.getDestination();
+                        line += String.format("%s,%s,%s,%s,", start.getX(), start.getY(), end.getX(), end.getY());
+                    }
+                    writer.write(line + "\n");
+                    moveCounter++;
+                }
+            }
+        } catch (IOException e) {
+
+        }
+        System.out.printf("Overwrite of GlobalMoveSpace.csv - global move space now has %s entries", moveCounter);
+    }
+
+
+    /**
+     * [not used in application]
+     * Helper function for logGlobalMoveSpace()
+     * @param x x coordinate
+     * @param y y coordinate
+     * @return set of all possible moves for that coordinate
+     */
     public static Set<Move> getGlobalMoveSpaceFrom(int x, int y) {
         Set<Move> results = new HashSet<>();
 
@@ -139,10 +184,9 @@ public class Main {
         }
 
         // multi-jump sequences (abstract, enemy-agnostic)
-        getAllMovesAt(x, y,
+        getAllCapturesAt(x, y,
                 new ArrayList<>(),
-                results,
-                new HashSet<>());
+                results);
 
         return results;
     }
@@ -151,7 +195,15 @@ public class Main {
         return x >= 0 && x < 8 && y >= 0 && y < 8;
     }
 
-    private static void getAllMovesAt(int x, int y, List<Action> path, Set<Move> results, Set<Coordinate> usedLandings) {
+    /**
+     * [not used in application]
+     * Helper function for getGlobalMoveSpaceFrom(x, y)
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param path previous actions [empty arrayList when calling, recursive]
+     * @param results set to which moves are added
+     */
+    private static void getAllCapturesAt(int x, int y, List<Action> path, Set<Move> results) {
         if (!isInBounds(x, y)) {
             return;
         }
@@ -164,25 +216,24 @@ public class Main {
         }
 
         for (int[] d : dirs) {
-            int newX = x + 2 * d[0]; // landing
+            int newX = x + 2 * d[0];
             int newY = y + 2 * d[1];
 
             if (!isInBounds(newX, newY)) {
                 continue;
             }
             Coordinate landing = new Coordinate(newX, newY);
+            Action action = new Action(new Coordinate(x, y), landing);
             //if already passed by, continue
-            if (usedLandings.contains(landing)) {
+            if (path.contains(action) || path.contains(new Action(action.getDestination(), action.getStart()))) {
                 continue;
             }
             //Chain moves are captures, assume always enough pieces to capture (12 enemy pieces, too much to capture all in 8x8)
-            path.add(new Action(new Coordinate(x, y), landing));
-            usedLandings.add(landing);
-            getAllMovesAt(newX, newY, path, results, usedLandings);
+            path.add(action);
+            getAllCapturesAt(newX, newY, path, results);
 
             // backtrack
-            usedLandings.remove(landing);
-            path.remove(path.size() - 1);
+            path.removeLast();
         }
     }
 
