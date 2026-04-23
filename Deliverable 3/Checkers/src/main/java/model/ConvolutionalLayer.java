@@ -157,10 +157,11 @@ public class ConvolutionalLayer {
                     for (int c = 0; c < 8; c++)
                         for (int kr = 0; kr < width; kr++)
                             for (int kc = 0; kc < height; kc++) {
-                                int inR = r + kr - 1;
-                                int inC = c + kc - 1;
-                                if (inR >= 0 && inR < 8 && inC >= 0 && inC < 8)
-                                    inputGradient[ch][r][c] += gradientPreAct[f][inR][inC] * kernels[f][ch][kr][kc];
+                                int outR = r - kr + 1;
+                                int outC = c - kc + 1;
+                                if (outR >= 0 && outR < 8 && outC >= 0 && outC < 8) {
+                                    inputGradient[ch][r][c] += gradientPreAct[f][outR][outC] * kernels[f][ch][kr][kc];
+                                }
                             }
 
         return inputGradient;
@@ -197,10 +198,11 @@ public class ConvolutionalLayer {
                     for (int c = 0; c < 8; c++)
                         for (int kr = 0; kr < width; kr++)
                             for (int kc = 0; kc < height; kc++) {
-                                int inR = r + kr - 1;
-                                int inC = c + kc - 1;
-                                if (inR >= 0 && inR < 8 && inC >= 0 && inC < 8)
-                                    inputGradient[ch][r][c] += gradientFromNext[f][inR][inC] * kernels[f][ch][kr][kc];
+                                int outR = r - kr + 1;
+                                int outC = c - kc + 1;
+                                if (outR >= 0 && outR < 8 && outC >= 0 && outC < 8) {
+                                    inputGradient[ch][r][c] += gradientFromNext[f][outR][outC] * kernels[f][ch][kr][kc];
+                                }
                             }
 
         return inputGradient;

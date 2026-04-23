@@ -1,8 +1,8 @@
 package training;
 
-import game.Move;
-
 import java.util.List;
+
+import game.Move;
 
 /**
  * Data container for game states, policy pi, and game value z
@@ -13,6 +13,10 @@ public class TrainingExample {
     public List<Move> legalMoves;
     public boolean whiteToMove;
     public Double z;
+
+    public TrainingExample(double[][][] state, double[] pi, boolean whiteToMove) {
+        this(state, pi, null, whiteToMove);
+    }
 
     public TrainingExample(double[][][] state, double[] pi, List<Move> legalMoves, boolean whiteToMove) {
         this.state = state.clone();

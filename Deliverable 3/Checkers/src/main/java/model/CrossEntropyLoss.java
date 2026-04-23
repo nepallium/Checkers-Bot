@@ -1,10 +1,9 @@
 package model;
 
+import java.util.List;
+
 import game.Move;
 import lombok.Getter;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class CrossEntropyLoss {
     private double[] prediction;
@@ -19,30 +18,24 @@ public class CrossEntropyLoss {
         this.target = target;
         this.legalMovesForTarget = legalMovesForTarget;
 
-        double[] indexes = new double[target.length];
-
-        for (int a = 0; a < target.length; a++) {
-            for (int b = 0; b < Move.GLOBAL_MOVE_SPACE_SIZE; b++) {
-                if (legalMovesForTarget.get(a) == Move.GLOBAL_MOVE_SPACE[b]) {
-                    indexes[a] = b;
-                    break;
-                }
-            }
-        }
-
         double sum = 0;
-        for (int i = 0; i < prediction.length; i++) {
-            for (int j = 0; j < indexes.length; j++) {
-                if (indexes[j] == i) {
-                    double clipped = Math.max(prediction[i], 1e-15);
-                    sum += target[j] * Math.log(clipped);
-                    break;
-                }
-            }
+        for (int i = 0; i < target.length; i++) {
+            int idx = getGlobalMoveIndex(legalMovesForTarget.get(i));
+            double clipped = Math.max(prediction[idx], 1e-15);
+            sum += target[i] * Math.log(clipped);
         }
 
         this.loss = -sum;
         return this.loss;
+    }
+
+    private int getGlobalMoveIndex(Move move) {
+        for (int i = 0; i < Move.GLOBAL_MOVE_SPACE_SIZE; i++) {
+            if (move.equals(Move.GLOBAL_MOVE_SPACE[i])) {
+                return i;
+            }
+        }
+        throw new IllegalStateException("Move not found in global move space: " + move);
     }
 
     // Combined gradient of Softmax + CrossEntropy: dL/dz[i] = pred[i] - target[i]

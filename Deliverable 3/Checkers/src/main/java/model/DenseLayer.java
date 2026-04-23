@@ -4,13 +4,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Random;
 
-import lombok.Getter;
-
 public class DenseLayer {
     public double[][] weights;
     public double[] bias;
     private int inputSize;
-    @Getter
     private int outputSize;
     private double[] postActivationOutput;
 
@@ -129,8 +126,8 @@ public class DenseLayer {
         }
 
         double[] gradientToPass = new double[inputSize];
-        for (int i = 0; i < gradientToPass.length; i ++) {
-            for (int j  = 0; j < weights[i].length; j++) {
+        for (int i = 0; i < inputSize; i ++) {
+            for (int j = 0; j < outputSize; j++) {
                 gradientToPass[i] += weights[j][i] * gradientPreAct[j];
             }
         }
@@ -155,7 +152,7 @@ public class DenseLayer {
 
         double[] gradientPreAct = new double[outputSize];
         for (int i = 0; i < gradientPreAct.length; i++) {
-            gradientPreAct[i] = gradientFromNext[i] * (Activation.tanhDeriv(postActivationOutput[i]));
+            gradientPreAct[i] = gradientFromNext[i] * (1.0 - postActivationOutput[i] * postActivationOutput[i]);
         }
 
         return computeGradients(gradientPreAct, outputFromLast);

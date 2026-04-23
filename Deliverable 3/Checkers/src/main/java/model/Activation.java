@@ -1,9 +1,8 @@
 package model;
 
-import game.Move;
-
-import java.util.Arrays;
 import java.util.List;
+
+import game.Move;
 
 public class Activation {
 
@@ -55,14 +54,18 @@ public class Activation {
     public static double[] softmaxDeriv(double[] pred, double[] target, List<Move> legalMovesForTarget) {
         double[] grad = new double[pred.length];
 
-        double[] indexes = new double[target.length];
+        int[] indexes = new int[target.length];
 
         for (int a = 0; a < target.length; a++) {
+            indexes[a] = -1;
             for (int b = 0; b < Move.GLOBAL_MOVE_SPACE_SIZE; b++) {
-                if (legalMovesForTarget.get(a) == Move.GLOBAL_MOVE_SPACE[b]) {
+                if (legalMovesForTarget.get(a).equals(Move.GLOBAL_MOVE_SPACE[b])) {
                     indexes[a] = b;
                     break;
                 }
+            }
+            if (indexes[a] == -1) {
+                throw new IllegalStateException("Move not found in global move space: " + legalMovesForTarget.get(a));
             }
         }
 

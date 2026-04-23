@@ -12,6 +12,10 @@ public class ReplayBuffer {
     private final int MAXSIZE = 10000; // max size for dataList
     private final Random random = new Random();
 
+    public ReplayBuffer() {
+        this.dataList = new ArrayList<>();
+    }
+
 
     public void addNewTrainingData(List<TrainingExample> newExamples) {
         if (newExamples == null) {
@@ -29,6 +33,10 @@ public class ReplayBuffer {
     }
 
     public List<TrainingExample> sample(int batchSize) {
+        if (batchSize <= 0 || dataList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         List<TrainingExample> samples = new ArrayList<>(batchSize);
         for (int i = 0; i < batchSize; i++) {
             int randIdx = random.nextInt(dataList.size());

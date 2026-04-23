@@ -1,6 +1,5 @@
 package game;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,15 +19,18 @@ public class PositionLog {
     }
 
     public PositionLog getDuplicate(boolean invertColors) {
-        List<int[][]> positionLogs = new LinkedList<>(recentPositions);
-        if (invertColors) {
-            positionLogs.forEach(cells -> {
-                for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
-                    for (int xIdx = (rowIdx % 2 == 0 ? 0 : 1); xIdx < 8; xIdx += 2) {
-                        cells[rowIdx][xIdx] *= -1;
+        List<int[][]> positionLogs = new LinkedList<>();
+        for (int[][] position : recentPositions) {
+            int[][] copiedPosition = new int[8][8];
+            for (int rowIdx = 0; rowIdx < 8; rowIdx++) {
+                copiedPosition[rowIdx] = position[rowIdx].clone();
+                if (invertColors) {
+                    for (int xIdx = 0; xIdx < 8; xIdx++) {
+                        copiedPosition[rowIdx][xIdx] *= -1;
                     }
                 }
-            });
+            }
+            positionLogs.add(copiedPosition);
         }
         return new PositionLog(maxPositionLogs, positionLogs);
     }

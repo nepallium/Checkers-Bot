@@ -1,7 +1,5 @@
 package game;
 
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,11 +7,10 @@ public class MoveLog {
     private final List<MoveResult> whiteMoveResults;
     private final List<MoveResult> blackMoveResults; //size is either equal to or one less than that of white moves
     private boolean whiteTurn;
-    @Getter
     private int noCaptureMoveStreak = 0;
 
     public MoveLog() {
-        this(new ArrayList<MoveResult>(List.of(new MoveResult())), new ArrayList<MoveResult>(List.of(new MoveResult())), true);
+        this(new ArrayList<>(List.of(new MoveResult())), new ArrayList<>(List.of(new MoveResult())), true);
 
     }
 
@@ -24,7 +21,33 @@ public class MoveLog {
     }
 
     public MoveLog getDuplicate(boolean invertColors) {
-        return new MoveLog(invertColors ? blackMoveResults : whiteMoveResults, invertColors ? whiteMoveResults : blackMoveResults, invertColors != whiteTurn);
+        List<MoveResult> copiedWhiteMoveResults = deepCopyMoveResults(whiteMoveResults);
+        List<MoveResult> copiedBlackMoveResults = deepCopyMoveResults(blackMoveResults);
+
+        return new MoveLog(
+                invertColors ? copiedBlackMoveResults : copiedWhiteMoveResults,
+                invertColors ? copiedWhiteMoveResults : copiedBlackMoveResults,
+                invertColors != whiteTurn
+        );
+    }
+
+    private List<MoveResult> deepCopyMoveResults(List<MoveResult> moveResults) {
+        List<MoveResult> copied = new ArrayList<>(moveResults.size());
+
+        for (MoveResult moveResult : moveResults) {
+            List<ActionResult> copiedActionResults = new ArrayList<>(moveResult.getActionResults().size());
+            for (ActionResult actionResult : moveResult.getActionResults()) {
+                copiedActionResults.add(new ActionResult(
+                        new Coordinate(actionResult.getStart().getX(), actionResult.getStart().getY()),
+                        new Coordinate(actionResult.getDestination().getX(), actionResult.getDestination().getY()),
+                        actionResult.getCapturedPiece(),
+                        actionResult.isPromotion()
+                ));
+            }
+            copied.add(new MoveResult(copiedActionResults));
+        }
+
+        return copied;
     }
 
     /**

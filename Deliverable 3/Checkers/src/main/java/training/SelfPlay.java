@@ -1,18 +1,15 @@
 package training;
 
-import UI.MainGameController;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import Util.Tuple;
 import game.Board;
 import game.GameResult;
 import game.Move;
-import game.MoveResult;
-import javafx.stage.Stage;
 import mcts.MCTS;
 import model.NeuralNet;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class SelfPlay {
     private MCTS mcts;
@@ -28,6 +25,7 @@ public class SelfPlay {
 
     public SelfPlay(NeuralNet net) {
         this.net = net;
+        this.mcts = new MCTS(net);
     }
 
     /**
@@ -35,24 +33,31 @@ public class SelfPlay {
      * @return the training dataset from a single self-play game
      */
     public List<TrainingExample> playOneGame() {
-        MCTS mcts = new MCTS(net);
+        MCTS search = this.mcts != null ? this.mcts : (this.net != null ? new MCTS(this.net) : null);
+        if (search == null) {
+            throw new IllegalStateException("SelfPlay requires either a non-null MCTS or NeuralNet");
+        }
+
         Board board = new Board();
 
         List<TrainingExample> examples = new ArrayList<>();
 
         int moveCount = 0;
-        boolean flag = false;
+        boolean noLegalMoves = false;
+        boolean noMoveWinnerIsWhite = false;
         while (board.getGameResult() == GameResult.ONGOING) {
             moveCount++;
 //            System.out.println("Result: " + board.getGameResult());
 
             // gets mcts policy, aka not improved
-            Tuple<double[], List<Move>> output = mcts.run(board);
+            Tuple<double[], List<Move>> output = search.run(board);
             double[] policy = output.e1;
 
             List<Move> moves = output.e2;
 
-            examples.add(new TrainingExample(board.splitBoardChannels(), policy, moves, !board.isWhiteToMove()));
+            TrainingExample example = new TrainingExample(board.splitBoardChannels(), policy, board.isWhiteToMove());
+            example.legalMoves = moves;
+            examples.add(example);
 
             // TODO pick action with sampling early, then argmax later
 
@@ -60,7 +65,8 @@ public class SelfPlay {
                 System.out.println("POLICY IS NULL");
             } else if (policy.length == 0) {
                 System.out.println("No legal moves found");
-                flag = true;
+                noLegalMoves = true;
+                noMoveWinnerIsWhite = !board.isWhiteToMove();
                 break;
             }
 
@@ -77,9 +83,11 @@ public class SelfPlay {
         int factor = 0; // init at 0 == GameResult.DRAW
         // since a TrainingExample's player is stored as boolean whiteToMove
         // +1 white, -1 black, 0 draw
-        if (GameResult.WHITE_WIN == winner) {
+        if (noLegalMoves) {
+            factor = noMoveWinnerIsWhite ? 1 : -1;
+        } else if (GameResult.WHITE_WIN == winner) {
             factor = 1;
-        } else if (GameResult.BLACK_WIN == winner || flag) {
+        } else if (GameResult.BLACK_WIN == winner) {
             factor = -1;
         }
 

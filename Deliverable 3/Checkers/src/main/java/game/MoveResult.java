@@ -51,7 +51,6 @@ public class MoveResult {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
         MoveResult moveResult = (MoveResult) o;
         return Objects.equals(actionResults, moveResult.actionResults);
     }
@@ -62,7 +61,12 @@ public class MoveResult {
     }
 
     public boolean isCapture() {
-        return !(actionResults.size() >= 2);
+        for (ActionResult actionResult : actionResults) {
+            if (actionResult.getCaptureCoordinate() != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<ActionResult> getActionResults() {

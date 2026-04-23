@@ -25,6 +25,7 @@ public class ActionResult extends Action {
     public ActionResult(Coordinate start, Coordinate destination, int capturedPiece, boolean promotion) {
         super(start, destination);
         this.capturedPiece = capturedPiece;
+        this.promotion = promotion;
     }
 
     @Override

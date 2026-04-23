@@ -5,7 +5,7 @@ import mcts.MCTS;
 import model.ConvolutionalLayer;
 import model.NeuralNet;
 import model.PolicyValue;
-import org.w3c.dom.ls.LSOutput;
+//import org.w3c.dom.ls.LSOutput;
 import training.SelfPlay;
 import training.Trainer;
 

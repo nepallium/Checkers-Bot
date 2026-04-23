@@ -18,7 +18,6 @@ public class Board {
     @Getter
     private final MoveLog moveLog;
     private final PositionLog positionLog;
-    @Getter
     private GameResult gameResult;
     private Coordinate forcedPieceCaptureCoordinate;
 
@@ -79,6 +78,12 @@ public class Board {
             gameResult = GameResult.WHITE_WIN;
             return true;
         }
+
+        if (getBoardMoveSpace().isEmpty()) {
+            gameResult = isWhiteToMove() ? GameResult.BLACK_WIN : GameResult.WHITE_WIN;
+            return true;
+        }
+
         return false;
     }
 
@@ -114,7 +119,7 @@ public class Board {
         if (arePiecesNonAllied(movingPiece, isWhiteToMove() ? 1 : -1) || action.getDestination().isInvalid() || getPieceAt(action.getDestination()) != 0 || (action.getCaptureCoordinate() != null && getPieceAt(action.getCaptureCoordinate()) == 0)) {
             return false;
         }
-        return (Math.abs(action.getDeltaCoordinate().getY()) == Math.abs(action.getDeltaCoordinate().getX()) && action.getDeltaCoordinate().getX() <= 2) && (Math.abs(movingPiece) == 2 || action.getDeltaCoordinate().getY() > 0 == movingPiece > 0);
+        return (Math.abs(action.getDeltaCoordinate().getY()) == Math.abs(action.getDeltaCoordinate().getX()) && Math.abs(action.getDeltaCoordinate().getX()) <= 2) && (Math.abs(movingPiece) == 2 || action.getDeltaCoordinate().getY() > 0 == movingPiece > 0);
     }
 
     /**
@@ -172,8 +177,15 @@ public class Board {
             forcedPieceCaptureCoordinate = null;
             ActionResult actionResult = new ActionResult(action, 0, isPromotion);
             moveLog.addActionLog(actionResult, true);
-            boolean gameOver = checkForDraw();
-            if (gameOver) {
+
+            boolean winnerFound = checkForWinner();
+            if (winnerFound) {
+                printGameOver();
+                return actionResult;
+            }
+
+            boolean drawGameOver = checkForDraw();
+            if (drawGameOver) {
                 printGameOver();
             }
             return actionResult;
@@ -190,6 +202,17 @@ public class Board {
         if (!chainIfPossible) {
             moveLog.addActionLog(actionResult, true);
             forcedPieceCaptureCoordinate = null;
+
+            boolean winnerFound = checkForWinner();
+            if (winnerFound) {
+                printGameOver();
+                return actionResult;
+            }
+
+            boolean drawGameOver = checkForDraw();
+            if (drawGameOver) {
+                printGameOver();
+            }
             return actionResult;
         }
         List<Action> chainActionSpace = getPieceActionSpace(destination, piece).e1;
@@ -334,9 +357,10 @@ public class Board {
                 continue;
             }
 
-            filteredCoordinates.add(moveDestination);
+            List<Coordinate> nextFilteredCoordinates = new ArrayList<>(filteredCoordinates);
+            nextFilteredCoordinates.add(moveDestination);
             //after captures, must move again if is another capture
-            Tuple<List<Move>, List<Move>> nextActionSpaces = getPieceMoveSpace(captureDestination, piece, filteredCoordinates);
+            Tuple<List<Move>, List<Move>> nextActionSpaces = getPieceMoveSpace(captureDestination, piece, nextFilteredCoordinates);
             //if there are no more capture moves, add this move to the capture move results
             if (nextActionSpaces.e1.isEmpty()) {
                 captureMoveResults.add(new Move(new Action(action.getStart(), captureDestination)));

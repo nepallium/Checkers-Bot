@@ -1,11 +1,14 @@
 package mcts;
 
+import java.util.List;
+
 import Util.Tuple;
-import game.*;
+import game.Board;
+import game.GameResult;
+import game.Move;
+import game.MoveResult;
 import model.NeuralNet;
 import model.PolicyValue;
-
-import java.util.List;
 
 public class MCTS {
 
@@ -43,11 +46,18 @@ public class MCTS {
         }
 
         // Normalize
-        for (int i = 0; i < policy.length; i++) {
-            policy[i] /= sum;
+        if (sum > 0.0) {
+            for (int i = 0; i < policy.length; i++) {
+                policy[i] /= sum;
+            }
+        } else if (!legalMoves.isEmpty()) {
+            double uniform = 1.0 / legalMoves.size();
+            for (int i = 0; i < policy.length; i++) {
+                policy[i] = uniform;
+            }
         }
 
-        return new Tuple<double[], List<Move>>(policy, legalMoves);
+        return new Tuple<>(policy, legalMoves);
     }
 
     private double simulate(Node node, Board board) {
@@ -55,7 +65,7 @@ public class MCTS {
         GameResult result = board.getGameResult();
 
         if (result != GameResult.ONGOING) {
-            return terminalValue(result);
+            return terminalValue(board, result);
         }
 
         if (!node.isExpanded()) {
@@ -82,7 +92,7 @@ public class MCTS {
 
         Board nextBoard = board.getBoardDuplicate();
         MoveResult moveResult = nextBoard.applyMove(bestMove);
-        if (moveResult == null) {
+        if (moveResult == null || bestChild == null) {
             return 0;
         }
         double value = -simulate(bestChild, nextBoard);
@@ -104,15 +114,10 @@ public class MCTS {
 
         List<Move> legalMoves = board.getBoardMoveSpace();
 
-        double sum = 0.0;
-
-        for (double pol : policy) {
-            sum += pol;
-        }
-
+        int[] globalMoveIndices = new int[legalMoves.size()];
+        double legalPolicySum = 0.0;
         for (int moveIdx = 0; moveIdx < legalMoves.size(); moveIdx++) {
             Move move = legalMoves.get(moveIdx);
-
             int idx = -1;
 
             for (int i = 0; i < Move.GLOBAL_MOVE_SPACE.length; i++) {
@@ -126,16 +131,29 @@ public class MCTS {
                 throw new ArrayIndexOutOfBoundsException("Index not found for a move in the global action space: " + move.toString());
             }
 
-            double policyAmount = policy[idx] / sum;
+            globalMoveIndices[moveIdx] = idx;
+            legalPolicySum += policy[idx];
+        }
+
+        for (int moveIdx = 0; moveIdx < legalMoves.size(); moveIdx++) {
+            Move move = legalMoves.get(moveIdx);
+            int idx = globalMoveIndices[moveIdx];
+            double policyAmount = legalPolicySum > 0.0 ? policy[idx] / legalPolicySum : (1.0 / legalMoves.size());
             node.children.put(move, new Node(policyAmount));
         }
 
         return value;
     }
 
-    private double terminalValue(GameResult result) {
-        if (result == GameResult.WHITE_WIN) return 1.0;
-        if (result == GameResult.BLACK_WIN) return -1.0;
+    private double terminalValue(Board board, GameResult result) {
+        if (result == GameResult.DRAW) return 0.0;
+
+        boolean whiteToMove = board.isWhiteToMove();
+        boolean playerToMoveWon = (result == GameResult.WHITE_WIN && whiteToMove)
+                || (result == GameResult.BLACK_WIN && !whiteToMove);
+
+        if (playerToMoveWon) return 1.0;
+        if (result == GameResult.WHITE_WIN || result == GameResult.BLACK_WIN) return -1.0;
         return 0.0;
     }
 }
