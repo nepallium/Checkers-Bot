@@ -178,7 +178,7 @@ public class MainGameController {
         pieceUIMap.put(action.getDestination(), pieceUI);
 
         Coordinate captureCoordinate = action.getCaptureCoordinate();
-        showPieceAction(actionResult, pieceUI, captureCoordinate == null ? null : pieceUIMap.remove(captureCoordinate), true);
+        showAction(actionResult, pieceUI, true);
         //Check if is AI turn
         if (board.isGameOver() || (board.isWhiteToMove() == playerPlaysAsWhite)) {
             return;
@@ -210,7 +210,7 @@ public class MainGameController {
                 ActionResult actionResult = actionIdx < moveResult.getActionResults().size() ? moveResult.getActionResults().get(actionIdx) : null;
                 Runnable application = actionResult != null ? ()  -> {
                     Coordinate captureCoordinate = actionResult.getCaptureCoordinate();
-                    showPieceAction(actionResult, pieceUI, captureCoordinate == null ? null : pieceUIMap.remove(captureCoordinate), false);
+                    showAction(actionResult, pieceUI, false);
                     this.accept(actionIdx + 1);
 
                 } : () -> {
@@ -222,40 +222,37 @@ public class MainGameController {
             }
         };
         actionApplication.accept(0);
-/*
-        for (ActionResult actionResult : moveResult.getActionResults()) {
-            Coordinate captureCoordinate = actionResult.getCaptureCoordinate();
-            showPieceAction(actionResult, pieceUI, captureCoordinate == null ? null : pieceUIMap.remove(captureCoordinate), false);
-            Thread.sleep((long) (App.PIECE_MOVE_DURATION * 3000));
-            System.out.println(System.currentTimeMillis());
-        }*/
     }
-
-    private void showPieceAction(ActionResult actionResult, ImageView movingPieceImg, ImageView capturedPieceImg, boolean toggleInputEnabled) {
-        //Temporarily disable inputs while the UI is moving if should
-        if (toggleInputEnabled) {
-            inputsDisabled = true;
-        }
-        Thread thread = new Thread(() -> {
-
-        });
-        //Transition for moving the piece
+    private void showPieceMoving(Coordinate start, Coordinate destination, ImageView movingPieceImg, boolean toggleInputEnabled, boolean isPromotion) {
         TranslateTransition moveTrans = new TranslateTransition(Duration.seconds(App.PIECE_MOVE_DURATION));
         moveTrans.setNode(movingPieceImg);
-        Tuple<Double, Double> layoutXY1 = getLayoutAtBoardCoordinate(actionResult.getStart());
-        Tuple<Double, Double> layoutXY2 = getLayoutAtBoardCoordinate(actionResult.getDestination());
+        Tuple<Double, Double> layoutXY1 = getLayoutAtBoardCoordinate(start);
+        Tuple<Double, Double> layoutXY2 = getLayoutAtBoardCoordinate(destination);
         moveTrans.setByX(layoutXY2.e1 - layoutXY1.e1);
         moveTrans.setByY(layoutXY2.e2 - layoutXY1.e2);
-
         moveTrans.setOnFinished(e -> {
             if (toggleInputEnabled) {
                 inputsDisabled = false;
             }
-            if (actionResult.isPromotion()) {
-                movingPieceImg.setImage(new Image(App.getPieceImagePath(board.getPieceAt(actionResult.getDestination()))));
+            if (isPromotion) {
+                movingPieceImg.setImage(new Image(App.getPieceImagePath(board.getPieceAt(destination))));
             }
         });
         moveTrans.play();
+    }
+
+    private void showAction(ActionResult actionResult, ImageView pieceUI, boolean toggleInputEnabled) {
+
+        ImageView capturedPieceImg = actionResult.getCaptureCoordinate() == null ? null : pieceUIMap.remove(actionResult.getCaptureCoordinate());
+        //Temporarily disable inputs while the UI is moving if should
+        if (toggleInputEnabled) {
+            inputsDisabled = true;
+        }
+        //Transition for moving the piece
+
+        showPieceMoving(actionResult.getStart(), actionResult.getDestination(), pieceUI, toggleInputEnabled, actionResult.isPromotion());
+
+
         //Transition for hiding captured piece
         if (capturedPieceImg == null) {
             return;
@@ -339,6 +336,30 @@ public class MainGameController {
             targetIcons[i].setVisible(true);
         }
     }
+
+    private boolean undoLastMove() {
+        Tuple<Boolean, MoveResult> undoQuery = board.undoLastMove();
+        if (!undoQuery.e1 || undoQuery.e2 == null) {
+            return false;
+        }
+        MoveResult moveResult = undoQuery.e2;
+        for (int i = moveResult.getActionResults().size() - 1; i >= 0; i--) {
+            undoActionResult(moveResult.getActionResults().get(i));
+        }
+        return true;
+    }
+
+    private void undoActionResult(ActionResult actionResult) {
+        Coordinate actionDestination = actionResult.getDestination();
+        Coordinate actionStart = actionResult.getStart();
+        //Show the piece moving backwards
+        //and show the ImageView of the piece that was captured
+        //then insert it into the Map of coordinates and pieces
+
+
+    }
+
+
 
 
     private static Button createGridButton(boolean isWhite) {
