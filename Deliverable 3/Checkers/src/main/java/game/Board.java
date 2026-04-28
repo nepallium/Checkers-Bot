@@ -388,15 +388,15 @@ public class Board {
         return captureAvailable ? captureMoveResults : nonCaptureMoveResults;
     }
 
-    public boolean undoLastMove() {
+    public Tuple<Boolean, MoveResult> undoLastMove() {
         MoveResult undoingMoveResult = moveLog.popLastMove();
         if (undoingMoveResult == null) {
-            return false;
+            return new Tuple<>(false, null);
         }
 
         boolean result = undoMove(undoingMoveResult);
         gameResult = GameResult.ONGOING;
-        return result;
+        return new Tuple<>(result, undoingMoveResult);
     }
 
     /**
