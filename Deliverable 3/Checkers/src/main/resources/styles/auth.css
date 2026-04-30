@@ -1,0 +1,28 @@
+/* Styles for login and signup forms */
+.auth-root {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #f2f7ff);
+    -fx-padding: 24;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.auth-root .label {
+    -fx-font-weight: bold;
+}
+
+.input-field {
+    -fx-pref-width: 260px;
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-padding: 6 8 6 8;
+}
+
+.submit-btn {
+    -fx-background-color: #2b6cb0;
+    -fx-text-fill: white;
+    -fx-padding: 8 14 8 14;
+    -fx-background-radius: 4;
+}
+
+.submit-btn:hover {
+    -fx-background-color: #245a9a;
+}

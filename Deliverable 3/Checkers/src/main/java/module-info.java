@@ -1,7 +1,9 @@
 module org.example.checkers {
     requires javafx.controls;
     requires javafx.fxml;
-    requires static lombok; // 'static' because lombok is only needed at compile time
+    requires static lombok;
+    requires jbcrypt;
+    requires com.opencsv; // 'static' because lombok is only needed at compile time
 
     opens main to javafx.fxml;
     exports main;

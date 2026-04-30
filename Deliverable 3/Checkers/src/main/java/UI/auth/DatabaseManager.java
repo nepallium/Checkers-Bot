@@ -1,6 +1,12 @@
 package UI.auth;
 
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,5 +34,49 @@ public class DatabaseManager {
         } catch (IOException e) {
             System.err.println("Could not initialize database: " + e.getMessage());
         }
+    }
+
+    /**
+     * Hashes plain password and adds to db.csv file
+     * @param email the user's email
+     * @param password the user's password, as is
+     */
+    public static void saveUser(String email, String password) {
+        String hashedPw = BCrypt.hashpw(password, BCrypt.gensalt());
+        try (CSVWriter writer = new CSVWriter(new FileWriter(CSV_PATH, true))) {
+            String[] user = {email, hashedPw};
+            writer.writeNext(user);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Authenticates user
+     * @param email the email
+     * @param password the password
+     * @return whether user has given valid or invalid credentials
+     */
+    public static boolean verifyUser(String email, String password) {
+        try (CSVReader reader = new CSVReader(new FileReader(CSV_PATH))) {
+            String[] nextLine;
+
+            // skip header row
+            reader.readNext();
+
+            while ((nextLine = reader.readNext()) != null) {
+                String storedEmail = nextLine[0];
+                String storedHash = nextLine[1];
+
+                if (storedEmail.equalsIgnoreCase(email)) {
+                    return BCrypt.checkpw(password, storedHash);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Database read error: " + e.getMessage());
+        }
+
+        // out of the while loop without finding email or password
+        return false;
     }
 }
