@@ -1,5 +1,6 @@
 package UI;
 
+import UI.auth.DatabaseManager;
 import game.Move;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -22,6 +23,8 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
+        DatabaseManager.initialize();
+
         App.stage = stage;
         stage.setTitle("Checkers Bot");
 

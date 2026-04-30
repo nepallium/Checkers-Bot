@@ -8,4 +8,6 @@ module org.example.checkers {
 
     opens UI to javafx.fxml;
     exports UI;
+    exports UI.auth;
+    opens UI.auth to javafx.fxml;
 }
