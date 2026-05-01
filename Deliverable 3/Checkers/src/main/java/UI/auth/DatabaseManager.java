@@ -79,4 +79,26 @@ public class DatabaseManager {
         // out of the while loop without finding email or password
         return false;
     }
+
+    public static boolean isEmailAvailable(String email) {
+        try (CSVReader reader = new CSVReader(new FileReader(CSV_PATH))) {
+            String[] nextLine;
+
+            // skip header row
+            reader.readNext();
+
+            while ((nextLine = reader.readNext()) != null) {
+                String storedEmail = nextLine[0];
+
+                if (storedEmail.equalsIgnoreCase(email)) {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Database read error: " + e.getMessage());
+        }
+
+        // out of the while loop
+        return true;
+    }
 }

@@ -3,18 +3,8 @@ package UI;
 import UI.auth.DatabaseManager;
 import game.Move;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 import main.App;
-import mcts.MCTS;
-import model.NeuralNet;
-import training.SelfPlay;
-import training.Trainer;
-
-import java.io.IOException;
-import java.util.Objects;
 
 public class Main extends Application {
     public static void main(String[] args) {
@@ -28,15 +18,7 @@ public class Main extends Application {
         App.stage = stage;
         stage.setTitle("Checkers Bot");
 
-        try {
-            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/View/startup.fxml")));
-
-            Scene scene = new Scene(root);
-
-            stage.setScene(scene);
-        } catch (IOException err) {
-            System.out.println("Error loading fxml file, " + err);
-        }
+        App.setScene("signup");
 
         Move.init();
 

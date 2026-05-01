@@ -1,17 +1,18 @@
 package main;
 
+import java.io.IOException;
+import java.net.URL;
+
 import game.Board;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.net.URL;
-
 public class App {
     public static Stage stage;
     private static final String FXML_SCENES_FILE_PATH_PREFIX = "/View/";
+    private static final String AUTH_STYLESHEET = "/styles/auth.css";
     public static final String IMAGES_FILE_PATH_PREFIX = "/Images/";
     private static final String WHITE_MAN_IMAGE_PATH = "Samurai_Cheems_Cropped_Light_Theme.png";
     private static final String WHITE_KING_IMAGE_PATH = "King_Cheems_Cropped_Light_Theme.png";
@@ -41,10 +42,17 @@ public class App {
                 System.out.println("No parent found for fxml file: " + fxmlName);
                 return false;
             }
-            stage.setScene(new Scene(parent));
+            Scene scene = new Scene(parent);
+            if ("login".equals(fxmlName) || "signup".equals(fxmlName)) {
+                var authStylesheet = App.class.getResource(AUTH_STYLESHEET);
+                if (authStylesheet != null) {
+                    scene.getStylesheets().add(authStylesheet.toExternalForm());
+                }
+            }
+            stage.setScene(scene);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
             return false;
         }
     }

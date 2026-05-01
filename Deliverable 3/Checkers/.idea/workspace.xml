@@ -6,13 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="54871252-14ea-486f-9f99-ac0cdac20dab" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/users.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/users.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/UI/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/UI/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/UI/auth/DatabaseManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/UI/auth/DatabaseManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/UI/auth/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/UI/auth/LoginController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/UI/auth/SignupController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/UI/auth/SignupController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/main/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/main/App.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/View/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/View/login.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/View/signup.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/View/signup.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/styles/auth.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/styles/auth.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +83,7 @@
       <recent name="C:\Users\2476382\Downloads\checkers\Deliverable 3\Checkers\src\main\resources\Images" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Application.Main">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="UI.Main" />
       <module name="Checkers" />
@@ -109,8 +112,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.main.Main" />
         <item itemvalue="Application.Main" />
+        <item itemvalue="Application.main.Main" />
       </list>
     </recent_temporary>
   </component>

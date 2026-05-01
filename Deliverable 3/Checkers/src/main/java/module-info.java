@@ -1,5 +1,6 @@
 module org.example.checkers {
     requires javafx.controls;
+    requires transitive javafx.graphics;
     requires javafx.fxml;
     requires static lombok;
     requires jbcrypt;
