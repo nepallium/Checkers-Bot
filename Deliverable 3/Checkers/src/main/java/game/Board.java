@@ -645,4 +645,8 @@ public class Board {
             new int[]{-1, 0, -1, 0, -1, 0, -1, 0,},
             new int[]{0, -1, 0, -1, 0, -1, 0, -1,},
     };
+
+    public boolean hasForcedPieceCaptureCoordinate() {
+        return forcedPieceCaptureCoordinate != null;
+    }
 }
