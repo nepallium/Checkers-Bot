@@ -83,9 +83,7 @@ public class MainGameController {
 
         pieceUIMap.remove(destination);
         pieceUIMap.put(start, pieceUI);
-        showPieceMoving(destination, start, pieceUI, actionResult.isPromotion(),
-                onActionUndone
-        );
+        showPieceMoving(destination, start, pieceUI, actionResult.isPromotion(), onActionUndone, App.PIECE_TAKEBACK_DURATION);
 
         Coordinate capturedCoordinate = actionResult.getCaptureCoordinate();
         if (capturedCoordinate != null) {
@@ -95,7 +93,7 @@ public class MainGameController {
             capturedPieceImg.setVisible(true);
 
             ScaleTransition scaleTransition = new ScaleTransition(
-                    Duration.seconds(App.PIECE_MOVE_DURATION * 0.5),
+                    Duration.seconds(App.PIECE_TAKEBACK_DURATION * 0.5),
                     capturedPieceImg
             );
             scaleTransition.setToX(1);
@@ -244,8 +242,9 @@ public class MainGameController {
 
         ImageView pieceUI = pieceUIMap.remove(action.getStart());
         pieceUIMap.put(action.getDestination(), pieceUI);
-
-        showAction(actionResult, pieceUI, canStillPlay);
+        inputsDisabled = true;
+        showAction(actionResult, pieceUI, () -> {inputsDisabled = !canStillPlay;});
+        showPieceActions();
         //Check if is AI turn
         if (board.isGameOver() || (board.isWhiteToMove() == playerPlaysAsWhite)) {
             return;
@@ -275,14 +274,21 @@ public class MainGameController {
             @Override
             public void accept(Integer actionIdx) {
                 ActionResult actionResult = actionIdx < moveResult.getActionResults().size() ? moveResult.getActionResults().get(actionIdx) : null;
+
                 Runnable application = actionResult != null ? ()  -> {
                     Coordinate captureCoordinate = actionResult.getCaptureCoordinate();
-                    showAction(actionResult, pieceUI, true);
+                    showAction(actionResult, pieceUI, () -> {
+                        if (actionIdx < moveResult.getActionResults().size() - 1) {
+                            return;
+                        }
+                        inputsDisabled = false;
+                    });
+                    if (actionIdx == moveResult.getActionResults().size() - 1) {
+                        showPieceActions();
+                    }
                     this.accept(actionIdx + 1);
 
-                } : () -> {
-                    actionScheduler.close();
-                };
+                } : actionScheduler::close;
 
                 actionScheduler.schedule(application, 500, TimeUnit.MILLISECONDS);
             }
@@ -294,7 +300,8 @@ public class MainGameController {
             Coordinate destination,
             ImageView movingPieceImg,
             boolean isPromotion,
-            Runnable onFinished
+            Runnable onFinished,
+            double moveDuration
     ) {
         Tuple<Double, Double> layoutXY1 = getLayoutAtBoardCoordinate(start);
         Tuple<Double, Double> layoutXY2 = getLayoutAtBoardCoordinate(destination);
@@ -303,7 +310,7 @@ public class MainGameController {
         double dy = layoutXY2.e2 - layoutXY1.e2;
 
         TranslateTransition moveTrans = new TranslateTransition(
-                Duration.seconds(App.PIECE_MOVE_DURATION),
+                Duration.seconds(moveDuration),
                 movingPieceImg
         );
 
@@ -325,8 +332,7 @@ public class MainGameController {
         moveTrans.play();
     }
 
-    private void showAction(ActionResult actionResult, ImageView pieceUI, boolean toggleInputEnabled) {
-
+    private void showAction(ActionResult actionResult, ImageView pieceUI, Runnable onActionDone) {
         Coordinate start = actionResult.getStart();
         Coordinate destination = actionResult.getDestination();
 
@@ -336,39 +342,20 @@ public class MainGameController {
         if (capturedPieceImg != null) {
             capturedPieceUIs.add(capturedPieceImg);
         }
-        if (toggleInputEnabled) {
-            inputsDisabled = true;
-        }
+
         pieceUIMap.remove(start);
         pieceUIMap.put(destination, pieceUI);
 
-        showPieceMoving(
-                start,
-                destination,
-                pieceUI,
-                actionResult.isPromotion(),
-                () -> {
-                    if (toggleInputEnabled) {
-                        inputsDisabled = false;
-                    }
-                }
-        );
+        showPieceMoving(start, destination, pieceUI, actionResult.isPromotion(), onActionDone, App.PIECE_MOVE_DURATION);
 
         // Handle capture animation
         if (capturedPieceImg == null) {
             return;
         }
 
-        capturedPieceImg.setVisible(true);
-        capturedPieceImg.setScaleX(0);
-        capturedPieceImg.setScaleY(0);
-
         pieceUIMap.put(actionResult.getCaptureCoordinate(), capturedPieceImg);
 
-        ScaleTransition shrinkTrans = new ScaleTransition(
-                Duration.seconds(App.PIECE_MOVE_DURATION * 0.5),
-                capturedPieceImg
-        );
+        ScaleTransition shrinkTrans = new ScaleTransition(Duration.seconds(App.PIECE_MOVE_DURATION * 0.5), capturedPieceImg);
 
         shrinkTrans.setToX(0);
         shrinkTrans.setToY(0);
@@ -472,7 +459,7 @@ public class MainGameController {
         ScheduledExecutorService scheduler =
                 Executors.newSingleThreadScheduledExecutor();
 
-        double durationMs = App.PIECE_MOVE_DURATION * 1000;
+        double durationMs = App.PIECE_TAKEBACK_DURATION * 1000;
 
         int size = moveResult.getActionResults().size();
 
