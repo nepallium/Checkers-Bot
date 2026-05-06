@@ -64,6 +64,9 @@ public class MainGameController {
             System.out.println("No saved model found, using random weights");
         }
         mcts = new MCTS(neuralNet);
+        mcts.setSIMULATIONS(App.getMctsSimulations());
+
+        System.out.println("Simulations amount set to " + App.getMctsSimulations());
     }
 
     private void initializeSideBar() {

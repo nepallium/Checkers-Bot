@@ -13,7 +13,7 @@ import model.PolicyValue;
 public class MCTS {
 
     private static final double C_PUCT = 1.4;
-    private static final int SIMULATIONS = 100; // arbitrary number of simulations to run for every search of ONE ouputted prior policy
+    private int SIMULATIONS = 100; // arbitrary number of simulations to run for every search of ONE ouputted prior policy
 
     private NeuralNet net;
 
@@ -155,5 +155,13 @@ public class MCTS {
         if (playerToMoveWon) return 1.0;
         if (result == GameResult.WHITE_WIN || result == GameResult.BLACK_WIN) return -1.0;
         return 0.0;
+    }
+
+    public int getSIMULATIONS() {
+        return SIMULATIONS;
+    }
+
+    public void setSIMULATIONS(int SIMULATIONS) {
+        this.SIMULATIONS = SIMULATIONS;
     }
 }

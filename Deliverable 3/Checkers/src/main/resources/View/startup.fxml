@@ -15,7 +15,7 @@
                   <ToggleGroup fx:id="DifficultySelection" />
                </toggleGroup>
             </ToggleButton>
-            <ToggleButton fx:id="mediumButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onMediumButtonAction" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: 101930; -fx-text-fill: #FFFFFF; -fx-border-color: #FFFFFF; -fx-border-radius: 10; -fx-font-size: 16;" text="Medium" toggleGroup="$DifficultySelection" />
+            <ToggleButton fx:id="mediumButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onMediumButtonAction" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: 101930; -fx-text-fill: #FFFFFF; -fx-border-color: #FF0000; -fx-border-radius: 10; -fx-font-size: 16;" text="Medium" toggleGroup="$DifficultySelection" />
             <ToggleButton fx:id="hardButton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onHardButtonAction" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: 101930; -fx-text-fill: #FFFFFF; -fx-border-color: #FFFFFF; -fx-border-radius: 10; -fx-font-size: 16;" text="Hard" toggleGroup="$DifficultySelection" />
          </children>
       </HBox>

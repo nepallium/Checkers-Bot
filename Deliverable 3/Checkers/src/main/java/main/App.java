@@ -23,6 +23,8 @@ public class App {
     public static final String WHITE_GRID_COLOR = "#86a0e3";
     public static final double PIECE_MOVE_DURATION = 0.5;
 
+    private static int MCTS_SIMULATIONS;
+
     public static String getPieceImagePath(int piece) {
         if (Board.isPieceInvalid(piece)) {
             return "";
@@ -72,5 +74,13 @@ public class App {
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(fxmlLocation);
         return fxmlLoader.load();
+    }
+
+    public static int getMctsSimulations() {
+        return MCTS_SIMULATIONS;
+    }
+
+    public static void setMctsSimulations(int mctsSimulations) {
+        MCTS_SIMULATIONS = mctsSimulations;
     }
 }
