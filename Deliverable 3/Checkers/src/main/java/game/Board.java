@@ -142,7 +142,6 @@ public class Board {
             }
             ActionResult actionResult = applyAction(action, i < (moveActions.size() - 1));
             if (actionResult == null) {
-                System.out.printf("COULD NOT APPLY ACTION: %s", action);
                 return null;
             }
             moveResult.addAction(actionResult);
@@ -153,6 +152,7 @@ public class Board {
 
     /**
      * Applies an action to the game and checks for any changes in the game result
+     * !!! DOES NOT CHECK IF THE ACTION IS A VALID MOVE. PLEASE CHECK BEFORE.
      *
      * @param action action to apply
      * @return the action result or null
