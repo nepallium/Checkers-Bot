@@ -158,7 +158,10 @@ public class MainGameController {
     }
 
     private void selectCoordinate(Coordinate coordinate) {
-        if (inputsDisabled) return;
+        System.out.println("Inputs disabled :" + inputsDisabled);
+        if (inputsDisabled) {
+            return;
+        }
         if (board.isGameOver()) {
             System.out.println("Game over, no more moves can be made");
             return;
@@ -198,6 +201,7 @@ public class MainGameController {
             System.out.println("INVALID ACTION TO APPLY TO BOARD: " + action);
             return;
         }
+        boolean canStillPlay = board.hasForcedPieceCaptureCoordinate();
         //Update values relative to board
         boardActionSpaceState = board.getBoardActionSpace();
 
@@ -205,7 +209,7 @@ public class MainGameController {
         pieceUIMap.put(action.getDestination(), pieceUI);
 
         Coordinate captureCoordinate = action.getCaptureCoordinate();
-        showAction(actionResult, pieceUI, true);
+        showAction(actionResult, pieceUI, canStillPlay);
         //Check if is AI turn
         if (board.isGameOver() || (board.isWhiteToMove() == playerPlaysAsWhite)) {
             return;
@@ -237,11 +241,10 @@ public class MainGameController {
                 ActionResult actionResult = actionIdx < moveResult.getActionResults().size() ? moveResult.getActionResults().get(actionIdx) : null;
                 Runnable application = actionResult != null ? ()  -> {
                     Coordinate captureCoordinate = actionResult.getCaptureCoordinate();
-                    showAction(actionResult, pieceUI, false);
+                    showAction(actionResult, pieceUI, true);
                     this.accept(actionIdx + 1);
 
                 } : () -> {
-                    inputsDisabled = false;
                     actionScheduler.close();
                 };
 
@@ -297,6 +300,7 @@ public class MainGameController {
     private void doAIMove() {
         // run MCTS on a background thread so UI doesn't freeze
         Thread aiThread = new Thread(() -> {
+            inputsDisabled = true;
             double[][][] boardState = board.splitBoardChannels();
             Tuple<double[], List<Move>> output = mcts.run(board);
 
