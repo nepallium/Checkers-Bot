@@ -22,6 +22,7 @@ public class App {
     public static final String BLACK_GRID_COLOR = "#101930";
     public static final String WHITE_GRID_COLOR = "#86a0e3";
     public static final double PIECE_MOVE_DURATION = 0.5;
+    public static final double PIECE_TAKEBACK_DURATION = 0.25;
 
     private static int MCTS_SIMULATIONS;
 
