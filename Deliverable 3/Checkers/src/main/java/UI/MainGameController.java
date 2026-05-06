@@ -18,10 +18,7 @@ import mcts.MCTS;
 import model.NeuralNet;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -44,6 +41,8 @@ public class MainGameController {
     private final ImageView[] targetIcons = new ImageView[4];
     public Pane boardPane;
     public Pane boardParentPane;
+    private Stack<ImageView> capturedPieceUIs = new Stack<>();
+
 
     public ImageView homeImg;
     public ImageView undoImg;
@@ -51,24 +50,58 @@ public class MainGameController {
     private NeuralNet neuralNet;
     private MCTS mcts;
 
-    private void onUndoButtonPressed() {
-        System.out.println("Undo button pressed");
-        undoLastMove();
-        undoLastMove();
+    private void onUndoButtonPressed() throws InterruptedException {
+        if (inputsDisabled) {
+            return;
+        }
+        inputsDisabled = true;
+        Runnable undoSecondMove = () -> {
+            try {
+                boolean success = undoLastMove(() -> {
+                    inputsDisabled = false;
+                    boardActionSpaceState = board.getBoardActionSpace();
+                    showPieceActions();
+                    System.out.println(board);
+                });
+                if (!success) {
+                    inputsDisabled = false;
+                }
+            } catch (InterruptedException e) {
+                inputsDisabled = false;
+                throw new RuntimeException(e);
+            }
+        };
+        if (!undoLastMove(undoSecondMove)) {
+            inputsDisabled = false;
+        }
     }
+    private void undoActionResult(ActionResult actionResult, Runnable onActionUndone) {
+        Coordinate start = actionResult.getStart();
+        Coordinate destination = actionResult.getDestination();
 
-    private void undoActionResult(ActionResult actionResult) {
-        Coordinate actionDestination = actionResult.getDestination();
-        Coordinate actionStart = actionResult.getStart();
-        //Show the piece moving backwards
-        ImageView pieceUI = pieceUIMap.remove(actionDestination);
+        ImageView pieceUI = pieceUIMap.get(destination);
 
-        //then insert it into the Map of coordinates and pieces
-        pieceUIMap.put(actionStart, pieceUI);
-        System.out.printf("Undo: moving piece UI from (%s to %s)", actionDestination, actionStart);
-        //and show the ImageView of the piece that was captured
-        showPieceMoving(actionDestination, actionStart, pieceUI, true, actionResult.isPromotion());
+        pieceUIMap.remove(destination);
+        pieceUIMap.put(start, pieceUI);
+        showPieceMoving(destination, start, pieceUI, actionResult.isPromotion(),
+                onActionUndone
+        );
 
+        Coordinate capturedCoordinate = actionResult.getCaptureCoordinate();
+        if (capturedCoordinate != null) {
+            ImageView capturedPieceImg = capturedPieceUIs.pop();
+            pieceUIMap.put(capturedCoordinate, capturedPieceImg);
+            // restore visibility
+            capturedPieceImg.setVisible(true);
+
+            ScaleTransition scaleTransition = new ScaleTransition(
+                    Duration.seconds(App.PIECE_MOVE_DURATION * 0.5),
+                    capturedPieceImg
+            );
+            scaleTransition.setToX(1);
+            scaleTransition.setToY(1);
+            scaleTransition.play();
+        }
     }
 
 
@@ -89,7 +122,11 @@ public class MainGameController {
 
         System.out.println("Simulations amount set to " + App.getMctsSimulations());
         undoImg.setOnMouseClicked(e -> {
-            onUndoButtonPressed();
+            try {
+                onUndoButtonPressed();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
         });
     }
 
@@ -208,7 +245,6 @@ public class MainGameController {
         ImageView pieceUI = pieceUIMap.remove(action.getStart());
         pieceUIMap.put(action.getDestination(), pieceUI);
 
-        Coordinate captureCoordinate = action.getCaptureCoordinate();
         showAction(actionResult, pieceUI, canStillPlay);
         //Check if is AI turn
         if (board.isGameOver() || (board.isWhiteToMove() == playerPlaysAsWhite)) {
@@ -253,51 +289,106 @@ public class MainGameController {
         };
         actionApplication.accept(0);
     }
-    private void showPieceMoving(Coordinate start, Coordinate destination, ImageView movingPieceImg, boolean toggleInputEnabled, boolean isPromotion) {
-        TranslateTransition moveTrans = new TranslateTransition(Duration.seconds(App.PIECE_MOVE_DURATION));
-        moveTrans.setNode(movingPieceImg);
+    private void showPieceMoving(
+            Coordinate start,
+            Coordinate destination,
+            ImageView movingPieceImg,
+            boolean isPromotion,
+            Runnable onFinished
+    ) {
         Tuple<Double, Double> layoutXY1 = getLayoutAtBoardCoordinate(start);
         Tuple<Double, Double> layoutXY2 = getLayoutAtBoardCoordinate(destination);
+
+        double dx = layoutXY2.e1 - layoutXY1.e1;
+        double dy = layoutXY2.e2 - layoutXY1.e2;
+
+        TranslateTransition moveTrans = new TranslateTransition(
+                Duration.seconds(App.PIECE_MOVE_DURATION),
+                movingPieceImg
+        );
+
         moveTrans.setByX(layoutXY2.e1 - layoutXY1.e1);
         moveTrans.setByY(layoutXY2.e2 - layoutXY1.e2);
+
         moveTrans.setOnFinished(e -> {
-            if (toggleInputEnabled) {
-                inputsDisabled = false;
-            }
             if (isPromotion) {
-                movingPieceImg.setImage(new Image(App.getPieceImagePath(board.getPieceAt(destination))));
+                movingPieceImg.setImage(
+                        new Image(App.getPieceImagePath(board.getPieceAt(destination)))
+                );
+            }
+
+            if (onFinished != null) {
+                onFinished.run();
             }
         });
+
         moveTrans.play();
     }
 
     private void showAction(ActionResult actionResult, ImageView pieceUI, boolean toggleInputEnabled) {
 
-        ImageView capturedPieceImg = actionResult.getCaptureCoordinate() == null ? null : pieceUIMap.remove(actionResult.getCaptureCoordinate());
-        //Temporarily disable inputs while the UI is moving if should
+        Coordinate start = actionResult.getStart();
+        Coordinate destination = actionResult.getDestination();
+
+        ImageView capturedPieceImg = actionResult.getCaptureCoordinate() == null
+                ? null
+                : pieceUIMap.remove(actionResult.getCaptureCoordinate());
+        if (capturedPieceImg != null) {
+            capturedPieceUIs.add(capturedPieceImg);
+        }
         if (toggleInputEnabled) {
             inputsDisabled = true;
         }
-        //Transition for moving the piece
+        pieceUIMap.remove(start);
+        pieceUIMap.put(destination, pieceUI);
 
-        showPieceMoving(actionResult.getStart(), actionResult.getDestination(), pieceUI, toggleInputEnabled, actionResult.isPromotion());
+        showPieceMoving(
+                start,
+                destination,
+                pieceUI,
+                actionResult.isPromotion(),
+                () -> {
+                    if (toggleInputEnabled) {
+                        inputsDisabled = false;
+                    }
+                }
+        );
 
-
-        //Transition for hiding captured piece
+        // Handle capture animation
         if (capturedPieceImg == null) {
             return;
         }
-        ScaleTransition shrinkTrans = new ScaleTransition(Duration.seconds(App.PIECE_MOVE_DURATION * 0.5));
+
+        capturedPieceImg.setVisible(true);
+        capturedPieceImg.setScaleX(0);
+        capturedPieceImg.setScaleY(0);
+
+        pieceUIMap.put(actionResult.getCaptureCoordinate(), capturedPieceImg);
+
+        ScaleTransition shrinkTrans = new ScaleTransition(
+                Duration.seconds(App.PIECE_MOVE_DURATION * 0.5),
+                capturedPieceImg
+        );
+
         shrinkTrans.setToX(0);
         shrinkTrans.setToY(0);
-        shrinkTrans.setNode(capturedPieceImg);
+
         shrinkTrans.setOnFinished(e -> {
             capturedPieceImg.setVisible(false);
         });
+
         shrinkTrans.play();
     }
-
     private void doAIMove() {
+        Consumer<Move> playMove = (Move move ) -> {
+            javafx.application.Platform.runLater(() -> {
+                try {
+                    applyMoveToBoard(move);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        };
         // run MCTS on a background thread so UI doesn't freeze
         Thread aiThread = new Thread(() -> {
             inputsDisabled = true;
@@ -313,14 +404,8 @@ public class MainGameController {
             }
 
             Move bestMove = output.e2.get(best);
+            playMove.accept(bestMove);
 
-            javafx.application.Platform.runLater(() -> {
-                try {
-                    applyMoveToBoard(bestMove);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
         });
         aiThread.setDaemon(true);
         aiThread.start();
@@ -329,9 +414,11 @@ public class MainGameController {
     private void showPieceActions() {
         for (Coordinate coordinate : pieceUIMap.keySet()) {
             ImageView pieceImg = pieceUIMap.get(coordinate);
+            if (pieceImg == null) {
+                continue;
+            }
             pieceImg.setEffect(boardActionSpaceState.e2.get(coordinate) == null || !boardActionSpaceState.e1 ? PIECE_DEFAULT_EFFECT : PIECE_FORCED_ACTION_EFFECT);
         }
-
     }
 
     private void setSelectedPieceCoordinate(Coordinate coordinate) {
@@ -368,15 +455,38 @@ public class MainGameController {
         }
     }
 
-    private boolean undoLastMove() {
+    /**
+     * Undoes the last move if possible
+     * @param onLastActionUndone runnable to call when the last action is done
+     * @return if it was successful or not (false if no actions to undo found)
+     * @throws InterruptedException if the application quits
+     */
+    private boolean undoLastMove(Runnable onLastActionUndone) throws InterruptedException {
+
         Tuple<Boolean, MoveResult> undoQuery = board.undoLastMove();
         if (!undoQuery.e1 || undoQuery.e2 == null) {
             return false;
         }
         MoveResult moveResult = undoQuery.e2;
-        for (int i = moveResult.getActionResults().size() - 1; i >= 0; i--) {
-            undoActionResult(moveResult.getActionResults().get(i));
+
+        ScheduledExecutorService scheduler =
+                Executors.newSingleThreadScheduledExecutor();
+
+        double durationMs = App.PIECE_MOVE_DURATION * 1000;
+
+        int size = moveResult.getActionResults().size();
+
+        for (int i = size - 1; i >= 0; i--) {
+            final int index = i;
+            scheduler.schedule(() -> {
+                javafx.application.Platform.runLater(() -> {
+                    undoActionResult(moveResult.getActionResults().get(index), onLastActionUndone);
+                });
+            }, (long) (durationMs * (size - 1 - index)), TimeUnit.MILLISECONDS);
         }
+
+        scheduler.schedule(scheduler::shutdown, (long) (durationMs * size), TimeUnit.MILLISECONDS);
+
         return true;
     }
 
