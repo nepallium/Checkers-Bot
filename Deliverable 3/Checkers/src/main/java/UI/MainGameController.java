@@ -51,6 +51,27 @@ public class MainGameController {
     private NeuralNet neuralNet;
     private MCTS mcts;
 
+    private void onUndoButtonPressed() {
+        System.out.println("Undo button pressed");
+        undoLastMove();
+        undoLastMove();
+    }
+
+    private void undoActionResult(ActionResult actionResult) {
+        Coordinate actionDestination = actionResult.getDestination();
+        Coordinate actionStart = actionResult.getStart();
+        //Show the piece moving backwards
+        ImageView pieceUI = pieceUIMap.remove(actionDestination);
+
+        //then insert it into the Map of coordinates and pieces
+        pieceUIMap.put(actionStart, pieceUI);
+        System.out.printf("Undo: moving piece UI from (%s to %s)", actionDestination, actionStart);
+        //and show the ImageView of the piece that was captured
+        showPieceMoving(actionDestination, actionStart, pieceUI, true, actionResult.isPromotion());
+
+    }
+
+
     @FXML
     private void initialize() {
         initializeSideBar();
@@ -67,6 +88,9 @@ public class MainGameController {
         mcts.setSIMULATIONS(App.getMctsSimulations());
 
         System.out.println("Simulations amount set to " + App.getMctsSimulations());
+        undoImg.setOnMouseClicked(e -> {
+            onUndoButtonPressed();
+        });
     }
 
     private void initializeSideBar() {
@@ -350,16 +374,6 @@ public class MainGameController {
             undoActionResult(moveResult.getActionResults().get(i));
         }
         return true;
-    }
-
-    private void undoActionResult(ActionResult actionResult) {
-        Coordinate actionDestination = actionResult.getDestination();
-        Coordinate actionStart = actionResult.getStart();
-        //Show the piece moving backwards
-        //and show the ImageView of the piece that was captured
-        //then insert it into the Map of coordinates and pieces
-
-
     }
 
 
