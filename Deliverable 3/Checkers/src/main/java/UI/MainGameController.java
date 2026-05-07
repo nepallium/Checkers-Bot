@@ -7,6 +7,7 @@ import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
@@ -43,7 +44,6 @@ public class MainGameController {
     public Pane boardParentPane;
     private Stack<ImageView> capturedPieceUIs = new Stack<>();
 
-
     public ImageView homeImg;
     public ImageView undoImg;
 
@@ -59,7 +59,7 @@ public class MainGameController {
             try {
                 boolean success = undoLastMove(() -> {
                     inputsDisabled = false;
-                    boardActionSpaceState = board.getBoardActionSpace();
+                    updateBoardState();
                     showPieceActions();
                     System.out.println(board);
                 });
@@ -110,7 +110,7 @@ public class MainGameController {
 
         neuralNet = new NeuralNet(12);
         try {
-            neuralNet.load("checkersModel.bin");
+            neuralNet.load(App.NEURAL_NET_PATH);
             System.out.println("Model loaded!!");
         } catch (IOException e) {
             System.out.println("No saved model found, using random weights");
@@ -193,7 +193,6 @@ public class MainGameController {
     }
 
     private void selectCoordinate(Coordinate coordinate) {
-        System.out.println("Inputs disabled :" + inputsDisabled);
         if (inputsDisabled) {
             return;
         }
@@ -229,16 +228,33 @@ public class MainGameController {
         setSelectedPieceCoordinate(coordinate);
     }
 
+    private void updateBoardState() {
+        boardActionSpaceState = board.getBoardActionSpace();
+        if (boardActionSpaceState == null) { //GAME OVER
+            inputsDisabled = true;
+            Arrays.stream(targetIcons).toList().forEach((ImageView target) -> {
+                target.setVisible(false);
+            });
+            pieceUIMap.forEach((Coordinate coord, ImageView pieceUI) -> {
+                pieceUI.setEffect(PIECE_DEFAULT_EFFECT);
+            });
+            GameResult gameResult = board.getGameResult();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("GAME OVER");
+            alert.setHeaderText(gameResult.getMessageText());
+            alert.setContentText("Good game");
 
+            alert.showAndWait();
+        }
+    }
     private void applyActionToBoard(Action action) {
         ActionResult actionResult = board.applyAction(action, true);
         if (actionResult == null) {
             System.out.println("INVALID ACTION TO APPLY TO BOARD: " + action);
             return;
         }
+        updateBoardState();
         boolean canStillPlay = board.hasForcedPieceCaptureCoordinate();
-        //Update values relative to board
-        boardActionSpaceState = board.getBoardActionSpace();
 
         ImageView pieceUI = pieceUIMap.remove(action.getStart());
         pieceUIMap.put(action.getDestination(), pieceUI);
@@ -264,7 +280,7 @@ public class MainGameController {
             System.out.println("INVALID MOVE TO APPLY TO BOARD " + move);
             return;
         }
-        boardActionSpaceState = board.getBoardActionSpace();
+        updateBoardState();
         inputsDisabled = true;
         ImageView pieceUI = pieceUIMap.remove(moveResult.getStart());
         pieceUIMap.put(move.getDestination(), pieceUI);

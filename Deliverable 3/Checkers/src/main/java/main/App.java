@@ -23,7 +23,7 @@ public class App {
     public static final String WHITE_GRID_COLOR = "#86a0e3";
     public static final double PIECE_MOVE_DURATION = 0.5;
     public static final double PIECE_TAKEBACK_DURATION = 0.25;
-
+    public static final String NEURAL_NET_PATH = "/data/checkersModel.bin";
     private static int MCTS_SIMULATIONS;
 
     public static String getPieceImagePath(int piece) {

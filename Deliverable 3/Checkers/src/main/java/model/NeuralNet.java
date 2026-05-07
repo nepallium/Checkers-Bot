@@ -246,8 +246,7 @@ public class NeuralNet {
      * @param filePath path to load the model from
      */
     public void load(String filePath) throws IOException {
-        try (DataInputStream dis = new DataInputStream(
-                new BufferedInputStream(new FileInputStream(filePath)))) {
+        try (DataInputStream dis = new DataInputStream(new BufferedInputStream(NeuralNet.class.getResourceAsStream(filePath)))) {
 
             loadConvLayer(dis, firstLayer);
 

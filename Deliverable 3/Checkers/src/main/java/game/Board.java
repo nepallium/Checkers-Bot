@@ -283,7 +283,7 @@ public class Board {
         }
         if (forcedPieceCaptureCoordinate != null) {
             List<Action> actionSpace = getPieceActionSpace(forcedPieceCaptureCoordinate, getPieceAt(forcedPieceCaptureCoordinate)).e1;
-            return new Tuple<>(true, actionSpace.isEmpty() ? new HashMap<>() : new HashMap<>(Map.of(forcedPieceCaptureCoordinate, actionSpace) )) ;
+            return new Tuple<>(true, actionSpace.isEmpty() ? new HashMap<>() : new HashMap<>(Map.of(forcedPieceCaptureCoordinate, actionSpace)));
         }
         Map<Coordinate, List<Action>> captureActions = new HashMap<>();
         Map<Coordinate, List<Action>> nonCaptureActions = new HashMap<>();

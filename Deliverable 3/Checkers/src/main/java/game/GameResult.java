@@ -12,4 +12,13 @@ public enum GameResult {
         }
         return this;
     }
+
+    public String getMessageText() {
+        return switch (this) {
+            case WHITE_WIN -> "White Victory";
+            case BLACK_WIN -> "Black Victory";
+            case DRAW -> "Draw";
+            case ONGOING -> "Game Ongoing";
+        };
+    }
 }

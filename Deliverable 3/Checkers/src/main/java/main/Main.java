@@ -24,7 +24,6 @@ public class Main {
     	System.out.println("Working.....");
         NeuralNet net = new NeuralNet(12);
 
-//        net.load("src/main/data/checkersModel.bin");
 
         Trainer trainer = new Trainer(net);
         SelfPlay selfPlay = new SelfPlay(net);

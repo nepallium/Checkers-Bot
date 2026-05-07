@@ -1,6 +1,7 @@
 package game;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.io.File;
 
@@ -64,7 +65,7 @@ public class Move {
     }
 
     /// GLOBAL ACTION SPACE
-    public static final String GLOBAL_MOVE_SPACE_FILE_PATH = "src/main/data/GlobalMoveSpace.csv";
+    public static final String GLOBAL_MOVE_SPACE_FILE_PATH = "data/GlobalMoveSpace.csv";
     public static final int GLOBAL_MOVE_SPACE_SIZE = 1426;
     public static final Move[] GLOBAL_MOVE_SPACE = new Move[GLOBAL_MOVE_SPACE_SIZE];
 
@@ -82,8 +83,7 @@ public class Move {
      * Sets the global move space array with the CSV file of the global move space
      */
     private static void setGlobalMoveSpace() {
-        File file = new File(GLOBAL_MOVE_SPACE_FILE_PATH);
-        try (Scanner scanner = new Scanner(file)) {
+        try (InputStream input = Move.class.getResourceAsStream("/data/GlobalMoveSpace.csv"); Scanner scanner = new Scanner(input)) {
             for (int i = 0; i < GLOBAL_MOVE_SPACE_SIZE; i++) {
                 String line = scanner.nextLine();
                 String[] split = line.split(",");
