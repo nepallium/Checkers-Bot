@@ -4,6 +4,7 @@ import Util.Tuple;
 import game.*;
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -494,6 +495,16 @@ public class MainGameController {
         imgView.setFitHeight(GRID_ENTRY_SIDE_LENGTH);
         imgView.setMouseTransparent(true);
         return imgView;
+    }
+
+    @FXML
+    private void handleExit() {
+        Platform.exit();
+    }
+
+    @FXML
+    private void handlePreferences() {
+        App.setScene("preferences.fxml");
     }
 
 }

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -7,6 +10,22 @@
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane style="-fx-background-color: #101930;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.MainGameController">
+   <top>
+      <MenuBar style="-fx-background-color: #1e2d4a; -fx-text-fill: white;">
+         <menus>
+            <Menu text="File" style="-fx-text-fill: white;">
+               <items>
+                  <MenuItem text="Exit" onAction="#handleExit" />
+               </items>
+            </Menu>
+            <Menu text="Settings" style="-fx-text-fill: white;">
+               <items>
+                  <MenuItem text="Preferences" onAction="#handlePreferences" />
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+   </top>
    <center>
       <Pane style="-fx-background-color: #101930;">
          <children>
@@ -15,7 +34,8 @@
                   <Pane fx:id="boardParentPane" prefHeight="800.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                      <children>
                         <Pane fx:id="boardPane" prefHeight="800.0" prefWidth="800.0" />
-                     </children></Pane>
+                     </children>
+                  </Pane>
                </center>
                <left>
                   <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
@@ -23,7 +43,8 @@
                         <ImageView fx:id="homeImg" fitHeight="70.0" fitWidth="73.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../Images/home.png" />
-                           </image></ImageView>
+                           </image>
+                        </ImageView>
                         <ImageView fx:id="undoImg" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../Images/undo.png" />
