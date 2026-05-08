@@ -76,13 +76,21 @@ public class Move {
      */
     public static void init() {
         if (GLOBAL_MOVE_SPACE[0] != null) {
+            System.out.println("GlobalMoveSpace already loaded, skipping.");
             return;
         }
 
         try {
             setGlobalMoveSpace();
         } catch (Exception err) {
-            System.err.println("ERROR: " + err.getMessage());
+            System.err.println("ERROR loading GlobalMoveSpace: " + err.getMessage());
+            err.printStackTrace();
+        }
+
+        if (GLOBAL_MOVE_SPACE[0] == null) {
+            System.err.println("LOAD FAILED — GLOBAL_MOVE_SPACE[0] is still null after init()");
+        } else {
+            System.out.println("LOAD OK — GLOBAL_MOVE_SPACE[0] = " + GLOBAL_MOVE_SPACE[0]);
         }
     }
 
@@ -95,7 +103,11 @@ public class Move {
 
             for (int i = 0; i < GLOBAL_MOVE_SPACE_SIZE; i++) {
                 String[] split = reader.readNext();
-                int[] nums = Arrays.stream(split).mapToInt(Integer::parseInt).toArray();
+                int[] nums = Arrays.stream(split)
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .mapToInt(Integer::parseInt)
+                        .toArray();
                 List<Action> actions = new ArrayList<>();
                 for (int j = 0; j + 4 <= nums.length; j += 4) {
                     actions.add(new Action(

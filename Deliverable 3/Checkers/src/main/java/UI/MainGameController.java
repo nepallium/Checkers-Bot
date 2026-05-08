@@ -105,6 +105,7 @@ public class MainGameController {
 
     @FXML
     private void initialize() {
+        Move.init();
         initializeSideBar();
         initializeBoard();
 

@@ -3,3 +3,5 @@ email,password_hash
 "johndoe2@gmail.com","$2a$10$8JFoeTXRn5tHw9dOuyuqMOgCVgWv35OD.gX.PCZJQsyE.v8DcAMni"
 "email@email.email","$2a$10$7ArP8n1sZCTDtj3sKdVP8uhPh6oZ.cnuXtid0l3TLZszrwqwhooVK"
 "1@1.1","$2a$10$UijlFQOplYgaVvxr5isLTehUNEgsHXUZyYhMrOfe8e2NFwxhOf8hO"
+"123","$2a$10$uHIJWl9/YEOEeJdvg1wi3./dEZh1KMIVCpimvkgdJ1a1PMeNHv1m2"
+"123123","$2a$10$wNwknuNlZpSVZSH2Ak203eTgh.w.cJTnrkB1hOcqt0Ba.yywFvlxq"
