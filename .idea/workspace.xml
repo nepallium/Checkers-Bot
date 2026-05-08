@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="73bd672d-c493-4f66-942a-e601d590e4c1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Deliverable 3/Checkers/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Deliverable 3/Checkers/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="73bd672d-c493-4f66-942a-e601d590e4c1" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -28,17 +26,16 @@
     &quot;assignee&quot;: &quot;sebastianbo2&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/adinashby-vanier-college/integrative-project-in-csm-project-coding-party.git&quot;,
-    &quot;accountId&quot;: &quot;7145c702-0960-4b9e-9544-11e42ca25d06&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/adinashby-vanier-college/integrative-project-in-csm-project-coding-party.git",
+    "accountId": "800ba97e-4247-4f20-88ec-8cb0f02f5082"
   }
-}</component>
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
   <component name="ProjectId" id="39OWXW2pgtZsqiyTR6EK70mcJQ0" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
