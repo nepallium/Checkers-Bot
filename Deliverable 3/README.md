@@ -111,8 +111,8 @@ Changes apply immediately and are saved for future sessions.
 
 ---
 
-## Notes
+## JAR Launch
 
-- The bot's move is computed automatically after you complete yours. A brief delay may occur on **Hard** difficulty while the bot thinks.
-- Kings are visually distinguished from regular pieces by a crown marker.
-- The game will notify you when it ends — win, loss, or draw — and offer the option to play again.
+To run the project using the compiled jar file, use this command :
+
+["C:\Program Files\Java\jdk-22\bin\java.exe" --module-path "C:\Users\6305020\javafx-sdk-21.0.11\lib" --add-modules javafx.controls,javafx.fxml,javafx.graphics -jar Checkers-1.0-SNAPSHOT.jar]
