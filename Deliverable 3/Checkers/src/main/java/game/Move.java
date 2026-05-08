@@ -90,23 +90,24 @@ public class Move {
      * Sets the global move space array with the CSV file of the global move space
      */
     private static void setGlobalMoveSpace() throws IOException {
-        try (CSVReader reader = new CSVReader(new FileReader(GLOBAL_MOVE_SPACE_FILE_PATH))) {
+        try (InputStream is = Move.class.getResourceAsStream("/data/GlobalMoveSpace.csv");
+             CSVReader reader = new CSVReader(new InputStreamReader(Objects.requireNonNull(is)))) {
+
             for (int i = 0; i < GLOBAL_MOVE_SPACE_SIZE; i++) {
                 String[] split = reader.readNext();
                 int[] nums = Arrays.stream(split).mapToInt(Integer::parseInt).toArray();
                 List<Action> actions = new ArrayList<>();
-                for (int j = 0; j >= 0; j += 4) {
-                    if (nums.length < j + 4) {
-                        break;
-                    }
-                    actions.add(new Action(new Coordinate(nums[j], nums[j + 1]), new Coordinate(nums[j + 2], nums[j + 3])));
+                for (int j = 0; j + 4 <= nums.length; j += 4) {
+                    actions.add(new Action(
+                            new Coordinate(nums[j],     nums[j + 1]),
+                            new Coordinate(nums[j + 2], nums[j + 3])
+                    ));
                 }
                 GLOBAL_MOVE_SPACE[i] = new Move(actions);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
         } catch (CsvValidationException e) {
-            System.err.println("ERROR: " + e.getMessage());;
+            System.err.println("ERROR: " + e.getMessage());
         }
     }
 
