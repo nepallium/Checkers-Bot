@@ -1,0 +1,10 @@
+model\ResidualBlockTest.class
+training\TrainingExampleTest.class
+model\LossFunctionsTest.class
+training\ReplayBufferTest.class
+model\ConvolutionalLayerTest.class
+training\TrainingTestSupport.class
+training\TrainingIntegrationTest.class
+model\DenseLayerTest.class
+model\ActivationTest.class
+model\NeuralNetUtilsTest.class

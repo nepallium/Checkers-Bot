@@ -1,0 +1,4 @@
+--patch-module
+org.example.checkers=_
+--add-reads
+org.example.checkers=ALL-UNNAMED

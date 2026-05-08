@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane style="-fx-background-color: #101930;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.MainGameController">
+   <top>
+      <MenuBar fx:id="menuBar" style="-fx-background-color: #1a2540;">
+         <menus>
+            <Menu style="-fx-text-fill: #FFFFFF;" text="File">
+               <items>
+                  <MenuItem onAction="#onExitMenuItemClicked" text="Exit" />
+               </items>
+            </Menu>
+            <Menu style="-fx-text-fill: #FFFFFF;" text="Settings">
+               <items>
+                  <MenuItem onAction="#onPreferencesMenuItemClicked" text="Preferences" />
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+   </top>
+   <center>
+      <Pane style="-fx-background-color: #101930;">
+         <children>
+            <BorderPane style="-fx-background-color: #101930;">
+               <center>
+                  <Pane fx:id="boardParentPane" prefHeight="800.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Pane fx:id="boardPane" prefHeight="800.0" prefWidth="800.0" />
+                     </children></Pane>
+               </center>
+               <left>
+                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <ImageView fx:id="undoImg" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../Images/undo.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </VBox>
+               </left>
+            </BorderPane>
+         </children>
+      </Pane>
+   </center>
+</BorderPane>

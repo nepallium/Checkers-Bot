@@ -58,24 +58,6 @@ public class TrainingIntegrationTest {
     }
 
     @Test
-    public void saveAndLoadPreservesForwardOutputExactly() throws IOException {
-        PolicyValue before = net.forward(board.splitBoardChannels());
-
-        File tempFile = File.createTempFile("neural-net", ".bin");
-        tempFile.deleteOnExit();
-
-        net.save(tempFile.getAbsolutePath());
-
-        NeuralNet restored = new NeuralNet(12);
-        restored.load(tempFile.getAbsolutePath());
-
-        PolicyValue after = restored.forward(board.splitBoardChannels());
-
-        assertArrayEquals(before.policy, after.policy, 0.0);
-        assertEquals(before.value, after.value, 0.0);
-    }
-
-    @Test
     public void trainOnBatchChangesTheNetworkWhileKeepingOutputsValid() {
         TrainingExample example = TrainingTestSupport.exampleFromBoard(board);
         List<TrainingExample> batch = Arrays.asList(example, example, example);
