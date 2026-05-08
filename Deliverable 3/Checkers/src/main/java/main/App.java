@@ -18,6 +18,7 @@ public class App {
     private static final String WHITE_KING_IMAGE_PATH = "King_Cheems_Cropped_Light_Theme.png";
     private static final String BLACK_MAN_IMAGE_PATH = "Samurai_Cheems_Cropped_Dark_Theme.png";
     private static final String BLACK_KING_IMAGE_PATH = "King_Cheems_Cropped_Dark_Theme.png";
+    public static final String TARGET_X_IMAGE_PATH = "x.png";
     public static final String TARGET_ICON_IMAGE_PATH = "target.png";
     public static final String BLACK_GRID_COLOR = "#101930";
     public static final String WHITE_GRID_COLOR = "#86a0e3";
@@ -52,6 +53,7 @@ public class App {
                     scene.getStylesheets().add(authStylesheet.toExternalForm());
                 }
             }
+            scene.getStylesheets().add(App.class.getResource("/styles/auth.css").toExternalForm());
             stage.setScene(scene);
             return true;
         } catch (IOException e) {

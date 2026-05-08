@@ -80,3 +80,23 @@
   -fx-text-fill: #ffb3b3;
   -fx-font-weight: 600;
 }
+
+.menu-bar {
+    -fx-background-color: #1a2540;
+}
+
+.menu-bar .label {
+    -fx-text-fill: white;
+}
+
+.context-menu {
+    -fx-background-color: #1a2540;
+}
+
+.menu-item .label {
+    -fx-text-fill: white;
+}
+
+.menu-item:focused {
+    -fx-background-color: #2e3f6e;
+}
