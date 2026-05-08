@@ -11,7 +11,7 @@
 
 <VBox spacing="16.0" style="-fx-background-color: #1a2540; -fx-padding: 24;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.PreferencesController">
     <children>
-        
+
         <Label text="Piece Style" style="-fx-text-fill: #aab4cc; -fx-font-size: 11px; -fx-font-weight: bold;" />
         <HBox spacing="16.0">
             <children>
