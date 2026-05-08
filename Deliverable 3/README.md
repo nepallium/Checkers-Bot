@@ -115,4 +115,7 @@ Changes apply immediately and are saved for future sessions.
 
 To run the project using the compiled jar file, use this command :
 
-["C:\Program Files\Java\jdk-22\bin\java.exe" --module-path "C:\Users\6305020\javafx-sdk-21.0.11\lib" --add-modules javafx.controls,javafx.fxml,javafx.graphics -jar Checkers-1.0-SNAPSHOT.jar]
+
+"""bash
+C:\Program Files\Java\jdk-22\bin\java.exe" --module-path "C:\Users\6305020\javafx-sdk-21.0.11\lib" --add-modules javafx.controls,javafx.fxml,javafx.graphics -jar Checkers-1.0-SNAPSHOT.jar
+"""
