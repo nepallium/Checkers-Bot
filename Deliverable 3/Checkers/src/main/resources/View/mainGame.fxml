@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
 
 <BorderPane style="-fx-background-color: #101930;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="UI.MainGameController">
    <top>
       <MenuBar fx:id="menuBar" style="-fx-background-color: #1a2540;">
          <menus>
-            <Menu text="File" style="-fx-text-fill: #FFFFFF;">
+            <Menu style="-fx-text-fill: #FFFFFF;" text="File">
                <items>
-                  <MenuItem text="Exit" onAction="#onExitMenuItemClicked" />
+                  <MenuItem onAction="#onExitMenuItemClicked" text="Exit" />
                </items>
             </Menu>
-            <Menu text="Settings" style="-fx-text-fill: #FFFFFF;">
+            <Menu style="-fx-text-fill: #FFFFFF;" text="Settings">
                <items>
-                  <MenuItem text="Preferences" onAction="#onPreferencesMenuItemClicked" />
+                  <MenuItem onAction="#onPreferencesMenuItemClicked" text="Preferences" />
                </items>
             </Menu>
          </menus>
@@ -39,10 +39,6 @@
                <left>
                   <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
                      <children>
-                        <ImageView fx:id="homeImg" fitHeight="70.0" fitWidth="73.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../Images/home.png" />
-                           </image></ImageView>
                         <ImageView fx:id="undoImg" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../Images/undo.png" />
