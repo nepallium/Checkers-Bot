@@ -1,9 +1,11 @@
 package game;
 
-import java.io.IOException;
-import java.io.InputStream;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.opencsv.exceptions.CsvValidationException;
+
+import java.io.*;
 import java.util.*;
-import java.io.File;
 
 public class Move {
     private final List<Action> actions;
@@ -76,17 +78,21 @@ public class Move {
         if (GLOBAL_MOVE_SPACE[0] != null) {
             return;
         }
-        setGlobalMoveSpace();
+
+        try {
+            setGlobalMoveSpace();
+        } catch (Exception err) {
+            System.err.println("ERROR: " + err.getMessage());
+        }
     }
 
     /**
      * Sets the global move space array with the CSV file of the global move space
      */
-    private static void setGlobalMoveSpace() {
-        try (InputStream input = Move.class.getResourceAsStream("/data/GlobalMoveSpace.csv"); Scanner scanner = new Scanner(input)) {
+    private static void setGlobalMoveSpace() throws IOException {
+        try (CSVReader reader = new CSVReader(new FileReader(GLOBAL_MOVE_SPACE_FILE_PATH))) {
             for (int i = 0; i < GLOBAL_MOVE_SPACE_SIZE; i++) {
-                String line = scanner.nextLine();
-                String[] split = line.split(",");
+                String[] split = reader.readNext();
                 int[] nums = Arrays.stream(split).mapToInt(Integer::parseInt).toArray();
                 List<Action> actions = new ArrayList<>();
                 for (int j = 0; j >= 0; j += 4) {
@@ -99,6 +105,8 @@ public class Move {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (CsvValidationException e) {
+            System.err.println("ERROR: " + e.getMessage());;
         }
     }
 
